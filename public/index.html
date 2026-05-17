@@ -1,61 +1,76 @@
 <!doctype html>
-<html>
+<html lang="ar">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/public/logo-left.png" type="image/png">
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>School Activity Registration</title>
+  <link rel="icon" href="/public/logo-left.png" type="image/png">
   <link rel="stylesheet" href="/public/styles.css">
 
   <style>
-    body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+    /* Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  background: url('/public/logo mahragan.png') no-repeat center center ;
-  background-size:contain;
-}
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #f2f2f2;
+    }
 
     .center-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+      text-align: center;
+    }
 
-  background: rgba(255, 255, 255, 0);
-}
+    .box {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+      margin: 0 auto;
+    }
 
-   .box {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.8); /* transparency */
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+    .box h1 {
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
 
-    h1 {
-      margin-bottom: 30px;
+    .logo {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 150px;
+      height: auto;
     }
 
     .btn {
       display: block;
-      width: 250px;
-      margin: 10px auto;
+      width: 100%;
+      margin: 10px 0;
       padding: 12px;
       font-size: 16px;
       border-radius: 8px;
       text-decoration: none;
       color: white;
+      background-color: #052642;
+      transition: background 0.3s;
     }
 
-    .register { background: #052642; }
-    .student { background: #052642; }
+    .btn:hover {
+      background-color: #03406b;
+    }
 
-    /* Bottom section */
     .bottom-section {
-      margin-top: 200px;
+      margin-top: 30px;
       text-align: center;
-      padding-bottom: 40px;
     }
 
     .teacher-small {
@@ -66,36 +81,40 @@
       color: white;
       border-radius: 6px;
       text-decoration: none;
+      transition: background 0.3s;
     }
 
     .teacher-small:hover {
       background: #666;
     }
+
+    footer.app-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+    }
   </style>
 </head>
-
 <body>
 
   <div class="center-container">
     <div class="box">
+      <!-- Logo -->
+      <img src="/public/logo mahragan.png" alt="Coptech Logo" class="logo">
+
       <h1>مهرجان حبة حنطة</h1>
 
-      <a class="btn register" href="/public/register.html">
- إنشاء حساب      </a>
-
-      <a class="btn student" href="/public/student-login.html">
-تسجيل دخول   
-   </a>
+      <a class="btn register" href="/public/register.html">إنشاء حساب</a>
+      <a class="btn student" href="/public/student-login.html">تسجيل دخول</a>
     </div>
   </div>
 
-  <!-- Scroll down area -->
   <div class="bottom-section">
-    <a class="teacher-small" href="/public/teacher-login.html">
-      Servant Login
-    </a>
+    <a class="teacher-small" href="/public/teacher-login.html">Servant Login</a>
   </div>
 
-<footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
+  <footer class="app-footer">© 2026 CoptechAi. All rights reserved.</footer>
+
 </body>
 </html>
