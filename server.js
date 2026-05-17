@@ -10,6 +10,7 @@ const path = require('path');
 const { Storage } = require('@google-cloud/storage');
 const multer = require('multer');
 const { requireTeacher } = require('./middleware/auth');
+
 const teacherRoutes = require('./routes/teachers');
 const authRoutes = require('./routes/auth');
 const studentRoutes = require('./routes/students');
@@ -19,7 +20,7 @@ const teamRoutes = require('./routes/teams');
 
 const app = express();
 
-// ===== GCS Setup =====
+// ===== Google Cloud Storage setup =====
 const storage = new Storage({
   projectId: process.env.GCLOUD_PROJECT_ID,
   credentials: JSON.parse(process.env.GCLOUD_KEY_JSON),
@@ -37,6 +38,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Sanitize all input
 app.use((req, res, next) => {
   req.body = mongoSanitize(req.body);
   req.query = mongoSanitize(req.query);
@@ -44,23 +46,28 @@ app.use((req, res, next) => {
   next();
 });
 
+// Rate limiting
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
   message: { error: 'محاولات كثيرة. حاول مرة أخرى لاحقًا.' },
 });
-
 app.use('/api/auth', authLimiter);
 app.use('/api/students/register', authLimiter);
 
-// ===== Session =====
+// ===== Session setup =====
 app.use(
   session({
     secret: process.env.SESSION_SECRET || 'change-this-secret',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: MONGODB_URI }),
-    cookie: { httpOnly: true, sameSite: 'lax', secure: false, maxAge: 1000 * 60 * 60 * 4 },
+    cookie: {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 4, // 4 hours
+    },
   })
 );
 
@@ -73,13 +80,13 @@ app.use('/api/activities', activityRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/admin', adminRoutes);
 
-// ===== Home redirect =====
+// Home redirect
 app.get('/', (req, res) => res.redirect('/public/index.html'));
 
-// ===== Upload routes for GCS =====
+// ===== GCS Upload routes =====
 const allowedFolders = ['student-photos', 'birth-certificates', 'payment-proofs'];
 
-// Generic upload endpoint
+// Upload endpoint
 app.post('/api/upload/:folder', requireTeacher, upload.single('file'), async (req, res) => {
   const folder = req.params.folder;
   if (!allowedFolders.includes(folder)) return res.status(403).send('Forbidden');
@@ -103,7 +110,7 @@ app.post('/api/upload/:folder', requireTeacher, upload.single('file'), async (re
   }
 });
 
-// ===== Download route with signed URLs =====
+// Download endpoint using signed URLs
 app.get('/protected/download/:folder/:filename', requireTeacher, async (req, res) => {
   const { folder, filename } = req.params;
   if (!allowedFolders.includes(folder)) return res.status(403).send('Forbidden');
@@ -130,7 +137,7 @@ app.use((err, req, res, next) => {
   next();
 });
 
-// ===== Connect MongoDB =====
+// ===== Connect to MongoDB =====
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
