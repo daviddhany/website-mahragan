@@ -8,38 +8,48 @@
   <link rel="stylesheet" href="/public/styles.css">
 
   <style>
-    body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+    /* Reset and font */
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
 
-   background: url('/public/logo mahragan.png') no-repeat center center;
-  background-attachment: fixed; /* keeps the logo fixed while scrolling */
-  background-size: contain; /* ensures the logo scales nicely */
-  background-repeat: no-repeat;
-  background-position: center center;
-}
- 
+    /* Fixed background logo */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('/public/logo mahragan.png') no-repeat center center;
+      background-size: contain; /* use cover if you want full-screen */
+      z-index: -1; /* behind content */
+    }
+
+    /* Center container */
     .center-container {
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-  background: rgba(255, 255, 255, 0);
-}
-
-   .box {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.8); /* transparency */
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+    /* Content box */
+    .box {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.8); /* semi-transparent to show logo behind */
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
     h1 {
       margin-bottom: 30px;
     }
 
+    /* Buttons */
     .btn {
       display: block;
       width: 250px;
@@ -74,6 +84,13 @@
     .teacher-small:hover {
       background: #666;
     }
+
+    footer.app-footer {
+      text-align: center;
+      padding: 20px 0;
+      color: #555;
+    }
+
   </style>
 </head>
 
@@ -84,11 +101,12 @@
       <h1>مهرجان حبة حنطة</h1>
 
       <a class="btn register" href="/public/register.html">
- إنشاء حساب      </a>
+        إنشاء حساب
+      </a>
 
       <a class="btn student" href="/public/student-login.html">
-تسجيل دخول   
-   </a>
+        تسجيل دخول
+      </a>
     </div>
   </div>
 
@@ -99,6 +117,6 @@
     </a>
   </div>
 
-<footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
+  <footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
 </body>
 </html>
