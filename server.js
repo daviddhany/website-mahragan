@@ -27,7 +27,7 @@ const storage = new Storage({
 });
 const bucket = storage.bucket(process.env.GCS_BUCKET_NAME);
 
-// Multer memory storage
+// Multer memory storage for uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
 // ===== App setup =====
@@ -38,7 +38,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Sanitize all input
+// Sanitize inputs
 app.use((req, res, next) => {
   req.body = mongoSanitize(req.body);
   req.query = mongoSanitize(req.query);
@@ -66,7 +66,7 @@ app.use(
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 1000 * 60 * 60 * 4, // 4 hours
+      maxAge: 1000 * 60 * 60 * 4,
     },
   })
 );
@@ -83,7 +83,7 @@ app.use('/api/admin', adminRoutes);
 // Home redirect
 app.get('/', (req, res) => res.redirect('/public/index.html'));
 
-// ===== GCS Upload routes =====
+// ===== Upload/download routes using GCS =====
 const allowedFolders = ['student-photos', 'birth-certificates', 'payment-proofs'];
 
 // Upload endpoint
@@ -137,7 +137,7 @@ app.use((err, req, res, next) => {
   next();
 });
 
-// ===== Connect to MongoDB =====
+// ===== Connect MongoDB =====
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
