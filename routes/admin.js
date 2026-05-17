@@ -313,13 +313,4 @@ router.put('/students/:id/password', requireTeacher, async (req, res) => {
     res.status(500).json({ error: 'فشل تغيير كلمة سر المخدوم' });
   }
 });
-router.get('/admins', requireAdmin, async (req, res) => {
-  try {
-    const admins = await Teacher.find({ role: 'admin' }).select('-passwordHash');
-    res.json(admins);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'فشل جلب قائمة المديرين' });
-  }
-});
 module.exports = router;
