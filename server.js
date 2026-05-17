@@ -8,6 +8,18 @@ const MongoStore = require('connect-mongo');
 const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
+const uploadDirs = [
+  'uploads',
+  'uploads/student-photos',
+  'uploads/birth-certificates',
+  'uploads/payment-proofs'
+];
+
+uploadDirs.forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
 const teacherRoutes = require('./routes/teachers');
 const authRoutes = require('./routes/auth');
 const studentRoutes = require('./routes/students');
