@@ -1,0 +1,131 @@
+<!doctype html><html><head>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><title>الصفحة الشخصية</title><link rel="stylesheet" href="/public/styles.css">
+<link rel="icon" href="/public/logo-left.png" type="image/png"></head>
+<body>
+<header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
+  <div class="header-title"><h2>مهرجان حبة حنطة</h2></div>
+  <div class="header-right">
+    <nav class="header-actions"><button type="button" onclick="logout()" class="btn-logout">تسجيل خروج</button></nav>
+    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+  </div>
+</header>
+<main>
+<section class="card"><h2>بياناتي</h2><div id="profile"></div></section>
+<section class="card"><h2>رفع الملفات</h2><p class="muted">أكمل الملفات المطلوبة قبل إرسال التسجيل.</p>
+<div class="upload-grid">
+  <div class="upload-card"><form id="photoForm"><label>الصورة الشخصية (مطلوبة)<input name="file" type="file" accept="image/*" required></label><button>رفع الصورة الشخصية</button></form><p id="photoMsg"></p></div>
+  <div class="upload-card"><form id="birthForm"><label>شهادة الميلاد (مطلوبة)<input name="file" type="file" required></label><button>رفع شهادة الميلاد</button></form><p id="birthMsg"></p></div>
+  <div class="upload-card" id="paymentUploadCard"><form id="payForm"><label>إيصال الدفع إنستا باي<input name="file" type="file" required></label><button>رفع إيصال الدفع</button></form><p id="payMsg"></p></div>
+</div></section>
+<section class="card"><h2>اختيار الأنشطة</h2><p class="muted">اضغط على النشاط لاختياره. السعر الافتراضي لكل نشاط 10 ج.</p><form id="activityForm"><div id="activities"></div><div id="paymentTotal" class="payment-total">الإجمالي: 0 ج</div><button id="activitySubmitBtn">إرسال التسجيل</button></form><p id="actMsg"></p></section>
+<section class="card" id="summaryCard" style="display:none;"><h2>ملخص التسجيل</h2><div id="summary"></div></section>
+</main>
+<footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
+<script src="/public/app.js"></script><script>
+let me = null;
+let activityData = [];
+
+function yesNo(v){ return v ? 'نعم' : 'لا'; }
+function paymentLabel(v){ return v === 'instapay' ? 'إنستا باي' : 'مع الخادم'; }
+function status(value){ return value ? '<span class="status-pill status-submitted">✅ تم الرفع</span>' : '<span class="status-pill status-missing">❌ ناقص</span>'; }
+function selectedActivities(){ return [...document.querySelectorAll('#activities input:checked')].map(x => x.value); }
+function selectedTotal(){
+  const ids = new Set(selectedActivities());
+  return activityData.filter(a => ids.has(a._id)).reduce((sum, a) => sum + Number(a.price || 0), 0);
+}
+function updateTotal(){ document.getElementById('paymentTotal').textContent = `الإجمالي: ${selectedTotal()} ج`; }
+
+async function loadMe(){
+  me = await api('/api/students/me');
+  document.getElementById('paymentUploadCard').style.display = me.paymentMethod === 'instapay' ? '' : 'none';
+  document.getElementById('profile').innerHTML = `
+    <div class="profile-grid">
+      <div class="profile-item"><span>كود المخدوم</span><strong>${me.studentCode || ''}</strong></div>
+      <div class="profile-item"><span>الاسم</span><strong>${me.fullName || ''}</strong></div>
+      <div class="profile-item"><span>الخدمة</span><strong>${me.className || ''}</strong></div>
+      <div class="profile-item"><span>السنة</span><strong>${me.studentYear || ''}</strong></div>
+      <div class="profile-item"><span>الرقم القومي</span><strong>${me.nationalId || ''}</strong></div>
+      <div class="profile-item"><span>رقم ولي الأمر</span><strong>${me.parentPhone || ''}</strong></div>
+      <div class="profile-item"><span>العنوان</span><strong>${me.address || ''}</strong></div>
+      <div class="profile-item"><span>طريقة الدفع</span><strong>${paymentLabel(me.paymentMethod)}</strong></div>
+      <div class="profile-item"><span>الصورة الشخصية</span><strong>${status(me.studentPhotoPath)}</strong></div>
+      <div class="profile-item"><span>شهادة الميلاد</span><strong>${status(me.birthCertificatePath)}</strong></div>
+      <div class="profile-item"><span>إيصال الدفع</span><strong>${me.paymentMethod === 'instapay' ? status(me.paymentProofPath) : 'غير مطلوب'}</strong></div>
+    </div>`;
+  renderSummary();
+}
+
+async function loadActivities(){
+  const data = await api('/api/students/me/activities');
+  const selected = new Set(data.selected);
+  activityData = data.activities || [];
+  const groups = [
+    ['spiritual', 'أنشطة روحية'],
+    ['sports', 'أنشطة رياضية']
+  ];
+  document.getElementById('activities').innerHTML = groups.map(([category, title]) => {
+    const list = activityData.filter(a => (a.category || 'spiritual') === category);
+    return `<div class="activity-group"><h3>${title}</h3><div class="activity-choice-grid">${list.map(a => `
+      <label class="activity-choice ${selected.has(a._id) ? 'selected' : ''}">
+        <input type="checkbox" value="${a._id}" ${selected.has(a._id) ? 'checked' : ''}>
+        <span>${a.name}</span>
+        <small>${Number(a.price || 0)} ج</small>
+      </label>`).join('') || '<p class="muted">لا توجد أنشطة.</p>'}</div></div>`;
+  }).join('');
+  document.querySelectorAll('.activity-choice input').forEach(input => {
+    input.addEventListener('change', () => {
+      input.closest('.activity-choice').classList.toggle('selected', input.checked);
+      updateTotal();
+    });
+  });
+  updateTotal();
+  renderSummary();
+}
+
+function renderSummary(){
+  if (!me) return;
+  const chosen = activityData.filter(a => (me.activities || []).some(x => (typeof x === 'string' ? x : x._id) === a._id));
+  if (!me.submissionComplete && !chosen.length) return;
+  document.getElementById('summaryCard').style.display = 'block';
+  document.getElementById('summary').innerHTML = `
+    <div class="profile-grid">
+      <div class="profile-item"><span>الاسم</span><strong>${me.fullName || ''}</strong></div>
+      <div class="profile-item"><span>كود المخدوم</span><strong>${me.studentCode || ''}</strong></div>
+      <div class="profile-item"><span>الخدمة والسنة</span><strong>${me.className || ''} - ${me.studentYear || ''}</strong></div>
+      <div class="profile-item"><span>الأنشطة المختارة</span><strong>${chosen.map(a => a.name).join('، ') || 'لم يتم الاختيار'}</strong></div>
+      <div class="profile-item"><span>إجمالي الدفع</span><strong>${chosen.reduce((sum,a)=>sum+Number(a.price||0),0)} ج</strong></div>
+      <div class="profile-item"><span>طريقة الدفع</span><strong>${paymentLabel(me.paymentMethod)}</strong></div>
+    </div>`;
+}
+
+async function upload(form, url, msg){
+  const button = form.querySelector('button');
+  setButtonLoading(button, true, 'جاري الرفع...');
+  try { const fd = new FormData(form); await api(url, { method:'POST', body: fd }); message(msg, 'تم الرفع بنجاح'); form.reset(); await loadMe(); }
+  finally { setButtonLoading(button, false); }
+}
+document.getElementById('photoForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/student-photo', 'photoMsg'); } catch(err){ message('photoMsg', err.message, false); } });
+document.getElementById('birthForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/birth-certificate', 'birthMsg'); } catch(err){ message('birthMsg', err.message, false); } });
+document.getElementById('payForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/payment-proof', 'payMsg'); } catch(err){ message('payMsg', err.message, false); } });
+document.getElementById('activityForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const ids = selectedActivities();
+  const button = document.getElementById('activitySubmitBtn');
+  button.disabled = true;
+  button.textContent = 'جاري الإرسال...';
+  try {
+    await api('/api/students/me/activities', { method:'PUT', body: JSON.stringify({ activityIds: ids }) });
+    message('actMsg', 'تم إرسال التسجيل بنجاح. بياناتك ظاهرة في الملخص بالأسفل.');
+    await loadMe();
+    await loadActivities();
+    document.getElementById('summaryCard').scrollIntoView({ behavior: 'smooth' });
+  } catch(err) {
+    message('actMsg', err.message, false);
+  } finally {
+    button.disabled = false;
+    button.textContent = 'إرسال التسجيل';
+  }
+});
+loadMe().catch(()=>location.href='/public/student-login.html'); loadActivities().catch(()=>{});
+</script></body></html>

@@ -1,0 +1,794 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Teacher Dashboard</title>
+  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="icon" href="/public/logo-left.png" type="image/png">
+</head>
+
+<body>
+<header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
+  <div class="header-title">
+    <h2>مهرجان حبة حنطة</h2>
+    <p id="teacherName">Teacher Dashboard</p>
+  </div>
+  <div class="header-right">
+    <nav class="header-actions">
+      <a href="/api/admin/export/students.csv" class="btn-export">Export Students CSV</a>
+      <a href="/public/admin-teachers.html" class="btn-export" id="manageTeachersBtn">Manage Teachers</a>
+      <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+    </nav>
+    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <h2>المخدومين</h2>
+
+    <label>
+      Search
+      <input id="search" placeholder="Name, national ID, or student ID">
+    </label>
+
+    <button onclick="loadStudents()">Search</button>
+
+    <div style="overflow:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Birth Date</th>
+            <th>Year</th>
+            <th>Class</th>
+            <th>National ID</th>
+            <th>Parent</th>
+            <th>Status</th>
+            <th>الدفع</th>
+            <th>الإجمالي</th>
+            <th>Photo</th>
+            <th>Documents</th>
+            <th>Activities</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="editBox" style="display:none;">
+    <h2>تعديل بيانات المخدوم</h2>
+
+    <form id="editStudentForm">
+      <input type="hidden" name="studentId" id="editStudentId">
+
+      <label>
+        الاسم رباعي
+        <input name="fullName" id="editFullName" required>
+      </label>
+
+      <label>
+        رقم ولي الأمر
+        <input name="parentPhone" id="editParentPhone" pattern="\d{11}" maxlength="11" required>
+      </label>
+
+      <label>
+        رقم المخدوم - اختياري
+        <input name="studentPhone" id="editStudentPhone" pattern="\d{11}" maxlength="11">
+      </label>
+
+      <label>
+        العنوان
+        <textarea name="address" id="editAddress" required></textarea>
+      </label>
+
+      <label>
+        تاريخ الميلاد
+        <input name="birthDate" id="editBirthDate" type="date" required>
+      </label>
+
+      <label>
+        هل يمكنه السفر في حالة التأهل؟
+        <select name="canTravel" id="editCanTravel" required>
+          <option value="true">نعم</option>
+          <option value="false">لا</option>
+        </select>
+      </label>
+
+
+      <label>
+        طريقة الدفع
+        <select name="paymentMethod" id="editPaymentMethod" required>
+          <option value="servant">مع الخادم</option>
+          <option value="instapay">إنستا باي</option>
+        </select>
+      </label>
+
+      <div>
+        <label>Activities selected by student</label>
+        <div id="editActivities" class="checkbox-list"></div>
+        <small class="muted">Teacher can update the activities for this student.</small>
+      </div>
+
+      <button>حفظ التعديل</button>
+      <button type="button" onclick="closeEditBox()">إلغاء</button>
+      <p id="editMsg"></p>
+    </form>
+  </section>
+<!---
+  <section class="card">
+    <h2>تغيير كلمة السر</h2>
+
+    <form id="passwordForm">
+      <label>
+        كلمة السر الجديدة
+        <input name="newPassword" type="password" required>
+      </label>
+
+      <button>تغيير</button>
+      <p id="passMsg"></p>
+    </form>
+  </section>-->
+
+
+
+  <section class="card">
+    <h2>Team Builder</h2>
+    <p>الخادم يرى كل مخدومي نفس السنة والنوع من الخدمات المرتبطة عند تكوين الفريق، ثم ينقلهم بالاختيار أو بالسحب على الكمبيوتر.</p>
+
+    <div class="toolbar">
+      <label>
+        Activity
+        <select name="activityId" id="teamActivitySelect" required></select>
+      </label>
+            <a id="exportTeamsExcel" href="#" class="btn-export">Export Teams Excel</a>
+      <a id="exportTeamsPdf" href="#" class="btn-export" target="_blank">Export Teams PDF</a>
+    </div>
+
+    <form id="manualTeamForm" class="grid">
+      <label>
+        Team Name
+        <input name="name" id="teamNameInput" placeholder="Team 1" required>
+      </label>
+
+      <label>
+        &nbsp;
+        <button>Create Empty Team</button>
+      </label>
+    </form>
+
+    <div id="teamBalanceWarning" class="warning-box" style="display:none;"></div>
+    <p id="teamMsg"></p>
+    <div id="teamsList"></div>
+  </section>
+
+  <div id="adminOnly">
+    <section class="card">
+      <h2>Add Activity</h2>
+
+      <form id="activityAdd">
+        <label>
+          Activity Name
+          <input name="name" required>
+        </label>
+
+        <label>
+          Description
+          <input name="description">
+        </label>
+
+        <label>
+          Type
+          <select name="category" required>
+            <option value="spiritual">روحي</option>
+            <option value="sports">رياضي</option>
+          </select>
+        </label>
+
+        <label>
+          Price
+          <input name="price" type="number" min="0" value="10" required>
+        </label>
+
+        <button>Add Activity</button>
+        <p id="addMsg"></p>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Manage Activities</h2>
+      <div id="activityList"></div>
+    </section>
+  </div>
+</main>
+
+<script src="/public/app.js"></script>
+
+<script>
+let currentUser = null;
+let cachedStudents = [];
+let cachedActivities = [];
+let cachedTeams = [];
+let cachedTeamEligibleStudents = [];
+
+
+function studentStatusHtml(student) {
+  if (student.submissionComplete) {
+    return '<span class="status-pill status-submitted">✅ Submitted</span>';
+  }
+
+  if (!student.studentPhotoPath) {
+    return '<span class="status-pill status-missing">❌ Missing photo</span>';
+  }
+
+  return '<span class="status-pill status-pending">⏳ Pending</span>';
+}
+
+function paymentLabel(value) { return value === 'instapay' ? 'إنستا باي' : 'مع الخادم'; }
+function yesNo(value) { return value ? 'نعم' : 'لا'; }
+function activityTotal(student) { return (student.activities || []).reduce((sum, a) => sum + Number(a.price || 0), 0); }
+
+function documentHtml(path, label) {
+  if (!path) {
+    return `<p>${label}: Not uploaded</p>`;
+  }
+
+  const downloadUrl = path.replace('/protected/uploads/', '/protected/download/');
+  const isPdf = path.toLowerCase().endsWith('.pdf');
+
+  if (isPdf) {
+    return `
+      <p>${label}:</p>
+      <a href="${path}" target="_blank">View PDF</a><br>
+      <a href="${downloadUrl}" download>Download</a>
+    `;
+  }
+
+  return `
+    <p>${label}:</p>
+    <a href="${path}" target="_blank">
+      <img src="${path}" width="120" style="border-radius:8px;border:1px solid #ddd">
+    </a><br>
+    <a href="${path}" target="_blank">View</a><br>
+    <a href="${downloadUrl}" download>Download</a>
+  `;
+}
+
+async function loadMe() {
+  currentUser = await api('/api/auth/me');
+
+  document.getElementById('teacherName').textContent =
+    currentUser.fullName ? `أهلاً ${currentUser.fullName}` : 'Teacher Dashboard';
+
+  if (currentUser.role !== 'admin') {
+    document.getElementById('adminOnly').style.display = 'none';
+    document.getElementById('manageTeachersBtn').style.display = 'none';
+  }
+}
+
+async function loadActivities() {
+  const activities = await api('/api/activities');
+  cachedActivities = activities;
+
+  const teamActivitySelect = document.getElementById('teamActivitySelect');
+  teamActivitySelect.innerHTML = activities.map(a => `
+    <option value="${a._id}">${a.name}</option>
+  `).join('');
+
+  const activityList = document.getElementById('activityList');
+  if (activityList) {
+    activityList.innerHTML = activities.map(a => `
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <strong>${a.name}</strong>
+        <span class="badge">${a.category === 'sports' ? 'رياضي' : 'روحي'}</span>
+        <span class="badge">${Number(a.price || 0)} ج</span>
+        <button onclick="deleteActivity('${a._id}')">Remove</button>
+      </div>
+    `).join('');
+  }
+}
+
+async function deleteActivity(id) {
+  if (!confirm('Remove this activity?')) return;
+
+  await api('/api/activities/' + id, {
+    method: 'DELETE'
+  });
+
+  loadActivities();
+  loadStudents();
+}
+
+async function deleteStudent(id) {
+  if (!confirm('Are you sure you want to remove this student? This will free the national ID for reuse.')) {
+    return;
+  }
+
+  await api('/api/admin/students/' + id, {
+    method: 'DELETE'
+  });
+
+  loadStudents();
+}
+
+async function renderEditActivities(student) {
+  if (!cachedActivities.length) {
+    cachedActivities = await api('/api/activities');
+  }
+
+  const selected = new Set((student.activities || []).map(activity => typeof activity === 'string' ? activity : activity._id));
+  const box = document.getElementById('editActivities');
+
+  box.innerHTML = cachedActivities.map(activity => `
+    <label class="checkbox-row">
+      <input type="checkbox" name="activityIds" value="${activity._id}" ${selected.has(activity._id) ? 'checked' : ''}>
+      ${activity.name} - ${activity.category === 'sports' ? 'رياضي' : 'روحي'} - ${Number(activity.price || 0)} ج
+    </label>
+  `).join('') || '<p class="muted">No activities available.</p>';
+}
+
+async function openEditStudent(id) {
+  const student = cachedStudents.find(s => s._id === id);
+  if (!student) return;
+
+  document.getElementById('editBox').style.display = 'block';
+  document.getElementById('editStudentId').value = student._id;
+  document.getElementById('editFullName').value = student.fullName || '';
+  document.getElementById('editParentPhone').value = student.parentPhone || '';
+  document.getElementById('editStudentPhone').value = student.studentPhone || '';
+  document.getElementById('editAddress').value = student.address || '';
+  document.getElementById('editBirthDate').value = student.birthDate
+    ? new Date(student.birthDate).toISOString().slice(0, 10)
+    : '';
+  document.getElementById('editCanTravel').value = student.canTravel ? 'true' : 'false';
+  document.getElementById('editPaymentMethod').value = student.paymentMethod || 'servant';
+  await renderEditActivities(student);
+
+  document.getElementById('editBox').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeEditBox() {
+  document.getElementById('editBox').style.display = 'none';
+}
+
+async function loadStudents() {
+  const q = document.getElementById('search').value;
+  const rows = document.getElementById('rows');
+  rows.innerHTML = '<tr><td colspan="15" class="loading">Loading students...</td></tr>';
+
+  let students = [];
+  try {
+    students = await api('/api/admin/students?search=' + encodeURIComponent(q));
+    cachedStudents = students;
+  } catch (err) {
+    rows.innerHTML = `<tr><td colspan="15" class="error">${err.message}</td></tr>`;
+    return;
+  }
+
+  rows.innerHTML = students.map(s => `
+    <tr>
+      <td>${s.studentCode || ''}</td>
+      <td>${s.fullName || ''}</td>
+      <td>${s.birthDate ? new Date(s.birthDate).toLocaleDateString() : ''}</td>
+      <td>${s.studentYear || ''}</td>
+      <td>${s.className || ''}</td>
+      <td>${s.nationalId || ''}</td>
+      <td>${s.parentPhone || ''}</td>
+      <td>${studentStatusHtml(s)}</td>
+      <td>${paymentLabel(s.paymentMethod)}</td>
+      <td>${activityTotal(s)} ج</td>
+      <td>
+        ${documentHtml(s.studentPhotoPath, 'Student Photo')}
+      </td>
+      <td>
+        ${documentHtml(s.birthCertificatePath, 'Birth Certificate')}
+        <hr>
+        ${documentHtml(s.paymentProofPath, 'Payment Proof')}
+      </td>
+      <td>
+        ${(s.activities || []).map(a => `<span class="badge">${a.name}</span>`).join('')}
+      </td>
+      <td>
+        <button onclick="openEditStudent('${s._id}')">Edit</button>
+        <button onclick="changeStudentPassword('${s._id}')">Change Password</button>
+        <button onclick="deleteStudent('${s._id}')">Remove Student</button>
+      </td>
+    </tr>
+  `).join('');
+}
+async function changeStudentPassword(id) {
+  const newPassword = prompt('Enter new student password:');
+  if (!newPassword) return;
+
+  await api('/api/admin/students/' + id + '/password', {
+    method: 'PUT',
+    body: JSON.stringify({ newPassword })
+  });
+
+  alert('Student password changed');
+}
+
+
+function activityMatchesStudent(student, activityId) {
+  return (student.activities || []).some(activity => {
+    const id = typeof activity === 'string' ? activity : activity._id;
+    return id === activityId;
+  });
+}
+
+function eligibleStudentsForActivity(activityId) {
+  return cachedTeamEligibleStudents
+    .filter(student => student.submissionComplete && activityMatchesStudent(student, activityId))
+    .sort((a, b) => {
+      const yearCompare = (a.studentYear || '').localeCompare(b.studentYear || '');
+      if (yearCompare) return yearCompare;
+
+      const classCompare = (a.className || '').localeCompare(b.className || '');
+      if (classCompare) return classCompare;
+
+      return (a.fullName || '').localeCompare(b.fullName || '');
+    });
+}
+
+function teamStudentIdsForActivity(activityId) {
+  return new Set(
+    cachedTeams
+      .filter(team => team.activity && team.activity._id === activityId)
+      .flatMap(team => (team.students || []).map(student => student._id))
+  );
+}
+
+function updateExportLinks() {
+  const activityId = document.getElementById('teamActivitySelect').value;
+  const suffix = activityId ? '?activityId=' + encodeURIComponent(activityId) : '';
+  document.getElementById('exportTeamsExcel').href = '/api/teams/export/excel' + suffix;
+  document.getElementById('exportTeamsPdf').href = '/api/teams/export/pdf' + suffix;
+}
+
+function renderBalanceWarning(teams) {
+  const warning = document.getElementById('teamBalanceWarning');
+
+  if (teams.length < 2) {
+    warning.style.display = 'none';
+    warning.textContent = '';
+    return;
+  }
+
+  const counts = teams.map(team => (team.students || []).length);
+  const min = Math.min(...counts);
+  const max = Math.max(...counts);
+
+  if (max - min > 1) {
+    warning.style.display = 'block';
+    warning.textContent = `⚠️ Teams are unbalanced. Smallest team: ${min}, largest team: ${max}.`;
+  } else {
+    warning.style.display = 'none';
+    warning.textContent = '';
+  }
+}
+
+function teamOptionsHtml(currentTeamId = '') {
+  const activityId = document.getElementById('teamActivitySelect').value;
+  const teams = cachedTeams.filter(t => t.activity && t.activity._id === activityId && !t.locked);
+
+  return teams.map(team => `
+    <option value="${team._id}" ${team._id === currentTeamId ? 'selected' : ''}>${team.name}</option>
+  `).join('');
+}
+
+function studentChip(student, currentTeamId = '') {
+  const options = teamOptionsHtml(currentTeamId);
+
+  return `
+    <div class="student-chip" draggable="true" data-student-id="${student._id}">
+      <div class="student-chip-main">
+        <span class="drag-handle" aria-hidden="true">☰</span>
+        <div>
+          <strong>${student.fullName || ''}</strong>
+          <small>${student.studentCode || ''}</small>
+        </div>
+      </div>
+      <div class="mobile-move-row">
+        <select class="move-team-select" aria-label="Move ${student.fullName || 'student'} to team" ${options ? '' : 'disabled'}>
+          <option value="">Move to team...</option>
+          ${options}
+        </select>
+        <button type="button" class="move-team-btn" ${options ? '' : 'disabled'}>Move</button>
+      </div>
+    </div>
+  `;
+}
+
+function enableTeamMoving() {
+  document.querySelectorAll('.student-chip').forEach(chip => {
+    chip.addEventListener('dragstart', e => {
+      if (e.target.closest('select, button')) {
+        e.preventDefault();
+        return;
+      }
+      e.dataTransfer.setData('studentId', chip.dataset.studentId);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    const button = chip.querySelector('.move-team-btn');
+    const select = chip.querySelector('.move-team-select');
+    if (button && select) {
+      button.addEventListener('click', async () => {
+        const teamId = select.value;
+        if (!teamId) {
+          message('teamMsg', 'Choose a team first.', false);
+          return;
+        }
+        await moveStudentToTeam(chip.dataset.studentId, teamId);
+      });
+    }
+  });
+
+  document.querySelectorAll('.drop-zone').forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+
+    zone.addEventListener('dragleave', () => {
+      zone.classList.remove('drag-over');
+    });
+
+    zone.addEventListener('drop', async e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const studentId = e.dataTransfer.getData('studentId');
+      const teamId = zone.dataset.teamId;
+
+      if (!studentId || !teamId) return;
+      await moveStudentToTeam(studentId, teamId);
+    });
+  });
+}
+
+async function loadTeamEligibleStudents() {
+  const activityId = document.getElementById('teamActivitySelect').value;
+
+  if (!activityId) {
+    cachedTeamEligibleStudents = [];
+    return;
+  }
+
+  cachedTeamEligibleStudents = await api('/api/teams/eligible-students?activityId=' + encodeURIComponent(activityId));
+}
+
+function renderTeams() {
+  const activityId = document.getElementById('teamActivitySelect').value;
+  const teamsList = document.getElementById('teamsList');
+  const teams = cachedTeams.filter(t => t.activity && t.activity._id === activityId);
+  const eligibleStudents = eligibleStudentsForActivity(activityId);
+  const assignedIds = teamStudentIdsForActivity(activityId);
+  const unassignedStudents = eligibleStudents.filter(student => !assignedIds.has(student._id));
+
+  updateExportLinks();
+  renderBalanceWarning(teams);
+
+  if (!activityId) {
+    teamsList.innerHTML = '<p>No activities available.</p>';
+    return;
+  }
+
+  teamsList.innerHTML = `
+    <div class="team-workspace">
+      <div class="team-card unassigned-card">
+        <h3>Unassigned Students</h3>
+        <p class="muted">On phones, use the Move to Team menu. On desktop, you can also drag students into a team.</p>
+        <div class="chip-list">
+          ${unassignedStudents.map(student => studentChip(student)).join('') || '<p class="muted">All submitted students are assigned.</p>'}
+        </div>
+      </div>
+
+      ${teams.length ? teams.map(team => `
+        <div class="team-card ${team.locked ? 'locked-team' : ''}">
+          <div class="team-title-row">
+            <h3>${team.name}</h3>
+            <span class="lock-badge">${team.locked ? '🔒 Locked' : '🔓 Editable'}</span>
+          </div>
+          <p><strong>${(team.students || []).length}</strong> students</p>
+          <div class="drop-zone chip-list" data-team-id="${team._id}">
+            ${(team.students || []).map(student => studentChip(student, team._id)).join('') || '<p class="muted">Move students here.</p>'}
+          </div>
+          <div class="team-actions">
+            <button type="button" onclick="toggleTeamLock('${team._id}', ${team.locked ? 'false' : 'true'})">
+              ${team.locked ? 'Unlock Team' : 'Lock Team'}
+            </button>
+            <button type="button" onclick="deleteTeam('${team._id}')" ${team.locked ? 'disabled' : ''}>Delete Team</button>
+          </div>
+        </div>
+      `).join('') : '<p>No teams created for this activity yet. Create empty teams first, then move students into them.</p>'}
+    </div>
+  `;
+
+  enableTeamMoving();
+}
+
+async function loadTeams() {
+  setLoading('teamMsg', 'Loading teams...');
+  try {
+    await loadTeamEligibleStudents();
+    cachedTeams = await api('/api/teams');
+    clearMessage('teamMsg');
+    renderTeams();
+  } catch (err) {
+    message('teamMsg', err.message, false);
+  }
+}
+
+async function moveStudentToTeam(studentId, teamId) {
+  const team = cachedTeams.find(t => t._id === teamId);
+  if (!team) return;
+
+  if (team.locked) {
+    message('teamMsg', 'This team is locked. Unlock it before moving students.', false);
+    return;
+  }
+
+  const newStudentIds = Array.from(new Set([...(team.students || []).map(s => s._id), studentId]));
+
+  setLoading('teamMsg', 'Moving student...');
+  try {
+    await api('/api/teams/' + teamId + '/students', {
+      method: 'PUT',
+      body: JSON.stringify({ studentIds: newStudentIds })
+    });
+
+    message('teamMsg', 'Student moved successfully');
+    await loadTeams();
+  } catch (err) {
+    message('teamMsg', err.message, false);
+  }
+}
+
+async function deleteTeam(id) {
+  if (!confirm('Delete this team?')) return;
+
+  setLoading('teamMsg', 'Deleting team...');
+  try {
+    await api('/api/teams/' + id, { method: 'DELETE' });
+    message('teamMsg', 'Team deleted');
+    await loadTeams();
+  } catch (err) {
+    message('teamMsg', err.message, false);
+  }
+}
+
+async function toggleTeamLock(id, shouldLock) {
+  setLoading('teamMsg', shouldLock ? 'Locking team...' : 'Unlocking team...');
+  try {
+    await api('/api/teams/' + id + (shouldLock ? '/lock' : '/unlock'), { method: 'PUT' });
+    message('teamMsg', shouldLock ? 'Team locked' : 'Team unlocked');
+    await loadTeams();
+  } catch (err) {
+    message('teamMsg', err.message, false);
+  }
+}
+
+document.getElementById('teamActivitySelect').addEventListener('change', async () => {
+  setLoading('teamMsg', 'تحميل المخدومين المتاحين للفريق...');
+  try {
+    await loadTeamEligibleStudents();
+    clearMessage('teamMsg');
+    renderTeams();
+  } catch (err) {
+    message('teamMsg', err.message, false);
+  }
+});
+
+const teamGroupSelect = document.getElementById('teamGroupSelect');
+if (teamGroupSelect) {
+  teamGroupSelect.addEventListener('change', renderTeams);
+}
+
+document.getElementById('manualTeamForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const activityId = document.getElementById('teamActivitySelect').value;
+  const form = new FormData(e.target);
+  const body = {
+    activityId,
+    name: form.get('name'),
+    studentIds: []
+  };
+
+  setLoading('teamMsg', 'Creating team...');
+  try {
+    await api('/api/teams', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    message('teamMsg', 'Team created. Move students into it.');
+    e.target.reset();
+    await loadTeams();
+  } catch (err) {
+    message('teamMsg', err.message, false);
+  }
+});
+
+document.getElementById('editStudentForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const body = Object.fromEntries(formData);
+  const id = body.studentId;
+  delete body.studentId;
+
+  body.canTravel = body.canTravel === 'true';
+  body.activityIds = formData.getAll('activityIds');
+
+  setLoading('editMsg', 'Saving student changes...');
+  try {
+    await api('/api/admin/students/' + id, {
+      method: 'PUT',
+      body: JSON.stringify(body)
+    });
+
+    message('editMsg', 'تم حفظ التعديل');
+    closeEditBox();
+    await loadStudents();
+    await loadTeams();
+  } catch (err) {
+    message('editMsg', err.message, false);
+  }
+});
+
+document.getElementById('activityAdd').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const body = Object.fromEntries(new FormData(e.target));
+  const submitBtn = e.target.querySelector('button');
+  submitBtn.disabled = true;
+  setLoading('addMsg', 'Adding activity...');
+
+  try {
+    await api('/api/activities', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    message('addMsg', 'Activity added successfully');
+    e.target.reset();
+    await loadActivities();
+  } catch (err) {
+    message('addMsg', err.message || 'Could not add activity', false);
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+async function changeStudentPassword(id) {
+  const newPassword = prompt('Enter new student password:');
+  if (!newPassword) return;
+
+  await api('/api/admin/students/' + id + '/password', {
+    method: 'PUT',
+    body: JSON.stringify({ newPassword })
+  });
+
+  alert('Student password changed');
+}
+async function start() {
+  try {
+    await loadMe();
+    await loadStudents();
+    await loadActivities();
+    await loadTeams();
+  } catch (err) {
+    location.href = '/public/teacher-login.html';
+  }
+}
+
+start();
+</script>
+<footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
+</body>
+</html>

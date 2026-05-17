@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/public/logo-left.png" type="image/png">
+  <meta charset="utf-8">
+  <title>School Activity Registration</title>
+  <link rel="stylesheet" href="/public/styles.css">
+
+  <style>
+    body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+
+  background: url('/public/logo mahragan.png') no-repeat center center ;
+  background-size:contain;
+}
+
+    .center-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0);
+}
+
+   .box {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8); /* transparency */
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      display: block;
+      width: 250px;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+    }
+
+    .register { background: #052642; }
+    .student { background: #052642; }
+
+    /* Bottom section */
+    .bottom-section {
+      margin-top: 200px;
+      text-align: center;
+      padding-bottom: 40px;
+    }
+
+    .teacher-small {
+      display: inline-block;
+      padding: 8px 14px;
+      font-size: 13px;
+      background: #888;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+
+    .teacher-small:hover {
+      background: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="center-container">
+    <div class="box">
+      <h1>مهرجان حبة حنطة</h1>
+
+      <a class="btn register" href="/public/register.html">
+ إنشاء حساب      </a>
+
+      <a class="btn student" href="/public/student-login.html">
+تسجيل دخول   
+   </a>
+    </div>
+  </div>
+
+  <!-- Scroll down area -->
+  <div class="bottom-section">
+    <a class="teacher-small" href="/public/teacher-login.html">
+      Servant Login
+    </a>
+  </div>
+
+<footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
+</body>
+</html>
