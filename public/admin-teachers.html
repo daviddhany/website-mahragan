@@ -1,222 +1,206 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Admin - Teachers</title>
   <link rel="stylesheet" href="/public/styles.css">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f9f9f9;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .logo {
-      display: block;
-      margin: 0 auto 20px;
-      max-width: 150px;
-      height: auto;
-    }
-
-    .controls {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .controls button {
-      padding: 10px 20px;
-      margin: 0 5px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: none;
-      background-color: #052642;
-      color: white;
-      cursor: pointer;
-    }
-
-    .controls button:hover {
-      background-color: #03406b;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    th, td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #ddd;
-      text-align: center;
-    }
-
-    th {
-      background-color: #052642;
-      color: white;
-    }
-
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-
-    .role-label {
-      padding: 4px 8px;
-      border-radius: 6px;
-      color: white;
-      font-size: 12px;
-    }
-
-    .role-admin {
-      background-color: #e74c3c;
-    }
-
-    .role-teacher {
-      background-color: #3498db;
-    }
-
-    .role-service {
-      background-color: #2ecc71;
-    }
-
-    footer.app-footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 12px;
-      color: #555;
-    }
-
-    .search-box {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .search-box input {
-      padding: 10px;
-      width: 300px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-  </style>
+  <link rel="icon" href="/public/logo-left.png" type="image/png">
 </head>
+
 <body>
-
-  <!-- Logo -->
-  <img src="/public/logo mahragan.png" alt="Coptech Logo" class="logo">
-
-  <h1>لوحة التحكم - المستخدمون</h1>
-
-  <!-- Controls -->
-  <div class="controls">
-    <button id="showAdminsBtn">عرض المديرين</button>
+<header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
+  <div class="header-title"><h2>إدارة الخدام</h2></div>
+  <div class="header-right">
+    <nav class="header-actions">
+      <a href="/public/teacher-dashboard.html" class="btn-nav">لوحة البيانات</a>
+      <button type="button" onclick="logout()" class="btn-logout">تسجيل خروج</button>
+    </nav>
+    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
   </div>
+</header>
 
-  <!-- Search -->
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="ابحث باسم المستخدم أو رقم الهاتف">
-  </div>
+<main>
+  <section class="card">
+    <h2>إضافة مستخدم</h2>
 
-  <!-- User Table -->
-  <table id="userTable">
-    <thead>
-      <tr>
-        <th>الاسم الكامل</th>
-        <th>الهاتف</th>
-        <th>الدور</th>
-        <th>الصف المعين</th>
-        <th>السنة المعينة</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Rows added dynamically -->
-    </tbody>
-  </table>
+    <form id="teacherForm">
+      <label>
+        اسم المستخدم
+        <input name="fullName" required>
+      </label>
 
-  <footer class="app-footer">© 2026 CoptechAi. All rights reserved.</footer>
+      <label>
+  رقم التليفون
+  <input name="phone" required pattern="\d{11}" maxlength="11" placeholder="11 رقم">
+  </label>
 
-  <script>
-    const userTableBody = document.querySelector('#userTable tbody');
-    const searchInput = document.getElementById('searchInput');
-    const showAdminsBtn = document.getElementById('showAdminsBtn');
+      <label>
+        كلمة السر
+        <input name="password" type="password" required>
+      </label>
 
-    // Function to load all users (teachers + service leaders)
-    async function loadUsers(query = '') {
-      try {
-        const res = await fetch('/api/teachers?search=' + encodeURIComponent(query));
-        if (!res.ok) throw new Error('فشل تحميل المستخدمين');
-        const users = await res.json();
-        populateTable(users);
-      } catch (err) {
-        alert(err.message);
-      }
-    }
+      <label>
+        الدور
+        <select name="role" id="teacherRole" required>
+          <option value="teacher">خادم</option>
+          <option value="serviceLeader">أمين خدمة</option>
+          <option value="admin">أدمن</option>
+        </select>
+      </label>
 
-    // Function to load only admins
-    async function loadAdmins() {
-      try {
-        const res = await fetch('/api/admin/admins');
-        if (!res.ok) throw new Error('فشل تحميل المديرين');
-        const admins = await res.json();
-        populateTable(admins);
-      } catch (err) {
-        alert(err.message);
-      }
-    }
+      <label>
+        الخدمة
+        <select name="assignedClass" required>
+          <option value="">اختر الخدمة</option>
+          <option value="يوحنا">يوحنا</option>
+          <option value="ابوسيفين">ابوسيفين</option>
+          <option value="العذراء">العذراء</option>
+          <option value="خمسة و ستة">خمسة و ستة</option>
+          <option value="إعدادي">إعدادي</option>
 
-    // Populate the table with users
-    function populateTable(users) {
-      userTableBody.innerHTML = '';
-      users.forEach(u => {
-        let roleClass = '';
-        let roleText = '';
+        </select>
+      </label>
 
-        if (u.role === 'admin') {
-          roleClass = 'role-admin';
-          roleText = 'أدمن';
-        } else if (u.role === 'teacher') {
-          roleClass = 'role-teacher';
-          roleText = 'معلم';
-        } else if (u.role === 'serviceLeader') {
-          roleClass = 'role-service';
-          roleText = 'أمين خدمة';
-        }
+      <label>
+        السنة
+        <select name="assignedYear" id="assignedYear" required>
+  <option value="">اختر السنة</option>
+  <option value="اولى إبتدائي">اولى إبتدائي</option>
+  <option value="تانية إبتدائي">تانية إبتدائي</option>
+  <option value="ثالثة إبتدائي">ثالثة إبتدائي</option>
+  <option value="رابعة إبتدائي">رابعة إبتدائي</option>
+  <option value="خمسة إبتدائي">خمسة إبتدائي</option>
+  <option value="سادسة إبتدائي">سادسة إبتدائي</option>
+  <option value="اولى اعدادي">اولى اعدادي</option>
+  <option value="تانية اعدادي">تانية اعدادي</option>
+  <option value="ثالثة اعدادي">ثالثة اعدادي</option>
+</select>
+      </label>
+<label>
+  النوع
+  <select name="assignedGender" required>
+    <option value="">اختر النوع</option>
+    <option value="male">بنين</option>
+    <option value="female">بنات</option>
+  </select>
+</label>
+      <button>إضافة المستخدم</button>
+      <p id="msg"></p>
+    </form>
+  </section>
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${u.fullName || '-'}</td>
-          <td>${u.phone || '-'}</td>
-          <td><span class="role-label ${roleClass}">${roleText}</span></td>
-          <td>${u.assignedClass || '-'}</td>
-          <td>${u.assignedYear || '-'}</td>
-        `;
-        userTableBody.appendChild(tr);
-      });
-    }
+  <section class="card">
+    <h2>الخدام وأمناء الخدمة الحاليين</h2>
+    <label>
+      بحث
+      <input id="teacherSearch" placeholder="ابحث بالاسم، التليفون، الخدمة، أو السنة">
+    </label>
+    <button type="button" onclick="loadTeachers()">بحث</button>
+    <div id="teachers"></div>
+  </section>
+</main>
 
-    // Initial load
-    loadUsers();
+<script src="/public/app.js"></script>
 
-    // Search event
-    searchInput.addEventListener('input', () => {
-      const query = searchInput.value.trim();
-      loadUsers(query);
+<script>
+
+const roleSelect = document.getElementById('teacherRole');
+const yearSelect = document.getElementById('assignedYear');
+function updateYearRequirement() {
+  const classSelect = document.querySelector('[name="assignedClass"]');
+  const genderSelect = document.querySelector('[name="assignedGender"]');
+  const classLabel = classSelect.closest('label');
+  const genderLabel = genderSelect.closest('label');
+
+  if (roleSelect.value === 'admin') {
+    yearSelect.required = false;
+    classSelect.required = false;
+    genderSelect.required = false;
+    yearSelect.closest('label').style.display = 'none';
+    classLabel.style.display = 'none';
+    genderLabel.style.display = 'none';
+    yearSelect.value = '';
+    classSelect.value = '';
+    genderSelect.value = '';
+  } else if (roleSelect.value === 'serviceLeader') {
+    yearSelect.required = false;
+    classSelect.required = true;
+    genderSelect.required = true;
+    yearSelect.closest('label').style.display = 'none';
+    classLabel.style.display = '';
+    genderLabel.style.display = '';
+    yearSelect.value = '';
+  } else {
+    yearSelect.required = true;
+    classSelect.required = true;
+    genderSelect.required = true;
+    yearSelect.closest('label').style.display = '';
+    classLabel.style.display = '';
+    genderLabel.style.display = '';
+  }
+}
+roleSelect.addEventListener('change', updateYearRequirement);
+updateYearRequirement();
+
+async function loadTeachers() {
+  const q = document.getElementById('teacherSearch') ? document.getElementById('teacherSearch').value : '';
+  const teachers = await api('/api/teachers?search=' + encodeURIComponent(q));
+
+  document.getElementById('teachers').innerHTML = teachers.map(t => `
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd;padding:10px 0;">
+      <div>
+        <strong>${t.fullName}</strong><br>
+${t.phone || ''}<br>        الدور: ${t.role === 'serviceLeader' ? 'أمين خدمة' : 'خادم'}<br>الخدمة: ${t.assignedClass || ''} - السنة: ${t.assignedYear || 'كل السنوات'}
+      </div>
+
+      <button onclick="deleteTeacher('${t._id}')">حذف</button>
+    </div>
+  `).join('');
+}
+
+async function deleteTeacher(id) {
+  if (!confirm('هل تريد حذف هذا المستخدم؟')) return;
+
+  await api('/api/teachers/' + id, {
+    method: 'DELETE'
+  });
+
+  loadTeachers();
+}
+
+document.getElementById('teacherForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const body = Object.fromEntries(new FormData(e.target));
+
+  try {
+    await api('/api/teachers', {
+      method: 'POST',
+      body: JSON.stringify(body)
     });
 
-    // Show admins button
-    showAdminsBtn.addEventListener('click', () => {
-      loadAdmins();
-    });
-  </script>
+    message('msg', 'تم إضافة المستخدم');
+    e.target.reset();
+    loadTeachers();
+  } catch (err) {
+    message('msg', err.message, false);
+  }
+});
 
+const teacherSearchInput = document.getElementById('teacherSearch');
+if (teacherSearchInput) {
+  teacherSearchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      loadTeachers();
+    }
+  });
+}
+
+loadTeachers().catch(() => location.href = '/public/teacher-login.html');
+</script>
+<footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
 </body>
 </html>
