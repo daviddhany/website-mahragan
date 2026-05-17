@@ -13,8 +13,11 @@ function requireTeacher(req, res, next) {
   next();
 }
 function requireAdmin(req, res, next) {
-  if (!req.session.userId || req.session.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin only' });
+  if (!req.session.userId) return res.status(401).json({ error: 'Not logged in' });
+
+  const currentUser = req.session.user; // or fetch from DB if you store only userId
+  if (!currentUser || currentUser.role !== 'admin') {
+    return res.status(403).json({ error: 'Forbidden' });
   }
 
   next();
