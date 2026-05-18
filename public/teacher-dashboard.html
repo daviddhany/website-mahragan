@@ -13,11 +13,11 @@
   <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
   <div class="header-title">
     <h2>مهرجان حبة حنطة</h2>
-    <p id="teacherName">Teacher Dashboard</p>
+    <p id="teacherName">واجهة الخادم</p>
   </div>
   <div class="header-right">
     <nav class="header-actions">
-      <a href="/api/admin/export/students.csv" class="btn-export">Export Students CSV</a>
+      <a href="/api/admin/export/students.csv" class="btn-export">Export excel</a>
       <a href="/public/admin-teachers.html" class="btn-export" id="manageTeachersBtn">Manage Teachers</a>
       <button type="button" onclick="logout()" class="btn-logout">Logout</button>
     </nav>
@@ -30,11 +30,11 @@
     <h2>المخدومين</h2>
 
     <label>
-      Search
+      بحث
       <input id="search" placeholder="Name, national ID, or student ID">
     </label>
 
-    <button onclick="loadStudents()">Search</button>
+    <button onclick="loadStudents()">بحث</button>
 
     <div style="overflow:auto">
       <table>
@@ -111,7 +111,7 @@
       </label>
 
       <div>
-        <label>Activities selected by student</label>
+        <label>الانشطة المختارة</label>
         <div id="editActivities" class="checkbox-list"></div>
         <small class="muted">Teacher can update the activities for this student.</small>
       </div>
@@ -139,12 +139,11 @@
 
 
   <section class="card">
-    <h2>Team Builder</h2>
-    <p>الخادم يرى كل مخدومي نفس السنة والنوع من الخدمات المرتبطة عند تكوين الفريق، ثم ينقلهم بالاختيار أو بالسحب على الكمبيوتر.</p>
+    <h2>تقسيم فرق</h2>
 
     <div class="toolbar">
       <label>
-        Activity
+        النشاط
         <select name="activityId" id="teamActivitySelect" required></select>
       </label>
             <a id="exportTeamsExcel" href="#" class="btn-export">Export Teams Excel</a>
@@ -153,13 +152,13 @@
 
     <form id="manualTeamForm" class="grid">
       <label>
-        Team Name
+أسم الفريق
         <input name="name" id="teamNameInput" placeholder="Team 1" required>
       </label>
 
       <label>
         &nbsp;
-        <button>Create Empty Team</button>
+        <button>إنشاء فريق</button>
       </label>
     </form>
 
