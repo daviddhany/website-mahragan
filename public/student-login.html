@@ -5,149 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>تسجيل دخول</title>
   <link rel="stylesheet" href="/public/styles.css">
-  <link rel="icon" href="/public/logo-left.png" type="image/png">
-  <style>
-    /* ===== Header ===== */
-    header.site-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #052642;
-      padding: 10px 20px;
-    }
-
-    .header-left img,
-    .header-right img {
-      height: 90px; /* bigger logos */
-      width: auto;
-      display: block;
-    }
-
-    .header-center {
-      text-align: center;
-    }
-
-    .header-center .btn-nav {
-      background: linear-gradient(180deg, #0a3a6b, #052642);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    /* ===== Main Login Card ===== */
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-    }
-
-    main {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: calc(100vh - 120px); /* adjust for header height */
-    }
-
-    .card {
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #052642;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      background-color: #4a6d8c;
-    }
-
-    #msg {
-      margin-top: 10px;
-      color: red;
-      font-size: 14px;
-    }
-
-    footer {
-      text-align: center;
-      padding: 15px 0;
-      color: #888;
-      font-size: 13px;
-    }
-
-    /* Responsive tweaks */
-    @media(max-width: 480px) {
-      .header-left img, .header-right img {
-        height: 70px;
-      }
-      .header-center .btn-nav {
-        font-size: 14px;
-        padding: 8px 16px;
-      }
-    }
-  </style>
 </head>
-
 <body>
-  <header class="site-header">
-    <div class="header-left">
-      <img src="/public/logo-left.png" alt="Logo Left">
-    </div>
+  <header style="display:flex; justify-content:space-between; align-items:center; background:#052642; padding:10px 20px;">
+    <!-- Left Logo -->
+    <img src="/public/logo-left.png" alt="Left Logo" style="height:90px; width:auto; display:block;">
 
-    <div class="header-center">
-      <a href="/" class="btn-nav">Home</a>
-    </div>
+    <!-- Center Home Button -->
+    <a href="/" style="background:#0a3a6b; color:white; text-decoration:none; padding:10px 20px; border-radius:8px; font-size:16px; display:flex; align-items:center; justify-content:center;">Home</a>
 
-    <div class="header-right">
-      <img src="/public/logo-right.png" alt="Logo Right">
-    </div>
+    <!-- Right Logo -->
+    <img src="/public/logo-right.png" alt="Right Logo" style="height:90px; width:auto; display:block;">
   </header>
 
-  <main>
-    <section class="card">
+  <main style="display:flex; justify-content:center; align-items:center; height:calc(100vh - 120px); background:#f5f5f5;">
+    <section style="background:white; padding:40px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); width:100%; max-width:400px;">
       <form id="form">
-        <label>
+        <label style="display:block; margin-bottom:15px;">
           الرقم القومي
-          <input name="nationalId" required inputmode="numeric" pattern="\d{14}" maxlength="14" minlength="14" placeholder="14 رقم">
+          <input name="nationalId" required inputmode="numeric" pattern="\d{14}" maxlength="14" minlength="14" placeholder="14 رقم" style="width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc;">
         </label>
-        <label>
+        <label style="display:block; margin-bottom:15px;">
           كلمة السر
-          <input name="password" type="password" required>
+          <input name="password" type="password" required style="width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc;">
         </label>
-        <button>Login</button>
-        <p id="msg"></p>
+        <button style="width:100%; padding:12px; background:#052642; color:white; font-size:16px; border:none; border-radius:8px; cursor:pointer;">Login</button>
+        <p id="msg" style="margin-top:10px; color:red; font-size:14px;"></p>
       </form>
     </section>
   </main>
+
+  <footer style="text-align:center; padding:15px 0; color:#888; font-size:13px;">
+    © 2026 CoptechAi. All rights reserved.
+  </footer>
 
   <script src="/public/app.js"></script>
   <script>
@@ -176,7 +66,6 @@
       }
     });
   </script>
-
-  <footer class="app-footer">© 2026 CoptechAi. All rights reserved.</footer>
 </body>
 </html>
+
