@@ -1,71 +1,41 @@
-<!doctype html>
-<html lang="ar">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>تسجيل دخول</title>
-  <link rel="stylesheet" href="/public/styles.css">
-</head>
-<body>
-  <header style="display:flex; justify-content:space-between; align-items:center; background:#052642; padding:10px 20px;">
-    <!-- Left Logo -->
-    <img src="/public/logo-left.png" alt="Left Logo" style="height:90px; width:auto; display:block;">
+<!doctype html><html><head>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><title>تسجيل دخول   
+</title><link rel="stylesheet" href="/public/styles.css"><link rel="icon" href="/public/logo-left.png" type="image/png"></head>
+<body><header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
+  <div class="header-title"><h2>مهرجان حبة حنطة</h2></div>
+  <div class="header-right">
+    <nav class="header-actions">
+      <a href="/" class="btn-nav">Home</a>
+    </nav>
+    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+  </div>
+</header><main><section class="card"><form id="form">
+<label>الرقم القومي<input name="nationalId" required inputmode="numeric" pattern="\d{14}" maxlength="14" minlength="14" placeholder="14 رقم"></label><label>كلمة السر<input name="password" type="password" required></label><button>Login</button><p id="msg"></p></form></section></main>
+<script src="/public/app.js"></script><script>
+const nationalIdInput = document.querySelector('input[name="nationalId"]');
+nationalIdInput.addEventListener('input', () => {
+  nationalIdInput.value = nationalIdInput.value.replace(/\D/g, '').slice(0, 14);
+});
 
-    <!-- Center Home Button -->
-    <a href="/" style="background:#0a3a6b; color:white; text-decoration:none; padding:10px 20px; border-radius:8px; font-size:16px; display:flex; align-items:center; justify-content:center;">Home</a>
-
-    <!-- Right Logo -->
-    <img src="/public/logo-right.png" alt="Right Logo" style="height:90px; width:auto; display:block;">
-  </header>
-
-  <main style="display:flex; justify-content:center; align-items:center; height:calc(100vh - 120px); background:#f5f5f5;">
-    <section style="background:white; padding:40px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); width:100%; max-width:400px;">
-      <form id="form">
-        <label style="display:block; margin-bottom:15px;">
-          الرقم القومي
-          <input name="nationalId" required inputmode="numeric" pattern="\d{14}" maxlength="14" minlength="14" placeholder="14 رقم" style="width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc;">
-        </label>
-        <label style="display:block; margin-bottom:15px;">
-          كلمة السر
-          <input name="password" type="password" required style="width:100%; padding:10px; margin-top:5px; border-radius:6px; border:1px solid #ccc;">
-        </label>
-        <button style="width:100%; padding:12px; background:#052642; color:white; font-size:16px; border:none; border-radius:8px; cursor:pointer;">Login</button>
-        <p id="msg" style="margin-top:10px; color:red; font-size:14px;"></p>
-      </form>
-    </section>
-  </main>
-
-  <footer style="text-align:center; padding:15px 0; color:#888; font-size:13px;">
-    © 2026 CoptechAi. All rights reserved.
-  </footer>
-
-  <script src="/public/app.js"></script>
-  <script>
-    const nationalIdInput = document.querySelector('input[name="nationalId"]');
-    nationalIdInput.addEventListener('input', () => {
-      nationalIdInput.value = nationalIdInput.value.replace(/\D/g, '').slice(0, 14);
-    });
-
-    document.getElementById('form').addEventListener('submit', async e => {
-      e.preventDefault();
-      const body = Object.fromEntries(new FormData(e.target));
-      if (!/^\d{14}$/.test(body.nationalId || '')) {
-        document.getElementById('msg').textContent = 'National ID must be exactly 14 numbers';
-        return;
-      }
-      const button = e.target.querySelector('button');
-      button.disabled = true;
-      button.textContent = 'Logging in...';
-      try {
-        await api('/api/auth/student/login', { method:'POST', body: JSON.stringify(body) });
-        location.href = '/public/student-dashboard.html';
-      } catch(err) {
-        document.getElementById('msg').textContent = err.message;
-        button.disabled = false;
-        button.textContent = 'Login';
-      }
-    });
-  </script>
-</body>
-</html>
-
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = Object.fromEntries(new FormData(e.target));
+  if (!/^\d{14}$/.test(body.nationalId || '')) {
+    message('msg', 'National ID must be exactly 14 numbers', false);
+    return;
+  }
+  const button = e.target.querySelector('button');
+  button.disabled = true;
+  button.textContent = 'Logging in...';
+  try {
+    await api('/api/auth/student/login', { method:'POST', body: JSON.stringify(body) });
+    location.href = '/public/student-dashboard.html';
+  } catch(err) {
+    message('msg', err.message, false);
+    button.disabled = false;
+    button.textContent = 'Login';
+  }
+});
+</script><footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
+</body></html>
