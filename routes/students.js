@@ -4,7 +4,12 @@ const Student = require('../models/Student');
 const Activity = require('../models/Activity');
 const { requireStudent } = require('../middleware/auth');
 const { makeUpload } = require('../middleware/upload');
-const { generateStudentCode, requireFields, normalizeClassName, normalizeStudentYear } = require('../utils');
+const {
+  generateStudentCode,
+  requireFields,
+  normalizeClassName,
+  normalizeStudentYear
+} = require('../utils');
 
 const router = express.Router();
 
@@ -14,6 +19,7 @@ const paymentUpload = makeUpload('uploads/payment-proofs');
 
 router.post('/register', async (req, res) => {
   try {
+
     const needed = [
       'fullName',
       'gender',
@@ -23,8 +29,9 @@ router.post('/register', async (req, res) => {
       'nationalId',
       'password',
       'parentPhone',
-      'address','canTravel','paymentMethod'
-      
+      'address',
+      'canTravel',
+      'paymentMethod'
     ];
 
     const missing = requireFields(req.body, needed);
@@ -70,15 +77,29 @@ router.post('/register', async (req, res) => {
     }
 
     const className = normalizeClassName(req.body.className);
-    const studentYear = normalizeStudentYear(req.body.studentYear);
-    const passwordHash = await bcrypt.hash(req.body.password, 12);
+
+    const studentYear = normalizeStudentYear(
+      req.body.studentYear
+    );
+
+    const passwordHash = await bcrypt.hash(
+      req.body.password,
+      12
+    );
+
     const studentCode = await generateStudentCode(
       req.body.gender,
       className,
       studentYear
     );
-const canTravel = req.body.canTravel === 'true';
-    const paymentMethod = req.body.paymentMethod === 'instapay' ? 'instapay' : 'servant';
+
+    const canTravel = req.body.canTravel === 'true';
+
+    const paymentMethod =
+      req.body.paymentMethod === 'instapay'
+        ? 'instapay'
+        : 'servant';
+
     const student = await Student.create({
       studentCode,
       fullName: req.body.fullName,
@@ -99,7 +120,9 @@ const canTravel = req.body.canTravel === 'true';
       message: 'Student registered',
       studentCode: student.studentCode
     });
+
   } catch (err) {
+
     if (err.code === 11000) {
       return res.status(409).json({
         error: 'الرقم القومي أو كود المخدوم موجود بالفعل'
@@ -116,12 +139,17 @@ const canTravel = req.body.canTravel === 'true';
 
 router.get('/me', requireStudent, async (req, res) => {
   try {
-    const student = await Student.findById(req.session.userId)
+
+    const student = await Student.findById(
+      req.session.userId
+    )
       .select('-passwordHash')
       .populate('activities');
 
     res.json(student);
+
   } catch (err) {
+
     res.status(500).json({
       error: 'فشل تحميل بيانات المخدوم'
     });
@@ -130,6 +158,7 @@ router.get('/me', requireStudent, async (req, res) => {
 
 router.put('/me', requireStudent, async (req, res) => {
   try {
+
     const allowed = [
       'fullName',
       'parentPhone',
@@ -148,19 +177,28 @@ router.put('/me', requireStudent, async (req, res) => {
       }
     });
 
-    if (updates.fullName && String(updates.fullName).trim().split(/\s+/).length < 4) {
+    if (
+      updates.fullName &&
+      String(updates.fullName).trim().split(/\s+/).length < 4
+    ) {
       return res.status(400).json({
         error: 'الاسم يجب أن يكون رباعي'
       });
     }
 
-    if (updates.parentPhone && !/^\d{11}$/.test(updates.parentPhone)) {
+    if (
+      updates.parentPhone &&
+      !/^\d{11}$/.test(updates.parentPhone)
+    ) {
       return res.status(400).json({
         error: 'رقم ولي الأمر يجب أن يكون 11 رقم'
       });
     }
 
-    if (updates.studentPhone && !/^\d{11}$/.test(updates.studentPhone)) {
+    if (
+      updates.studentPhone &&
+      !/^\d{11}$/.test(updates.studentPhone)
+    ) {
       return res.status(400).json({
         error: 'رقم تليفون المخدوم يجب أن يكون 11 رقم'
       });
@@ -169,38 +207,51 @@ router.put('/me', requireStudent, async (req, res) => {
     const student = await Student.findByIdAndUpdate(
       req.session.userId,
       updates,
-      { new: true, runValidators: true }
+      {
+        new: true,
+        runValidators: true
+      }
     ).select('-passwordHash');
 
     res.json(student);
+
   } catch (err) {
+
     res.status(500).json({
       error: 'فشل تعديل بيانات المخدوم'
     });
   }
 });
 
-
 router.post(
   '/me/upload/student-photo',
   requireStudent,
   photoUpload.single('file'),
+
   async (req, res) => {
     try {
+
       if (!req.file) {
         return res.status(400).json({
           error: 'الصورة الشخصية مطلوبة'
         });
       }
 
-      await Student.findByIdAndUpdate(req.session.userId, {
-        studentPhotoPath: `/protected/uploads/student-photos/${req.file.filename}`
-      });
+      await Student.findByIdAndUpdate(
+        req.session.userId,
+        {
+          studentPhotoPath: req.file.path
+        }
+      );
 
       res.json({
         message: 'تم رفع الصورة الشخصية'
       });
+
     } catch (err) {
+
+      console.error(err);
+
       res.status(500).json({
         error: 'فشل رفع الصورة الشخصية'
       });
@@ -212,22 +263,31 @@ router.post(
   '/me/upload/birth-certificate',
   requireStudent,
   birthUpload.single('file'),
+
   async (req, res) => {
     try {
+
       if (!req.file) {
         return res.status(400).json({
           error: 'الملف مطلوب'
         });
       }
 
-      await Student.findByIdAndUpdate(req.session.userId, {
-        birthCertificatePath: `/protected/uploads/birth-certificates/${req.file.filename}`
-      });
+      await Student.findByIdAndUpdate(
+        req.session.userId,
+        {
+          birthCertificatePath: req.file.path
+        }
+      );
 
       res.json({
         message: 'تم رفع شهادة الميلاد'
       });
+
     } catch (err) {
+
+      console.error(err);
+
       res.status(500).json({
         error: 'فشل رفع شهادة الميلاد'
       });
@@ -239,22 +299,31 @@ router.post(
   '/me/upload/payment-proof',
   requireStudent,
   paymentUpload.single('file'),
+
   async (req, res) => {
     try {
+
       if (!req.file) {
         return res.status(400).json({
           error: 'الملف مطلوب'
         });
       }
 
-      await Student.findByIdAndUpdate(req.session.userId, {
-        paymentProofPath: `/protected/uploads/payment-proofs/${req.file.filename}`
-      });
+      await Student.findByIdAndUpdate(
+        req.session.userId,
+        {
+          paymentProofPath: req.file.path
+        }
+      );
 
       res.json({
         message: 'تم رفع إيصال الدفع'
       });
+
     } catch (err) {
+
+      console.error(err);
+
       res.status(500).json({
         error: 'فشل رفع إيصال الدفع'
       });
@@ -264,7 +333,10 @@ router.post(
 
 router.get('/me/activities', requireStudent, async (req, res) => {
   try {
-    const student = await Student.findById(req.session.userId).select('activities');
+
+    const student = await Student.findById(
+      req.session.userId
+    ).select('activities');
 
     const activities = await Activity.find({
       isActive: true
@@ -274,7 +346,9 @@ router.get('/me/activities', requireStudent, async (req, res) => {
       selected: student.activities.map(String),
       activities
     });
+
   } catch (err) {
+
     res.status(500).json({
       error: 'فشل تحميل الأنشطة'
     });
@@ -283,7 +357,10 @@ router.get('/me/activities', requireStudent, async (req, res) => {
 
 router.put('/me/activities', requireStudent, async (req, res) => {
   try {
-    const student = await Student.findById(req.session.userId);
+
+    const student = await Student.findById(
+      req.session.userId
+    );
 
     if (!student.studentPhotoPath) {
       return res.status(400).json({
@@ -297,7 +374,10 @@ router.put('/me/activities', requireStudent, async (req, res) => {
       });
     }
 
-    if (student.paymentMethod === 'instapay' && !student.paymentProofPath) {
+    if (
+      student.paymentMethod === 'instapay' &&
+      !student.paymentProofPath
+    ) {
       return res.status(400).json({
         error: 'يجب رفع إيصال الدفع عند اختيار الدفع عن طريق إنستا باي'
       });
@@ -318,16 +398,23 @@ router.put('/me/activities', requireStudent, async (req, res) => {
       isActive: true
     }).select('_id');
 
-    await Student.findByIdAndUpdate(req.session.userId, {
-      activities: valid.map((a) => a._id),
-      submissionComplete: true,
-      submittedAt: new Date()
-    });
+    await Student.findByIdAndUpdate(
+      req.session.userId,
+      {
+        activities: valid.map((a) => a._id),
+        submissionComplete: true,
+        submittedAt: new Date()
+      }
+    );
 
     res.json({
       message: 'تم إرسال التسجيل بنجاح'
     });
+
   } catch (err) {
+
+    console.error(err);
+
     res.status(500).json({
       error: 'فشل إرسال التسجيل'
     });
