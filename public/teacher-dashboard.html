@@ -234,28 +234,30 @@ function yesNo(value) { return value ? 'نعم' : 'لا'; }
 function activityTotal(student) { return (student.activities || []).reduce((sum, a) => sum + Number(a.price || 0), 0); }
 
 function documentHtml(path, label) {
+
   if (!path) {
     return `<p>${label}: Not uploaded</p>`;
   }
 
-  const downloadUrl = path.replace('/protected/uploads/', '/protected/download/');
   const isPdf = path.toLowerCase().endsWith('.pdf');
 
   if (isPdf) {
     return `
       <p>${label}:</p>
       <a href="${path}" target="_blank">View PDF</a><br>
-      <a href="${downloadUrl}" download>Download</a>
+      <a href="${path}" download>Download</a>
     `;
   }
 
   return `
     <p>${label}:</p>
     <a href="${path}" target="_blank">
-      <img src="${path}" width="120" style="border-radius:8px;border:1px solid #ddd">
+      <img src="${path}" width="120"
+      style="border-radius:8px;border:1px solid #ddd">
     </a><br>
+
     <a href="${path}" target="_blank">View</a><br>
-    <a href="${downloadUrl}" download>Download</a>
+    <a href="${path}" download>Download</a>
   `;
 }
 
