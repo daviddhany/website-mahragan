@@ -8,7 +8,7 @@ const { generateStudentCode, requireFields, normalizeClassName, normalizeStudent
 
 const router = express.Router();
 
-const photoUpload = makeUpload('uploads/student-photos', ['.jpg', '.jpeg', '.png', '.webp']);
+const photoUpload = makeUpload('uploads/student-photos');
 const birthUpload = makeUpload('uploads/birth-certificates');
 const paymentUpload = makeUpload('uploads/payment-proofs');
 
