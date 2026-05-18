@@ -6,116 +6,96 @@
   <title>تسجيل دخول</title>
   <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-left.png" type="image/png">
-
   <style>
+    /* ===== Header ===== */
+    header.site-header {
+      display: flex;
+      justify-content: space-between; /* logos at edges */
+      align-items: center;
+      background-color: #052642;
+      padding: 10px 20px;
+    }
+
+    .header-left img,
+    .header-right img {
+      height: 80px; /* make logos bigger */
+      width: auto;
+    }
+
+    /* ===== Main Login Card ===== */
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f5f5f5;
     }
 
-    header.site-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #052642;
-      color: white;
-      padding: 10px 20px;
-      position: relative;
-    }
-
-    .logo-link img,
-    .header-right img {
-      height: 80px; /* make logos bigger */
-      width: auto;
-    }
-
-    .header-title {
-      text-align: center;
-      flex-grow: 1;
-      font-size: 24px;
-      font-weight: bold;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .header-actions .btn-nav {
-      background-color: #0a5aa1;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 6px;
-      text-decoration: none;
-    }
-
     main {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: calc(100vh - 100px); /* header height + margin */
+      height: calc(100vh - 100px); /* header space */
     }
 
-    section.card {
+    .card {
       background: white;
       padding: 40px;
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      width: 320px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
     }
 
-    section.card label {
+    label {
       display: block;
       margin-bottom: 15px;
       font-weight: bold;
     }
 
-    section.card input {
+    input {
       width: 100%;
       padding: 10px;
+      margin-top: 5px;
       border-radius: 6px;
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
 
-    section.card button {
+    button {
       width: 100%;
       padding: 12px;
-      border: none;
-      border-radius: 8px;
-      background: #052642;
+      background-color: #052642;
       color: white;
       font-size: 16px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
     }
 
-    section.card p#msg {
-      margin-top: 12px;
+    button:disabled {
+      background-color: #4a6d8c;
+    }
+
+    #msg {
+      margin-top: 10px;
       color: red;
       font-size: 14px;
     }
 
-    footer.app-footer {
+    footer {
       text-align: center;
-      padding: 12px 0;
+      padding: 15px 0;
       color: #888;
-      font-size: 14px;
+      font-size: 13px;
     }
   </style>
 </head>
 
 <body>
   <header class="site-header">
-    <a href="/" class="logo-link">
+    <div class="header-left">
       <img src="/public/logo-left.png" alt="Logo Left">
-    </a>
-    <div class="header-title">مهرجان حبة حنطة</div>
+    </div>
     <div class="header-right">
-      <nav class="header-actions">
-        <a href="/" class="btn-nav">Home</a>
-      </nav>
       <img src="/public/logo-right.png" alt="Logo Right">
     </div>
   </header>
@@ -123,10 +103,12 @@
   <main>
     <section class="card">
       <form id="form">
-        <label>الرقم القومي
-          <input name="nationalId" required inputmode="numeric" pattern="\d{14}" maxlength="14" placeholder="14 رقم">
+        <label>
+          الرقم القومي
+          <input name="nationalId" required inputmode="numeric" pattern="\d{14}" maxlength="14" minlength="14" placeholder="14 رقم">
         </label>
-        <label>كلمة السر
+        <label>
+          كلمة السر
           <input name="password" type="password" required>
         </label>
         <button>Login</button>
@@ -134,8 +116,6 @@
       </form>
     </section>
   </main>
-
-  <footer class="app-footer">© 2026 CoptechAi. All rights reserved.</footer>
 
   <script src="/public/app.js"></script>
   <script>
@@ -148,7 +128,7 @@
       e.preventDefault();
       const body = Object.fromEntries(new FormData(e.target));
       if (!/^\d{14}$/.test(body.nationalId || '')) {
-        message('msg', 'National ID must be exactly 14 numbers', false);
+        document.getElementById('msg').textContent = 'National ID must be exactly 14 numbers';
         return;
       }
       const button = e.target.querySelector('button');
@@ -158,11 +138,13 @@
         await api('/api/auth/student/login', { method:'POST', body: JSON.stringify(body) });
         location.href = '/public/student-dashboard.html';
       } catch(err) {
-        message('msg', err.message, false);
+        document.getElementById('msg').textContent = err.message;
         button.disabled = false;
         button.textContent = 'Login';
       }
     });
   </script>
+
+  <footer class="app-footer">© 2026 CoptechAi. All rights reserved.</footer>
 </body>
 </html>
