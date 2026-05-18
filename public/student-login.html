@@ -1,71 +1,77 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>تسجيل دخول</title>
-  <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-left.png" type="image/png">
+  <link rel="stylesheet" href="/public/styles.css">
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f0f2f5;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      background-color: #f4f4f4;
     }
 
-    /* Header */
+    /* ===== Header ===== */
     .site-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
-      background: linear-gradient(to right, #052642, #07345e);
+      justify-content: space-between;
+      padding: 10px 15px;
+      background-color: #052642;
       color: white;
     }
 
-    .site-header .logo-link img,
-    .site-header .header-logo {
-      height: 50px;
+    .header-left,
+    .header-center,
+    .header-right {
+      display: flex;
+      align-items: center;
     }
 
-    .header-title h2 {
-      margin: 0 15px;
+    .header-left .header-logo {
+      height: 40px;
+    }
+
+    .header-center {
+      flex: 1;
+      justify-content: center;
       font-size: 20px;
-    }
-
-    .header-actions .btn-nav {
-      text-decoration: none;
-      color: white;
-      background-color: #0a2e55;
-      padding: 6px 12px;
-      border-radius: 6px;
       font-weight: bold;
     }
 
-    .header-actions .btn-nav:hover {
-      background-color: #104073;
+    .header-right .header-logo {
+      height: 40px;
+      margin-left: 10px;
     }
 
-    /* Main card */
+    .btn-nav {
+      background: #fff;
+      color: #052642;
+      padding: 6px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-right: 10px;
+      font-size: 14px;
+    }
+
+    /* ===== Card ===== */
     main {
-      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: calc(100vh - 70px);
       padding: 20px;
     }
 
     .card {
       background: white;
-      padding: 30px 40px;
       border-radius: 12px;
+      padding: 30px 25px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 400px;
-      text-align: right;
     }
 
     .card label {
@@ -80,55 +86,60 @@
       margin-top: 5px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 16px;
-      box-sizing: border-box;
+      font-size: 14px;
     }
 
     .card button {
       width: 100%;
       padding: 12px;
-      border: none;
-      border-radius: 8px;
       background-color: #052642;
       color: white;
+      border: none;
+      border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
-      margin-top: 10px;
+      margin-top: 15px;
     }
 
-    .card button:hover {
-      background-color: #07345e;
+    .card button:disabled {
+      background-color: #888;
     }
 
     #msg {
-      margin-top: 10px;
       color: red;
+      margin-top: 10px;
+      text-align: center;
       font-size: 14px;
     }
 
-    footer {
+    /* Footer */
+    .app-footer {
       text-align: center;
-      padding: 15px 0;
       font-size: 12px;
-      color: #888;
+      color: #666;
+      padding: 15px 0;
+      background: #f4f4f4;
     }
+
   </style>
 </head>
 <body>
 
-  <!-- Header -->
+  <!-- ===== Header ===== -->
   <header class="site-header">
-    <a href="/" class="logo-link"><img src="/public/logo-left.png" alt="Logo"></a>
-    <div class="header-title"><h2>مهرجان حبة حنطة</h2></div>
+    <div class="header-left">
+      <a href="/" class="logo-link">
+        <img src="/public/logo-left.png" class="header-logo" alt="Logo">
+      </a>
+    </div>
+    <div class="header-center">مهرجان حبة حنطة</div>
     <div class="header-right">
-      <nav class="header-actions">
-        <a href="/" class="btn-nav">Home</a>
-      </nav>
-      <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+      <a href="/" class="btn-nav">Home</a>
+      <img src="/public/logo-right.png" class="header-logo" alt="Right Logo">
     </div>
   </header>
 
-  <!-- Login Card -->
+  <!-- ===== Login Card ===== -->
   <main>
     <section class="card">
       <form id="form">
@@ -138,21 +149,21 @@
         <label>كلمة السر
           <input name="password" type="password" required>
         </label>
-        <button type="submit">Login</button>
+        <button>Login</button>
         <p id="msg"></p>
       </form>
     </section>
   </main>
 
+  <footer class="app-footer">© 2026 CoptechAi. All rights reserved.</footer>
+
   <script src="/public/app.js"></script>
   <script>
-    // Only allow numbers in National ID field
     const nationalIdInput = document.querySelector('input[name="nationalId"]');
     nationalIdInput.addEventListener('input', () => {
       nationalIdInput.value = nationalIdInput.value.replace(/\D/g, '').slice(0, 14);
     });
 
-    // Form submission
     document.getElementById('form').addEventListener('submit', async e => {
       e.preventDefault();
       const body = Object.fromEntries(new FormData(e.target));
@@ -174,6 +185,5 @@
     });
   </script>
 
-  <footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
 </body>
 </html>
