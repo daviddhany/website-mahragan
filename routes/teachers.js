@@ -8,8 +8,7 @@ const router = express.Router();
 
 router.get('/', requireAdmin, async (req, res) => {
   const search = String(req.query.search || '').trim();
-  const filter = { role: { $in: ['teacher', 'serviceLeader'] } };
-
+const filter = { role: { $in: ['admin', 'teacher', 'serviceLeader'] } };
   if (search) {
     filter.$or = [
       { fullName: new RegExp(search, 'i') },
