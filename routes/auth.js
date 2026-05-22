@@ -112,16 +112,26 @@ router.put('/teacher/change-password', async (req, res) => {
       return res.status(401).json({ error: 'غير مصرح' });
     }
 
-    const { newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body;
 
-    if (!newPassword) {
-      return res.status(400).json({ error: 'كلمة السر الجديدة مطلوبة' });
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'كلمة السر القديمة والجديدة مطلوبين' });
+    }
+
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({ error: 'كلمة السر الجديدة يجب أن تكون 8 أحرف على الأقل' });
     }
 
     const teacher = await Teacher.findById(req.session.userId);
 
     if (!teacher) {
       return res.status(404).json({ error: 'الخادم غير موجود' });
+    }
+
+    const oldPasswordOk = await bcrypt.compare(oldPassword, teacher.passwordHash);
+
+    if (!oldPasswordOk) {
+      return res.status(401).json({ error: 'كلمة السر القديمة غير صحيحة' });
     }
 
     teacher.passwordHash = await bcrypt.hash(newPassword, 12);

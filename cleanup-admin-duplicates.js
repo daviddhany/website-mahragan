@@ -12,7 +12,8 @@ async function cleanup() {
   const admins = await Teacher.find({ role: 'admin' }).sort({ phone: -1, createdAt: 1 });
   const idsToDelete = [];
   const seenPhones = new Set();
-  const mainAdmin = admins.find(a => a.phone === '01000000000');
+  const mainAdminPhone = process.env.ADMIN_PHONE;
+  const mainAdmin = mainAdminPhone ? admins.find(a => a.phone === mainAdminPhone) : null;
 
   for (const admin of admins) {
     const phone = admin.phone || '';

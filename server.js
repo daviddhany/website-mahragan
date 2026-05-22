@@ -32,6 +32,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI =
   process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/school_activity_app';
+app.set('trust proxy', 1);
+
+const isProduction = process.env.NODE_ENV === 'production';
+if (isProduction && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)) {
+  throw new Error('SESSION_SECRET must be set to a strong random value of at least 32 characters in production.');
+}
+
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -49,27 +56,38 @@ app.use((req, res, next) => {
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000,
-  message: { error: 'محاولات كثيرة. حاول مرة أخرى لاحقًا.' }
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'محاولات تسجيل دخول كثيرة. حاول مرة أخرى بعد 15 دقيقة.' }
 });
 
-app.use('/api/auth', authLimiter);
-app.use('/api/students/register', authLimiter);
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'محاولات تسجيل كثيرة. حاول مرة أخرى لاحقًا.' }
+});
+
+app.use('/api/auth/student/login', authLimiter);
+app.use('/api/auth/teacher/login', authLimiter);
+app.use('/api/students/register', registerLimiter);
 app.use((req, res, next) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   next();
 });
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'change-this-secret',
+    secret: process.env.SESSION_SECRET || 'dev-only-change-this-secret-before-production',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: MONGODB_URI }),
     cookie: {
-  httpOnly: true,
-  sameSite: 'lax',
-  secure: false,
-  maxAge: 1000 * 60 * 60 * 4
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: isProduction,
+      maxAge: 1000 * 60 * 60 * 4
 }
   })
 );

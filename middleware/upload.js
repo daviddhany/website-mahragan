@@ -10,16 +10,23 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const defaultAllowed = ['.jpg', '.jpeg', '.png', '.webp', '.pdf'];
+const allowedTypes = {
+  '.jpg': ['image/jpeg'],
+  '.jpeg': ['image/jpeg'],
+  '.png': ['image/png'],
+  '.webp': ['image/webp'],
+  '.pdf': ['application/pdf']
+};
+
+const defaultAllowed = Object.keys(allowedTypes);
 
 function makeUpload(folder, allowedExtensions = defaultAllowed) {
+  const normalizedExtensions = allowedExtensions.map(ext => ext.toLowerCase());
 
   const storage = new CloudinaryStorage({
     cloudinary,
     params: async (req, file) => {
-
       const ext = path.extname(file.originalname).toLowerCase();
-
       const student = await Student.findById(req.session.userId);
 
       if (!student) {
@@ -27,25 +34,16 @@ function makeUpload(folder, allowedExtensions = defaultAllowed) {
       }
 
       let type = 'file';
-
-      if (folder.includes('student-photos')) {
-        type = 'student-photo';
-      }
-
-      if (folder.includes('birth-certificates')) {
-        type = 'birth-certificate';
-      }
-
-      if (folder.includes('payment-proofs')) {
-        type = 'payment-proof';
-      }
-
-      const public_id = `${student.studentCode}-${type}`;
+      if (folder.includes('student-photos')) type = 'student-photo';
+      if (folder.includes('birth-certificates')) type = 'birth-certificate';
+      if (folder.includes('payment-proofs')) type = 'payment-proof';
 
       return {
         folder: 'students',
         resource_type: 'auto',
-        public_id,
+        public_id: `${student.studentCode}-${type}`,
+        overwrite: true,
+        allowed_formats: normalizedExtensions.map(value => value.replace('.', ''))
       };
     }
   });
@@ -53,12 +51,12 @@ function makeUpload(folder, allowedExtensions = defaultAllowed) {
   return multer({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 },
-
     fileFilter: (req, file, cb) => {
       const ext = path.extname(file.originalname).toLowerCase();
+      const validMimeTypes = allowedTypes[ext] || [];
 
-      if (!allowedExtensions.includes(ext)) {
-        return cb(new Error('Only allowed file types can be uploaded'));
+      if (!normalizedExtensions.includes(ext) || !validMimeTypes.includes(file.mimetype)) {
+        return cb(new Error('نوع الملف غير مسموح. ارفع JPG أو PNG أو WEBP أو PDF فقط.'));
       }
 
       cb(null, true);

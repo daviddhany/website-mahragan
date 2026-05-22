@@ -127,8 +127,12 @@
 
     <form id="passwordForm">
       <label>
+        كلمة السر القديمة
+        <input name="oldPassword" type="password" required>
+      </label>
+      <label>
         كلمة السر الجديدة
-        <input name="newPassword" type="password" required>
+        <input name="newPassword" type="password" minlength="8" required>
       </label>
 
       <button>تغيير</button>
@@ -236,28 +240,28 @@ function activityTotal(student) { return (student.activities || []).reduce((sum,
 function documentHtml(path, label) {
 
   if (!path) {
-    return `<p>${label}: Not uploaded</p>`;
+    return `<p>${escapeHtml(label)}: Not uploaded</p>`;
   }
 
   const isPdf = path.toLowerCase().endsWith('.pdf');
 
   if (isPdf) {
     return `
-      <p>${label}:</p>
-      <a href="${path}" target="_blank">View PDF</a><br>
-      <a href="${path}" download>Download</a>
+      <p>${escapeHtml(label)}:</p>
+      <a href="${escapeAttr(path)}" target="_blank">View PDF</a><br>
+      <a href="${escapeAttr(path)}" download>Download</a>
     `;
   }
 
   return `
-    <p>${label}:</p>
-    <a href="${path}" target="_blank">
-      <img src="${path}" width="120"
+    <p>${escapeHtml(label)}:</p>
+    <a href="${escapeAttr(path)}" target="_blank">
+      <img src="${escapeAttr(path)}" width="120"
       style="border-radius:8px;border:1px solid #ddd">
     </a><br>
 
-    <a href="${path}" target="_blank">View</a><br>
-    <a href="${path}" download>Download</a>
+    <a href="${escapeAttr(path)}" target="_blank">View</a><br>
+    <a href="${escapeAttr(path)}" download>Download</a>
   `;
 }
 
@@ -279,17 +283,17 @@ async function loadActivities() {
 
   const teamActivitySelect = document.getElementById('teamActivitySelect');
   teamActivitySelect.innerHTML = activities.map(a => `
-    <option value="${a._id}">${a.name}</option>
+    <option value="${escapeAttr(a._id)}">${escapeHtml(a.name)}</option>
   `).join('');
 
   const activityList = document.getElementById('activityList');
   if (activityList) {
     activityList.innerHTML = activities.map(a => `
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
-        <strong>${a.name}</strong>
+        <strong>${escapeHtml(a.name)}</strong>
         <span class="badge">${a.category === 'sports' ? 'رياضي' : 'روحي'}</span>
         <span class="badge">${Number(a.price || 0)} ج</span>
-        <button onclick="deleteActivity('${a._id}')">Remove</button>
+        <button onclick="deleteActivity('${escapeAttr(a._id)}')">Remove</button>
       </div>
     `).join('');
   }
@@ -328,8 +332,8 @@ async function renderEditActivities(student) {
 
   box.innerHTML = cachedActivities.map(activity => `
     <label class="checkbox-row">
-      <input type="checkbox" name="activityIds" value="${activity._id}" ${selected.has(activity._id) ? 'checked' : ''}>
-      ${activity.name} - ${activity.category === 'sports' ? 'رياضي' : 'روحي'} - ${Number(activity.price || 0)} ج
+      <input type="checkbox" name="activityIds" value="${escapeAttr(activity._id)}" ${selected.has(activity._id) ? 'checked' : ''}>
+      ${escapeHtml(activity.name)} - ${activity.category === 'sports' ? 'رياضي' : 'روحي'} - ${Number(activity.price || 0)} ج
     </label>
   `).join('') || '<p class="muted">No activities available.</p>';
 }
@@ -368,19 +372,19 @@ async function loadStudents() {
     students = await api('/api/admin/students?search=' + encodeURIComponent(q));
     cachedStudents = students;
   } catch (err) {
-    rows.innerHTML = `<tr><td colspan="15" class="error">${err.message}</td></tr>`;
+    rows.innerHTML = `<tr><td colspan="15" class="error">${escapeHtml(err.message)}</td></tr>`;
     return;
   }
 
   rows.innerHTML = students.map(s => `
     <tr>
-      <td>${s.studentCode || ''}</td>
-      <td>${s.fullName || ''}</td>
+      <td>${escapeHtml(s.studentCode || '')}</td>
+      <td>${escapeHtml(s.fullName || '')}</td>
       <td>${s.birthDate ? new Date(s.birthDate).toLocaleDateString() : ''}</td>
-      <td>${s.studentYear || ''}</td>
-      <td>${s.className || ''}</td>
-      <td>${s.nationalId || ''}</td>
-      <td>${s.parentPhone || ''}</td>
+      <td>${escapeHtml(s.studentYear || '')}</td>
+      <td>${escapeHtml(s.className || '')}</td>
+      <td>${escapeHtml(s.nationalId || '')}</td>
+      <td>${escapeHtml(s.parentPhone || '')}</td>
       <td>${studentStatusHtml(s)}</td>
       <td>${paymentLabel(s.paymentMethod)}</td>
       <td>${activityTotal(s)} ج</td>
@@ -393,12 +397,12 @@ async function loadStudents() {
         ${documentHtml(s.paymentProofPath, 'Payment Proof')}
       </td>
       <td>
-        ${(s.activities || []).map(a => `<span class="badge">${a.name}</span>`).join('')}
+        ${(s.activities || []).map(a => `<span class="badge">${escapeHtml(a.name)}</span>`).join('')}
       </td>
       <td>
-        <button onclick="openEditStudent('${s._id}')">Edit</button>
-        <button onclick="changeStudentPassword('${s._id}')">Change Password</button>
-        <button onclick="deleteStudent('${s._id}')">Remove Student</button>
+        <button onclick="openEditStudent('${escapeAttr(s._id)}')">Edit</button>
+        <button onclick="changeStudentPassword('${escapeAttr(s._id)}')">Change Password</button>
+        <button onclick="deleteStudent('${escapeAttr(s._id)}')">Remove Student</button>
       </td>
     </tr>
   `).join('');
@@ -479,7 +483,7 @@ function teamOptionsHtml(currentTeamId = '') {
   const teams = cachedTeams.filter(t => t.activity && t.activity._id === activityId && !t.locked);
 
   return teams.map(team => `
-    <option value="${team._id}" ${team._id === currentTeamId ? 'selected' : ''}>${team.name}</option>
+    <option value="${team._id}" ${team._id === currentTeamId ? 'selected' : ''}>${escapeHtml(team.name)}</option>
   `).join('');
 }
 
@@ -593,18 +597,18 @@ function renderTeams() {
       ${teams.length ? teams.map(team => `
         <div class="team-card ${team.locked ? 'locked-team' : ''}">
           <div class="team-title-row">
-            <h3>${team.name}</h3>
+            <h3>${escapeHtml(team.name)}</h3>
             <span class="lock-badge">${team.locked ? '🔒 Locked' : '🔓 Editable'}</span>
           </div>
           <p><strong>${(team.students || []).length}</strong> students</p>
-          <div class="drop-zone chip-list" data-team-id="${team._id}">
+          <div class="drop-zone chip-list" data-team-id="${escapeAttr(team._id)}">
             ${(team.students || []).map(student => studentChip(student, team._id)).join('') || '<p class="muted">Move students here.</p>'}
           </div>
           <div class="team-actions">
-            <button type="button" onclick="toggleTeamLock('${team._id}', ${team.locked ? 'false' : 'true'})">
+            <button type="button" onclick="toggleTeamLock('${escapeAttr(team._id)}', ${team.locked ? 'false' : 'true'})">
               ${team.locked ? 'Unlock Team' : 'Lock Team'}
             </button>
-            <button type="button" onclick="deleteTeam('${team._id}')" ${team.locked ? 'disabled' : ''}>Delete Team</button>
+            <button type="button" onclick="deleteTeam('${escapeAttr(team._id)}')" ${team.locked ? 'disabled' : ''}>Delete Team</button>
           </div>
         </div>
       `).join('') : '<p>No teams created for this activity yet. Create empty teams first, then move students into them.</p>'}

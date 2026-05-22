@@ -10,8 +10,20 @@ const MONGODB_URI =
 async function seed() {
   await mongoose.connect(MONGODB_URI);
 
-  const adminPhone = '01000000000';
-  const adminPassword = 'admin12345';
+  const adminPhone = process.env.ADMIN_PHONE;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminPhone || !adminPassword) {
+    throw new Error('Set ADMIN_PHONE and ADMIN_PASSWORD in environment variables before running seed.');
+  }
+
+  if (!/^\d{11}$/.test(adminPhone)) {
+    throw new Error('ADMIN_PHONE must be 11 digits.');
+  }
+
+  if (adminPassword.length < 12) {
+    throw new Error('ADMIN_PASSWORD must be at least 12 characters.');
+  }
 
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
@@ -29,7 +41,8 @@ async function seed() {
   );
 
   console.log('Seed complete');
-  console.log(`Admin login: ${adminPhone} / ${adminPassword}`);
+  console.log(`Admin phone: ${adminPhone}`);
+  console.log('Admin password was read from ADMIN_PASSWORD and was not printed.');
 
   await mongoose.disconnect();
 }

@@ -42,7 +42,9 @@ cp .env.example .env
 ```env
 PORT=3000
 MONGODB_URI=mongodb://127.0.0.1:27017/school_activity_app
-SESSION_SECRET=change-this-secret-before-production
+SESSION_SECRET=replace-with-a-random-secret-at-least-32-characters
+ADMIN_PHONE=01012345678
+ADMIN_PASSWORD=replace-with-a-strong-admin-password
 ```
 
 4. Seed the first teacher/admin and sample activities:
@@ -51,14 +53,7 @@ SESSION_SECRET=change-this-secret-before-production
 npm run seed
 ```
 
-Default teacher login:
-
-```text
-Email: admin@school.com
-Password: admin12345
-```
-
-Change this password before real use.
+The admin login is created from `ADMIN_PHONE` and `ADMIN_PASSWORD` in `.env`. Do not use a default password in production.
 
 5. Start the app:
 

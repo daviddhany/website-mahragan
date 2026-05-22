@@ -41,13 +41,13 @@ async function loadMe(){
   document.getElementById('paymentUploadCard').style.display = me.paymentMethod === 'instapay' ? '' : 'none';
   document.getElementById('profile').innerHTML = `
     <div class="profile-grid">
-      <div class="profile-item"><span>كود المخدوم</span><strong>${me.studentCode || ''}</strong></div>
-      <div class="profile-item"><span>الاسم</span><strong>${me.fullName || ''}</strong></div>
-      <div class="profile-item"><span>الخدمة</span><strong>${me.className || ''}</strong></div>
-      <div class="profile-item"><span>السنة</span><strong>${me.studentYear || ''}</strong></div>
-      <div class="profile-item"><span>الرقم القومي</span><strong>${me.nationalId || ''}</strong></div>
-      <div class="profile-item"><span>رقم ولي الأمر</span><strong>${me.parentPhone || ''}</strong></div>
-      <div class="profile-item"><span>العنوان</span><strong>${me.address || ''}</strong></div>
+      <div class="profile-item"><span>كود المخدوم</span><strong>${escapeHtml(me.studentCode || '')}</strong></div>
+      <div class="profile-item"><span>الاسم</span><strong>${escapeHtml(me.fullName || '')}</strong></div>
+      <div class="profile-item"><span>الخدمة</span><strong>${escapeHtml(me.className || '')}</strong></div>
+      <div class="profile-item"><span>السنة</span><strong>${escapeHtml(me.studentYear || '')}</strong></div>
+      <div class="profile-item"><span>الرقم القومي</span><strong>${escapeHtml(me.nationalId || '')}</strong></div>
+      <div class="profile-item"><span>رقم ولي الأمر</span><strong>${escapeHtml(me.parentPhone || '')}</strong></div>
+      <div class="profile-item"><span>العنوان</span><strong>${escapeHtml(me.address || '')}</strong></div>
       <div class="profile-item"><span>طريقة الدفع</span><strong>${paymentLabel(me.paymentMethod)}</strong></div>
       <div class="profile-item"><span>الصورة الشخصية</span><strong>${status(me.studentPhotoPath)}</strong></div>
       <div class="profile-item"><span>شهادة الميلاد</span><strong>${status(me.birthCertificatePath)}</strong></div>
@@ -69,7 +69,7 @@ async function loadActivities(){
     return `<div class="activity-group"><h3>${title}</h3><div class="activity-choice-grid">${list.map(a => `
       <label class="activity-choice ${selected.has(a._id) ? 'selected' : ''}">
         <input type="checkbox" value="${a._id}" ${selected.has(a._id) ? 'checked' : ''}>
-        <span>${a.name}</span>
+        <span>${escapeHtml(a.name)}</span>
         <small>${Number(a.price || 0)} ج</small>
       </label>`).join('') || '<p class="muted">لا توجد أنشطة.</p>'}</div></div>`;
   }).join('');
@@ -90,10 +90,10 @@ function renderSummary(){
   document.getElementById('summaryCard').style.display = 'block';
   document.getElementById('summary').innerHTML = `
     <div class="profile-grid">
-      <div class="profile-item"><span>الاسم</span><strong>${me.fullName || ''}</strong></div>
-      <div class="profile-item"><span>كود المخدوم</span><strong>${me.studentCode || ''}</strong></div>
-      <div class="profile-item"><span>الخدمة والسنة</span><strong>${me.className || ''} - ${me.studentYear || ''}</strong></div>
-      <div class="profile-item"><span>الأنشطة المختارة</span><strong>${chosen.map(a => a.name).join('، ') || 'لم يتم الاختيار'}</strong></div>
+      <div class="profile-item"><span>الاسم</span><strong>${escapeHtml(me.fullName || '')}</strong></div>
+      <div class="profile-item"><span>كود المخدوم</span><strong>${escapeHtml(me.studentCode || '')}</strong></div>
+      <div class="profile-item"><span>الخدمة والسنة</span><strong>${escapeHtml(me.className || '')} - ${escapeHtml(me.studentYear || '')}</strong></div>
+      <div class="profile-item"><span>الأنشطة المختارة</span><strong>${chosen.map(a => escapeHtml(a.name)).join('، ') || 'لم يتم الاختيار'}</strong></div>
       <div class="profile-item"><span>إجمالي الدفع</span><strong>${chosen.reduce((sum,a)=>sum+Number(a.price||0),0)} ج</strong></div>
       <div class="profile-item"><span>طريقة الدفع</span><strong>${paymentLabel(me.paymentMethod)}</strong></div>
     </div>`;
