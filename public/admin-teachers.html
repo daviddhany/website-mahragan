@@ -152,9 +152,9 @@ async function loadTeachers() {
     <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd;padding:10px 0;">
       <div>
         <strong>${escapeHtml(t.fullName)}</strong><br>
-${escapeHtml(t.phone || '')}<br>        الدور: ${
+${escapeHtml(t.phone || '')}<br>      الدور: ${
   t.role === 'admin'
-    ? 'أدمن'
+    ? 'أدمن / خادم'
     : t.role === 'serviceLeader'
       ? 'أمين خدمة'
       : 'خادم'
