@@ -11,14 +11,9 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'student-photos',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [
-      { width: 1200, height: 1200, crop: 'limit' },
-      { quality: 'auto:good' },
-      { fetch_format: 'auto' }
-    ]
-  }
+    folder: "students",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+  },
 });
 
 const upload = multer({ storage });
