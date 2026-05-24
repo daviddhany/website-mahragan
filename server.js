@@ -24,6 +24,7 @@ const teacherRoutes = require('./routes/teachers');
 const authRoutes = require('./routes/auth');
 const studentRoutes = require('./routes/students');
 const activityRoutes = require('./routes/activities');
+const categoryRoutes = require('./routes/categories');
 const adminRoutes = require('./routes/admin');
 const { requireTeacher } = require('./middleware/auth');
 const teamRoutes = require('./routes/teams');
@@ -105,6 +106,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/activities', activityRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/teams', teamRoutes);
 app.use('/api/admin', adminRoutes);
 

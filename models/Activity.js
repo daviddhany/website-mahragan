@@ -4,11 +4,7 @@ const activitySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, unique: true },
     description: { type: String, default: '' },
-    category: {
-      type: String,
-      enum: ['spiritual', 'sports'],
-      default: 'spiritual'
-    },
+    category: { type: String, required: true, trim: true },
     price: {
       type: Number,
       default: 10,

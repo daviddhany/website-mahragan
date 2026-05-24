@@ -1,6 +1,7 @@
 const express = require('express');
 const Student = require('../models/Student');
 const Activity = require('../models/Activity');
+const Category = require('../models/Category');
 const Teacher = require('../models/Teacher');
 const Team = require('../models/Team');
 const { requireTeacher, requireAdmin } = require('../middleware/auth');
@@ -10,14 +11,24 @@ const router = express.Router();
 router.post('/activities', requireAdmin, async (req, res) => {
   const name = (req.body.name || '').trim();
   const description = (req.body.description || '').trim();
-  const category = ['spiritual', 'sports'].includes(req.body.category) ? req.body.category : 'spiritual';
+  const category = (req.body.category || '').trim();
   const price = Number.isFinite(Number(req.body.price)) ? Number(req.body.price) : 10;
 
   if (!name) {
     return res.status(400).json({ error: 'اسم النشاط مطلوب' });
   }
 
+  if (!category) {
+    return res.status(400).json({ error: 'تصنيف النشاط مطلوب' });
+  }
+
   try {
+    const selectedCategory = await Category.findOne({ name: category, isActive: true });
+
+    if (!selectedCategory) {
+      return res.status(400).json({ error: 'تصنيف النشاط غير موجود' });
+    }
+
     const existingActivity = await Activity.findOne({ name });
 
     if (existingActivity) {

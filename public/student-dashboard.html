@@ -60,13 +60,10 @@ async function loadActivities(){
   const data = await api('/api/students/me/activities');
   const selected = new Set(data.selected);
   activityData = data.activities || [];
-  const groups = [
-    ['spiritual', 'أنشطة روحية'],
-    ['sports', 'أنشطة رياضية']
-  ];
-  document.getElementById('activities').innerHTML = groups.map(([category, title]) => {
-    const list = activityData.filter(a => (a.category || 'spiritual') === category);
-    return `<div class="activity-group"><h3>${title}</h3><div class="activity-choice-grid">${list.map(a => `
+  const groups = [...new Set(activityData.map(a => a.category || 'بدون تصنيف'))];
+  document.getElementById('activities').innerHTML = groups.map(category => {
+    const list = activityData.filter(a => (a.category || 'بدون تصنيف') === category);
+    return `<div class="activity-group"><h3>${escapeHtml(category)}</h3><div class="activity-choice-grid">${list.map(a => `
       <label class="activity-choice ${selected.has(a._id) ? 'selected' : ''}">
         <input type="checkbox" value="${a._id}" ${selected.has(a._id) ? 'checked' : ''}>
         <span>${escapeHtml(a.name)}</span>

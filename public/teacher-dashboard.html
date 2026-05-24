@@ -173,6 +173,22 @@
 
   <div id="adminOnly">
     <section class="card">
+      <h2>Add Category</h2>
+
+      <form id="categoryAdd">
+        <label>
+          Category Name
+          <input name="name" placeholder="مثال: كشافة" required>
+        </label>
+
+        <button>Add Category</button>
+        <p id="categoryMsg"></p>
+      </form>
+
+      <div id="categoryList"></div>
+    </section>
+
+    <section class="card">
       <h2>Add Activity</h2>
 
       <form id="activityAdd">
@@ -188,10 +204,7 @@
 
         <label>
           Type
-          <select name="category" required>
-            <option value="spiritual">روحي</option>
-            <option value="sports">رياضي</option>
-          </select>
+          <select name="category" id="activityCategorySelect" required></select>
         </label>
 
         <label>
@@ -217,6 +230,7 @@
 let currentUser = null;
 let cachedStudents = [];
 let cachedActivities = [];
+let cachedCategories = [];
 let cachedTeams = [];
 let cachedTeamEligibleStudents = [];
 
@@ -277,6 +291,35 @@ async function loadMe() {
   }
 }
 
+async function loadCategories() {
+  const categories = await api('/api/categories');
+  cachedCategories = categories;
+
+  const activityCategorySelect = document.getElementById('activityCategorySelect');
+  if (activityCategorySelect) {
+    activityCategorySelect.innerHTML = categories.map(c => `
+      <option value="${escapeAttr(c.name)}">${escapeHtml(c.name)}</option>
+    `).join('');
+  }
+
+  const categoryList = document.getElementById('categoryList');
+  if (categoryList) {
+    categoryList.innerHTML = categories.map(c => `
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <strong>${escapeHtml(c.name)}</strong>
+        <button onclick="deleteCategory('${escapeAttr(c._id)}')">Remove</button>
+      </div>
+    `).join('') || '<p class="muted">No categories available.</p>';
+  }
+}
+
+async function deleteCategory(id) {
+  if (!confirm('Remove this category?')) return;
+
+  await api('/api/categories/' + id, { method: 'DELETE' });
+  await loadCategories();
+}
+
 async function loadActivities() {
   const activities = await api('/api/activities');
   cachedActivities = activities;
@@ -291,7 +334,7 @@ async function loadActivities() {
     activityList.innerHTML = activities.map(a => `
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
         <strong>${escapeHtml(a.name)}</strong>
-        <span class="badge">${a.category === 'sports' ? 'رياضي' : 'روحي'}</span>
+        <span class="badge">${escapeHtml(a.category || '')}</span>
         <span class="badge">${Number(a.price || 0)} ج</span>
         <button onclick="deleteActivity('${escapeAttr(a._id)}')">Remove</button>
       </div>
@@ -333,7 +376,7 @@ async function renderEditActivities(student) {
   box.innerHTML = cachedActivities.map(activity => `
     <label class="checkbox-row">
       <input type="checkbox" name="activityIds" value="${escapeAttr(activity._id)}" ${selected.has(activity._id) ? 'checked' : ''}>
-      ${escapeHtml(activity.name)} - ${activity.category === 'sports' ? 'رياضي' : 'روحي'} - ${Number(activity.price || 0)} ج
+      ${escapeHtml(activity.name)} - ${escapeHtml(activity.category || '')} - ${Number(activity.price || 0)} ج
     </label>
   `).join('') || '<p class="muted">No activities available.</p>';
 }
@@ -747,6 +790,31 @@ document.getElementById('editStudentForm').addEventListener('submit', async e =>
   }
 });
 
+
+document.getElementById('categoryAdd').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const body = Object.fromEntries(new FormData(e.target));
+  const submitBtn = e.target.querySelector('button');
+  submitBtn.disabled = true;
+  setLoading('categoryMsg', 'Adding category...');
+
+  try {
+    await api('/api/categories', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    message('categoryMsg', 'Category added successfully');
+    e.target.reset();
+    await loadCategories();
+  } catch (err) {
+    message('categoryMsg', err.message || 'Could not add category', false);
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
 document.getElementById('activityAdd').addEventListener('submit', async e => {
   e.preventDefault();
 
@@ -785,6 +853,7 @@ async function start() {
   try {
     await loadMe();
     await loadStudents();
+    await loadCategories();
     await loadActivities();
     await loadTeams();
   } catch (err) {
