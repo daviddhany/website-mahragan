@@ -44,7 +44,6 @@ return {
   public_id: `${student.studentCode}-${type}`,
   format: ext.replace('.', ''),
   overwrite: true,
-  allowed_formats: normalizedExtensions.map(value => value.replace('.', ''))
 };
     }
   });
