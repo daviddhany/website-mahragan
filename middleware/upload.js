@@ -15,7 +15,6 @@ const allowedTypes = {
   '.jpeg': ['image/jpeg'],
   '.png': ['image/png'],
   '.webp': ['image/webp'],
-  '.pdf': ['application/pdf']
 };
 
 const defaultAllowed = Object.keys(allowedTypes);
