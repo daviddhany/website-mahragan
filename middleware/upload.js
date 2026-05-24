@@ -40,7 +40,7 @@ function makeUpload(folder, allowedExtensions = defaultAllowed) {
 
       return {
         folder: 'students',
-        resource_type: 'auto',
+        resource_type: ext === '.pdf' ? 'raw' : 'image',
         public_id: `${student.studentCode}-${type}`,
         overwrite: true,
         allowed_formats: normalizedExtensions.map(value => value.replace('.', ''))
