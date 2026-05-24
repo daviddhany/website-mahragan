@@ -39,12 +39,12 @@ function makeUpload(folder, allowedExtensions = defaultAllowed) {
       if (folder.includes('payment-proofs')) type = 'payment-proof';
 
       return {
-        folder: 'students',
-        resource_type: ext === '.pdf' ? 'raw' : 'image',
-        public_id: `${student.studentCode}-${type}`,
-        overwrite: true,
-        allowed_formats: normalizedExtensions.map(value => value.replace('.', ''))
-      };
+  folder: 'students',
+  resource_type: ext === '.pdf' ? 'raw' : 'image',
+  public_id: `${student.studentCode}-${type}${ext}`,
+  overwrite: true,
+  allowed_formats: normalizedExtensions.map(value => value.replace('.', ''))
+};
     }
   });
 
