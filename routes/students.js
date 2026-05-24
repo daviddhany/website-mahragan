@@ -276,8 +276,9 @@ router.post(
       await Student.findByIdAndUpdate(
         req.session.userId,
         {
-          birthCertificatePath: req.file.path
-        }
+birthCertificatePath: req.file.path.endsWith('.pdf')
+  ? req.file.path.replace('/image/upload/', '/raw/upload/fl_inline/')
+  : req.file.path        }
       );
 
       res.json({
