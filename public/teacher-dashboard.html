@@ -173,15 +173,15 @@
 
   <div id="adminOnly">
     <section class="card">
-      <h2>Add Category</h2>
+      <h2>Categories Menu</h2>
 
       <form id="categoryAdd">
         <label>
-          Category Name
-          <input name="name" placeholder="مثال: كشافة" required>
+          Menu / Category Name
+          <input name="name" placeholder="مثال: ألحان / كشافة / رياضة" required>
         </label>
 
-        <button>Add Category</button>
+        <button>Add Menu / Category</button>
         <p id="categoryMsg"></p>
       </form>
 
@@ -203,7 +203,7 @@
         </label>
 
         <label>
-          Type
+          Menu / Category
           <select name="category" id="activityCategorySelect" required></select>
         </label>
 
@@ -297,9 +297,11 @@ async function loadCategories() {
 
   const activityCategorySelect = document.getElementById('activityCategorySelect');
   if (activityCategorySelect) {
-    activityCategorySelect.innerHTML = categories.map(c => `
-      <option value="${escapeAttr(c.name)}">${escapeHtml(c.name)}</option>
-    `).join('');
+    activityCategorySelect.innerHTML = categories.length
+      ? categories.map(c => `
+        <option value="${escapeAttr(c.name)}">${escapeHtml(c.name)}</option>
+      `).join('')
+      : '<option value="">Add a menu/category first</option>';
   }
 
   const categoryList = document.getElementById('categoryList');
@@ -307,9 +309,10 @@ async function loadCategories() {
     categoryList.innerHTML = categories.map(c => `
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
         <strong>${escapeHtml(c.name)}</strong>
+        <span class="badge">Menu</span>
         <button onclick="deleteCategory('${escapeAttr(c._id)}')">Remove</button>
       </div>
-    `).join('') || '<p class="muted">No categories available.</p>';
+    `).join('') || '<p class="muted">No menu/categories available. Add one first.</p>';
   }
 }
 
@@ -805,7 +808,7 @@ document.getElementById('categoryAdd').addEventListener('submit', async e => {
       body: JSON.stringify(body)
     });
 
-    message('categoryMsg', 'Category added successfully');
+    message('categoryMsg', 'Menu / Category added successfully');
     e.target.reset();
     await loadCategories();
   } catch (err) {
