@@ -65,10 +65,7 @@ document.getElementById('form').addEventListener('submit', async e => {
   const body = Object.fromEntries(new FormData(e.target));
   const button = document.getElementById('submitBtn');
 
-  if (!/^\d{14}$/.test(body.nationalId || '')) {
-    message('msg', 'الرقم القومي يجب أن يكون 14 رقم', false);
-    return;
-  }
+ 
 
   button.disabled = true;
   button.textContent = 'جاري الحفظ...';
