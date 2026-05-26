@@ -59,21 +59,12 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    if (!/^\d{14}$/.test(req.body.nationalId)) {
-      return res.status(400).json({
-        error: 'الرقم القومي يجب أن يكون 14 رقم'
-      });
-    }
-
+    
     const exists = await Student.findOne({
       nationalId: req.body.nationalId
     });
 
-    if (exists) {
-      return res.status(409).json({
-        error: 'يوجد مخدوم مسجل بهذا الرقم القومي بالفعل'
-      });
-    }
+   
 
     const className = normalizeClassName(req.body.className);
 
