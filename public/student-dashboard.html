@@ -12,6 +12,16 @@
 </header>
 <main>
 <section class="card"><h2>بياناتي</h2><div id="profile"></div></section>
+<section class="card" id="changePasswordCard">
+  <h2>تغيير كلمة السر</h2>
+  <p class="muted">لو دي أول مرة تدخل، غيّر كلمة السر الثابتة لكلمة سر خاصة بيك.</p>
+  <form id="passwordForm">
+    <label>كلمة السر الحالية<input name="oldPassword" type="password" required></label>
+    <label>كلمة السر الجديدة<input name="newPassword" type="password" minlength="8" required></label>
+    <button>تغيير كلمة السر</button>
+  </form>
+  <p id="passwordMsg"></p>
+</section>
 <section class="card"><h2>رفع الملفات</h2><p class="muted">أكمل الملفات المطلوبة قبل إرسال التسجيل.</p>
 <div class="upload-grid">
   <div class="upload-card"><form id="photoForm"><label>الصورة الشخصية (مطلوبة)<input name="file" type="file"  required></label><button>رفع الصورة الشخصية</button></form><p id="photoMsg"></p></div>
@@ -45,7 +55,6 @@ async function loadMe(){
       <div class="profile-item"><span>الاسم</span><strong>${escapeHtml(me.fullName || '')}</strong></div>
       <div class="profile-item"><span>الخدمة</span><strong>${escapeHtml(me.className || '')}</strong></div>
       <div class="profile-item"><span>السنة</span><strong>${escapeHtml(me.studentYear || '')}</strong></div>
-      <div class="profile-item"><span>الرقم القومي</span><strong>${escapeHtml(me.nationalId || '')}</strong></div>
       <div class="profile-item"><span>رقم ولي الأمر</span><strong>${escapeHtml(me.parentPhone || '')}</strong></div>
       <div class="profile-item"><span>العنوان</span><strong>${escapeHtml(me.address || '')}</strong></div>
       <div class="profile-item"><span>طريقة الدفع</span><strong>${paymentLabel(me.paymentMethod)}</strong></div>
@@ -105,6 +114,24 @@ async function upload(form, url, msg){
 document.getElementById('photoForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/student-photo', 'photoMsg'); } catch(err){ message('photoMsg', err.message, false); } });
 document.getElementById('birthForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/birth-certificate', 'birthMsg'); } catch(err){ message('birthMsg', err.message, false); } });
 document.getElementById('payForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/payment-proof', 'payMsg'); } catch(err){ message('payMsg', err.message, false); } });
+
+document.getElementById('passwordForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const button = e.target.querySelector('button');
+  setButtonLoading(button, true, 'جاري التغيير...');
+  try {
+    const body = Object.fromEntries(new FormData(e.target));
+    await api('/api/auth/student/change-password', { method:'PUT', body: JSON.stringify(body) });
+    message('passwordMsg', 'تم تغيير كلمة السر بنجاح');
+    e.target.reset();
+    me.mustChangePassword = false;
+  } catch(err) {
+    message('passwordMsg', err.message, false);
+  } finally {
+    setButtonLoading(button, false);
+  }
+});
+
 document.getElementById('activityForm').addEventListener('submit', async e => {
   e.preventDefault();
   const ids = selectedActivities();

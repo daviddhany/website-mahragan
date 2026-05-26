@@ -132,8 +132,8 @@
   <main>
     <section class="card">
       <form id="form">
-        <label>الرقم القومي
-          <input name="nationalId" required inputmode="numeric" pattern="\d{14}" maxlength="14" minlength="14" placeholder="14 رقم">
+        <label>كود المخدوم
+          <input name="studentCode" required placeholder="مثال: BY3-2026-0001">
         </label>
         <label>كلمة السر
           <input name="password" type="password" required>
@@ -146,25 +146,20 @@
 
   <script src="/public/app.js"></script>
   <script>
-    // Only allow numbers in National ID field
-    const nationalIdInput = document.querySelector('input[name="nationalId"]');
-    nationalIdInput.addEventListener('input', () => {
-      nationalIdInput.value = nationalIdInput.value.replace(/\D/g, '').slice(0, 14);
-    });
-
     // Form submission
     document.getElementById('form').addEventListener('submit', async e => {
       e.preventDefault();
       const body = Object.fromEntries(new FormData(e.target));
-      if (!/^\d{14}$/.test(body.nationalId || '')) {
-        message('msg', 'National ID must be exactly 14 numbers', false);
+      body.studentCode = String(body.studentCode || '').trim().toUpperCase();
+      if (!body.studentCode) {
+        message('msg', 'Student code is required', false);
         return;
       }
       const button = e.target.querySelector('button');
       button.disabled = true;
       button.textContent = 'Logging in...';
       try {
-        await api('/api/auth/student/login', { method:'POST', body: JSON.stringify(body) });
+        const data = await api('/api/auth/student/login', { method:'POST', body: JSON.stringify(body) });
         location.href = '/public/student-dashboard.html';
       } catch(err) {
         message('msg', err.message, false);

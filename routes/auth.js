@@ -8,22 +8,24 @@ const router = express.Router();
 // ================= STUDENT LOGIN =================
 router.post('/student/login', async (req, res) => {
   try {
-    const { nationalId, password } = req.body;
+    const { studentCode, password } = req.body;
 
-    if (!/^\d{14}$/.test(String(nationalId || ''))) {
-      return res.status(400).json({ error: 'الرقم القومي يجب أن يكون 14 رقم' });
+    const cleanCode = String(studentCode || '').trim().toUpperCase();
+
+    if (!cleanCode) {
+      return res.status(400).json({ error: 'كود المخدوم مطلوب' });
     }
 
-    const student = await Student.findOne({ nationalId });
+    const student = await Student.findOne({ studentCode: cleanCode });
 
     if (!student) {
-      return res.status(401).json({ error: 'الرقم القومي أو كلمة السر غير صحيحة' });
+      return res.status(401).json({ error: 'كود المخدوم أو كلمة السر غير صحيحة' });
     }
 
     const ok = await bcrypt.compare(password, student.passwordHash);
 
     if (!ok) {
-      return res.status(401).json({ error: 'الرقم القومي أو كلمة السر غير صحيحة' });
+      return res.status(401).json({ error: 'كود المخدوم أو كلمة السر غير صحيحة' });
     }
 
     req.session.userId = student._id.toString();
@@ -31,7 +33,8 @@ router.post('/student/login', async (req, res) => {
 
     res.json({
       message: 'Logged in',
-      userType: 'student'
+      userType: 'student',
+      mustChangePassword: student.mustChangePassword
     });
   } catch (err) {
     res.status(500).json({ error: 'فشل تسجيل الدخول' });
@@ -136,6 +139,49 @@ router.put('/teacher/change-password', async (req, res) => {
 
     teacher.passwordHash = await bcrypt.hash(newPassword, 12);
     await teacher.save();
+
+    res.json({ message: 'تم تغيير كلمة السر' });
+  } catch (err) {
+    res.status(500).json({ error: 'فشل تغيير كلمة السر' });
+  }
+});
+
+// ================= STUDENT PASSWORD CHANGE =================
+router.put('/student/change-password', async (req, res) => {
+  try {
+    if (!req.session.userId || req.session.userType !== 'student') {
+      return res.status(401).json({ error: 'غير مصرح' });
+    }
+
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'كلمة السر القديمة والجديدة مطلوبين' });
+    }
+
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({ error: 'كلمة السر الجديدة يجب أن تكون 8 أحرف على الأقل' });
+    }
+
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ error: 'كلمة السر الجديدة لازم تكون مختلفة عن القديمة' });
+    }
+
+    const student = await Student.findById(req.session.userId);
+
+    if (!student) {
+      return res.status(404).json({ error: 'المخدوم غير موجود' });
+    }
+
+    const oldPasswordOk = await bcrypt.compare(oldPassword, student.passwordHash);
+
+    if (!oldPasswordOk) {
+      return res.status(401).json({ error: 'كلمة السر القديمة غير صحيحة' });
+    }
+
+    student.passwordHash = await bcrypt.hash(newPassword, 12);
+    student.mustChangePassword = false;
+    await student.save();
 
     res.json({ message: 'تم تغيير كلمة السر' });
   } catch (err) {

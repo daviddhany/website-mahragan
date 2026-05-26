@@ -26,7 +26,6 @@ router.post('/register', async (req, res) => {
       'className',
       'studentYear',
       'birthDate',
-      'nationalId',
       'password',
       'parentPhone',
       'address',
@@ -108,7 +107,6 @@ router.post('/register', async (req, res) => {
       studentYear,
       birthDate: req.body.birthDate,
       studentPhone: req.body.studentPhone || '',
-      nationalId: req.body.nationalId,
       passwordHash,
       parentPhone: req.body.parentPhone,
       address: req.body.address,
@@ -125,7 +123,7 @@ router.post('/register', async (req, res) => {
 
     if (err.code === 11000) {
       return res.status(409).json({
-        error: 'الرقم القومي أو كود المخدوم موجود بالفعل'
+        error: 'كود المخدوم موجود بالفعل'
       });
     }
 

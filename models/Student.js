@@ -69,11 +69,9 @@ canTravel: {
       match: [/^$|^\d{11}$/, 'Student phone must be exactly 11 digits']
     },
 
-    nationalId: {
-      type: String,
-      required: true,
-      unique: true,
-      match: [/^\d{14}$/, 'National ID must be exactly 14 digits']
+    mustChangePassword: {
+      type: Boolean,
+      default: true
     },
 
     submissionComplete: {
