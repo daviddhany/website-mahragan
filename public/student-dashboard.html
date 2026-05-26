@@ -22,10 +22,10 @@
   </form>
   <p id="passwordMsg"></p>
 </section>
-<section class="card"><h2>رفع الملفات</h2><p class="muted">أكمل الملفات المطلوبة قبل إرسال التسجيل.</p>
+<section class="card"><h2>رفع الملفات</h2><p class="muted" id="uploadHint">الصورة الشخصية وشهادة الميلاد مطلوبين فقط عند اختيار نشاط رياضي.</p>
 <div class="upload-grid">
-  <div class="upload-card"><form id="photoForm"><label>الصورة الشخصية (مطلوبة)<input name="file" type="file"  required></label><button>رفع الصورة الشخصية</button></form><p id="photoMsg"></p></div>
-  <div class="upload-card"><form id="birthForm"><label>شهادة الميلاد (مطلوبة)<input name="file" type="file" required></label><button>رفع شهادة الميلاد</button></form><p id="birthMsg"></p></div>
+  <div class="upload-card"><form id="photoForm"><label id="photoLabel">الصورة الشخصية (مطلوبة للرياضي فقط)<input name="file" type="file"></label><button>رفع الصورة الشخصية</button></form><p id="photoMsg"></p></div>
+  <div class="upload-card"><form id="birthForm"><label id="birthLabel">شهادة الميلاد (مطلوبة للرياضي فقط)<input name="file" type="file"></label><button>رفع شهادة الميلاد</button></form><p id="birthMsg"></p></div>
   <div class="upload-card" id="paymentUploadCard"><form id="payForm"><label>إيصال الدفع إنستا باي<input name="file" type="file" required></label><button>رفع إيصال الدفع</button></form><p id="payMsg"></p></div>
 </div></section>
 <section class="card"><h2>اختيار الأنشطة</h2><p class="muted">اضغط على النشاط لاختياره. السعر الافتراضي لكل نشاط 10 ج.</p><form id="activityForm"><div id="activities"></div><div id="paymentTotal" class="payment-total">الإجمالي: 0 ج</div><button id="activitySubmitBtn">إرسال التسجيل</button></form><p id="actMsg"></p></section>
@@ -44,7 +44,26 @@ function selectedTotal(){
   const ids = new Set(selectedActivities());
   return activityData.filter(a => ids.has(a._id)).reduce((sum, a) => sum + Number(a.price || 0), 0);
 }
-function updateTotal(){ document.getElementById('paymentTotal').textContent = `الإجمالي: ${selectedTotal()} ج`; }
+function hasSelectedSportsActivity(){
+  const ids = new Set(selectedActivities());
+  return activityData.some(a => ids.has(a._id) && (`${a.name || ''} ${a.category || ''}`).includes('رياضي'));
+}
+function updateRequiredUploads(){
+  const required = hasSelectedSportsActivity();
+  const photoInput = document.querySelector('#photoForm input[name="file"]');
+  const birthInput = document.querySelector('#birthForm input[name="file"]');
+  photoInput.required = required;
+  birthInput.required = required;
+  document.getElementById('photoLabel').childNodes[0].textContent = required ? 'الصورة الشخصية (مطلوبة)' : 'الصورة الشخصية (اختياري إلا لو اخترت رياضي)';
+  document.getElementById('birthLabel').childNodes[0].textContent = required ? 'شهادة الميلاد (مطلوبة)' : 'شهادة الميلاد (اختياري إلا لو اخترت رياضي)';
+  document.getElementById('uploadHint').textContent = required
+    ? 'بما إنك اخترت نشاط رياضي، لازم ترفع الصورة الشخصية وشهادة الميلاد قبل إرسال التسجيل.'
+    : 'الصورة الشخصية وشهادة الميلاد مطلوبين فقط عند اختيار نشاط رياضي.';
+}
+function updateTotal(){
+  document.getElementById('paymentTotal').textContent = `الإجمالي: ${selectedTotal()} ج`;
+  updateRequiredUploads();
+}
 
 async function loadMe(){
   me = await api('/api/students/me');
@@ -86,6 +105,7 @@ async function loadActivities(){
     });
   });
   updateTotal();
+  updateRequiredUploads();
   renderSummary();
 }
 

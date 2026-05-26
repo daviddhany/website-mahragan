@@ -136,6 +136,54 @@ router.get('/students/:id', requireTeacher, async (req, res) => {
   res.json(student);
 });
 
+
+async function canTeacherAccessStudent(currentTeacher, student) {
+  if (!currentTeacher || !student) return false;
+
+  if (currentTeacher.role === 'admin') return true;
+
+  if (currentTeacher.role === 'teacher') {
+    return student.className === currentTeacher.assignedClass &&
+      student.studentYear === currentTeacher.assignedYear &&
+      student.gender === currentTeacher.assignedGender;
+  }
+
+  if (currentTeacher.role === 'serviceLeader') {
+    return student.className === currentTeacher.assignedClass &&
+      student.gender === currentTeacher.assignedGender;
+  }
+
+  return false;
+}
+
+router.put('/students/:id/payment-confirmation', requireTeacher, async (req, res) => {
+  try {
+    const currentTeacher = await Teacher.findById(req.session.userId);
+    const student = await Student.findById(req.params.id);
+
+    if (!student) {
+      return res.status(404).json({ error: 'المخدوم غير موجود' });
+    }
+
+    const allowed = await canTeacherAccessStudent(currentTeacher, student);
+
+    if (!allowed) {
+      return res.status(403).json({ error: 'غير مسموح' });
+    }
+
+    student.paymentConfirmed = Boolean(req.body.paymentConfirmed);
+    await student.save();
+
+    res.json({
+      message: student.paymentConfirmed ? 'تم تأكيد الدفع' : 'تم إلغاء تأكيد الدفع',
+      paymentConfirmed: student.paymentConfirmed
+    });
+  } catch (err) {
+    console.error('Payment confirmation error:', err);
+    res.status(500).json({ error: 'فشل تحديث حالة الدفع' });
+  }
+});
+
 router.put('/students/:id', requireTeacher, async (req, res) => {
   try {
     const Student = require('../models/Student');
@@ -248,6 +296,7 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
     'Parent Phone',
     'Address',
     'Payment Method',
+    'Payment Confirmed',
     'Karaza Qualified',
     'Student Photo Uploaded',
     'Birth Certificate Uploaded',
@@ -271,6 +320,7 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
     s.parentPhone,
     s.address,
     s.paymentMethod === 'instapay' ? 'Instapay' : 'With servant',
+    s.paymentConfirmed ? 'Yes' : 'No',
     s.studentPhotoPath ? 'Yes' : 'No',
     s.birthCertificatePath ? 'Yes' : 'No',
     s.paymentProofPath ? 'Yes' : 'No',

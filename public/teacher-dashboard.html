@@ -48,7 +48,8 @@
             <th>National ID</th>
             <th>Parent</th>
             <th>Status</th>
-            <th>الدفع</th>
+            <th>طريقة الدفع</th>
+            <th>تأكيد الدفع</th>
             <th>الإجمالي</th>
             <th>Photo</th>
             <th>Documents</th>
@@ -248,6 +249,7 @@ function studentStatusHtml(student) {
 }
 
 function paymentLabel(value) { return value === 'instapay' ? 'إنستا باي' : 'مع الخادم'; }
+function paymentConfirmedLabel(value) { return value ? '✅ Confirmed' : '❌ Not confirmed'; }
 function yesNo(value) { return value ? 'نعم' : 'لا'; }
 function activityTotal(student) { return (student.activities || []).reduce((sum, a) => sum + Number(a.price || 0), 0); }
 
@@ -408,6 +410,25 @@ function closeEditBox() {
   document.getElementById('editBox').style.display = 'none';
 }
 
+async function togglePaymentConfirmed(id, checked) {
+  try {
+    await api('/api/admin/students/' + id + '/payment-confirmation', {
+      method: 'PUT',
+      body: JSON.stringify({ paymentConfirmed: checked })
+    });
+
+    const student = cachedStudents.find(s => s._id === id);
+    if (student) student.paymentConfirmed = checked;
+
+    const status = document.getElementById('paymentStatus-' + id);
+    if (status) status.textContent = paymentConfirmedLabel(checked);
+  } catch (err) {
+    alert(err.message);
+    const checkbox = document.getElementById('paymentCheck-' + id);
+    if (checkbox) checkbox.checked = !checked;
+  }
+}
+
 async function loadStudents() {
   const q = document.getElementById('search').value;
   const rows = document.getElementById('rows');
@@ -433,6 +454,17 @@ async function loadStudents() {
       <td>${escapeHtml(s.parentPhone || '')}</td>
       <td>${studentStatusHtml(s)}</td>
       <td>${paymentLabel(s.paymentMethod)}</td>
+      <td>
+        <label class="checkbox-row" style="min-width:140px">
+          <input
+            type="checkbox"
+            id="paymentCheck-${escapeAttr(s._id)}"
+            ${s.paymentConfirmed ? 'checked' : ''}
+            onchange="togglePaymentConfirmed('${escapeAttr(s._id)}', this.checked)"
+          >
+          <span id="paymentStatus-${escapeAttr(s._id)}">${paymentConfirmedLabel(s.paymentConfirmed)}</span>
+        </label>
+      </td>
       <td>${activityTotal(s)} ج</td>
       <td>
         ${documentHtml(s.studentPhotoPath, 'Student Photo')}

@@ -100,6 +100,11 @@ canTravel: {
       default: 'servant'
     },
 
+    paymentConfirmed: {
+      type: Boolean,
+      default: false
+    },
+
     karazaQualified: {
       type: Boolean,
       default: false

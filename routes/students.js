@@ -352,27 +352,6 @@ router.put('/me/activities', requireStudent, async (req, res) => {
       req.session.userId
     );
 
-    if (!student.studentPhotoPath) {
-      return res.status(400).json({
-        error: 'يجب رفع الصورة الشخصية قبل إرسال التسجيل'
-      });
-    }
-
-    if (!student.birthCertificatePath) {
-      return res.status(400).json({
-        error: 'يجب رفع شهادة الميلاد قبل إرسال التسجيل'
-      });
-    }
-
-    if (
-      student.paymentMethod === 'instapay' &&
-      !student.paymentProofPath
-    ) {
-      return res.status(400).json({
-        error: 'يجب رفع إيصال الدفع عند اختيار الدفع عن طريق إنستا باي'
-      });
-    }
-
     const activityIds = Array.isArray(req.body.activityIds)
       ? req.body.activityIds
       : [];
@@ -386,7 +365,34 @@ router.put('/me/activities', requireStudent, async (req, res) => {
     const valid = await Activity.find({
       _id: { $in: activityIds },
       isActive: true
-    }).select('_id');
+    }).select('_id name category');
+
+    const hasSportsActivity = valid.some((activity) => {
+      const name = String(activity.name || '');
+      const category = String(activity.category || '');
+      return name.includes('رياضي') || category.includes('رياضي');
+    });
+
+    if (hasSportsActivity && !student.studentPhotoPath) {
+      return res.status(400).json({
+        error: 'يجب رفع الصورة الشخصية عند اختيار نشاط رياضي'
+      });
+    }
+
+    if (hasSportsActivity && !student.birthCertificatePath) {
+      return res.status(400).json({
+        error: 'يجب رفع شهادة الميلاد عند اختيار نشاط رياضي'
+      });
+    }
+
+    if (
+      student.paymentMethod === 'instapay' &&
+      !student.paymentProofPath
+    ) {
+      return res.status(400).json({
+        error: 'يجب رفع إيصال الدفع عند اختيار الدفع عن طريق إنستا باي'
+      });
+    }
 
     await Student.findByIdAndUpdate(
       req.session.userId,
