@@ -17,7 +17,17 @@
 <label>الاسم ثلاثي<input name="fullName" required></label>
 <label>النوع<select name="gender" required><option value="male">ذكر</option><option value="female">انثى</option></select></label>
 <label>تاريخ الميلاد<input name="birthDate" type="date" required></label>
-<label>السنة</label>
+
+<label>الخدمة
+ <select name="className" id="className" required>
+  <option value="">اختر الخدمة</option>
+  <option value="يوحنا">يوحنا</option>
+  <option value="ابوسيفين">ابوسيفين</option>
+  <option value="العذراء">العذراء</option>
+  <option value="خمسة و ستة">خمسة و ستة</option>
+  <option value="إعدادي">إعدادي</option>
+</select>
+  <label>السنة</label>
 <select name="studentYear" id="studentYear" required>
   <option value="">اختر السنة</option>
   <option value="اولى إبتدائي">اولى إبتدائي</option>
@@ -29,15 +39,6 @@
   <option value="اولى اعدادي">اولى إعدادي</option>
   <option value="تانية اعدادي">تانية إعدادي</option>
   <option value="ثالثة اعدادي">ثالثة إعدادي</option>
-</select>
-<label>الخدمة
- <select name="className" id="className" required>
-  <option value="">اختر الخدمة</option>
-  <option value="يوحنا">يوحنا</option>
-  <option value="ابوسيفين">ابوسيفين</option>
-  <option value="العذراء">العذراء</option>
-  <option value="خمسة و ستة">خمسة و ستة</option>
-  <option value="إعدادي">إعدادي</option>
 </select>
 </label>
 <label>طريقة الدفع
