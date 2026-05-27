@@ -12,8 +12,6 @@ async function generateStudentCode(gender, className, studentYear) {
     'العذراء': 'M'
   };
 
-  const classCode = classCodes[className];
-
   const yearCodes = {
     'اولى إبتدائي': '1',
     'تانية إبتدائي': '2',
@@ -23,12 +21,10 @@ async function generateStudentCode(gender, className, studentYear) {
     'سادسة إبتدائي': '6',
     'اولى اعدادي': '7',
     'تانية اعدادي': '8',
-    'ثالثة اعدادي': '9',
-    'اولى إعدادي': '7',
-    'تانية إعدادي': '8',
-    'ثالثة إعدادي': '9'
+    'ثالثة اعدادي': '9'
   };
 
+  const classCode = classCodes[className];
   const yearCode = yearCodes[studentYear] || '0';
 
   if (!classCode) {
@@ -38,18 +34,20 @@ async function generateStudentCode(gender, className, studentYear) {
   const year = new Date().getFullYear();
   const prefix = `${genderCode}${classCode}${yearCode}-${year}-`;
 
-  const students = await Student.find({
+  const lastStudent = await Student.findOne({
     studentCode: { $regex: `^${prefix}` }
-  }).select('studentCode');
-
-  const usedNumbers = students
-    .map((s) => Number(s.studentCode.split('-').pop()))
-    .filter((n) => Number.isInteger(n));
+  })
+    .sort({ studentCode: -1 })
+    .select('studentCode');
 
   let nextNumber = 1;
 
-  while (usedNumbers.includes(nextNumber)) {
-    nextNumber++;
+  if (lastStudent) {
+    const lastNumber = Number(lastStudent.studentCode.split('-').pop());
+
+    if (!isNaN(lastNumber)) {
+      nextNumber = lastNumber + 1;
+    }
   }
 
   const number = String(nextNumber).padStart(4, '0');
