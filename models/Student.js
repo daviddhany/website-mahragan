@@ -4,16 +4,16 @@ const studentSchema = new mongoose.Schema(
   {
     studentCode: { type: String, required: true, unique: true, trim: true },
 
-    // ✅ Full name (at least 4 names)
+    // ✅ Full name (at least 3 names)
     fullName: {
       type: String,
       required: true,
       trim: true,
       validate: {
         validator: function (v) {
-          return String(v).trim().split(/\s+/).length >= 4;
+          return String(v).trim().split(/\s+/).length >= 3;
         },
-        message: 'Full name must contain at least 4 names'
+        message: 'Full name must contain at least 3 names'
       }
     },
 

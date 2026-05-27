@@ -41,9 +41,9 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    if (String(req.body.fullName).trim().split(/\s+/).length < 4) {
+    if (String(req.body.fullName).trim().split(/\s+/).length < 3) {
       return res.status(400).json({
-        error: 'الاسم يجب أن يكون رباعي'
+        error: 'الاسم يجب أن يكون ثلاثي'
       });
     }
 
@@ -168,10 +168,10 @@ router.put('/me', requireStudent, async (req, res) => {
 
     if (
       updates.fullName &&
-      String(updates.fullName).trim().split(/\s+/).length < 4
+      String(updates.fullName).trim().split(/\s+/).length < 3
     ) {
       return res.status(400).json({
-        error: 'الاسم يجب أن يكون رباعي'
+        error: 'الاسم يجب أن يكون ثلاثي'
       });
     }
 
