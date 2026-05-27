@@ -18,7 +18,7 @@
 <label>النوع<select name="gender" required><option value="male">ذكر</option><option value="female">انثى</option></select></label>
 <label>تاريخ الميلاد<input name="birthDate" type="date" required></label>
 <label>السنة</label>
-<select name="studentYear" required>
+<select name="studentYear" id="studentYear" required>
   <option value="">اختر السنة</option>
   <option value="اولى إبتدائي">اولى إبتدائي</option>
   <option value="تانية إبتدائي">تانية إبتدائي</option>
@@ -31,7 +31,7 @@
   <option value="ثالثة اعدادي">ثالثة إعدادي</option>
 </select>
 <label>الخدمة
- <select name="className" required>
+ <select name="className" id="className" required>
   <option value="">اختر الخدمة</option>
   <option value="يوحنا">يوحنا</option>
   <option value="ابوسيفين">ابوسيفين</option>
@@ -60,6 +60,58 @@
 <button id="submitBtn">حفظ البيانات</button><p id="msg"></p></form></section></main>
 <footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
 <script src="/public/app.js"></script><script>
+
+const yearOptionsByClass = {
+  'يوحنا': [
+    ['اولى إبتدائي', 'اولى إبتدائي'],
+    ['تانية إبتدائي', 'تانية إبتدائي'],
+    ['ثالثة إبتدائي', 'ثالثة إبتدائي'],
+    ['رابعة إبتدائي', 'رابعة إبتدائي']
+  ],
+  'ابوسيفين': [
+    ['اولى إبتدائي', 'اولى إبتدائي'],
+    ['تانية إبتدائي', 'تانية إبتدائي'],
+    ['ثالثة إبتدائي', 'ثالثة إبتدائي'],
+    ['رابعة إبتدائي', 'رابعة إبتدائي']
+  ],
+  'العذراء': [
+    ['اولى إبتدائي', 'اولى إبتدائي'],
+    ['تانية إبتدائي', 'تانية إبتدائي'],
+    ['ثالثة إبتدائي', 'ثالثة إبتدائي'],
+    ['رابعة إبتدائي', 'رابعة إبتدائي']
+  ],
+  'خمسة و ستة': [
+    ['خمسة إبتدائي', 'خمسة إبتدائي'],
+    ['سادسة إبتدائي', 'سادسة إبتدائي']
+  ],
+  'إعدادي': [
+    ['اولى اعدادي', 'اولى إعدادي'],
+    ['تانية اعدادي', 'تانية إعدادي'],
+    ['ثالثة اعدادي', 'ثالثة إعدادي']
+  ]
+};
+
+function updateYearOptions() {
+  const classSelect = document.getElementById('className');
+  const yearSelect = document.getElementById('studentYear');
+  const selectedClass = classSelect.value;
+  const years = yearOptionsByClass[selectedClass] || [];
+
+  yearSelect.innerHTML = '<option value="">اختر السنة</option>';
+
+  years.forEach(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    yearSelect.appendChild(option);
+  });
+
+  yearSelect.disabled = years.length === 0;
+}
+
+document.getElementById('className').addEventListener('change', updateYearOptions);
+updateYearOptions();
+
 document.getElementById('form').addEventListener('submit', async e => {
   e.preventDefault();
   const body = Object.fromEntries(new FormData(e.target));
@@ -71,9 +123,10 @@ document.getElementById('form').addEventListener('submit', async e => {
   button.textContent = 'جاري الحفظ...';
   try {
     const data = await api('/api/students/register', { method:'POST', body: JSON.stringify(body) });
+    sessionStorage.setItem('lastRegisteredStudent', JSON.stringify(data.student || {}));
     sessionStorage.setItem('lastStudentCode', data.studentCode || '');
-    message('msg', `تم حفظ البيانات. كود المخدوم: ${data.studentCode}. سيتم فتح الصفحة الشخصية...`);
-    setTimeout(() => { location.href = '/public/student-login.html'; }, 1200);
+    message('msg', `تم حفظ البيانات. كود المخدوم: ${data.studentCode}. سيتم فتح صفحة البيانات...`);
+    setTimeout(() => { location.href = '/public/register-success.html'; }, 700);
   } catch(err) {
     message('msg', err.message, false);
     button.disabled = false;

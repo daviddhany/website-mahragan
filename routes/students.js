@@ -59,18 +59,25 @@ router.post('/register', async (req, res) => {
       });
     }
 
-    
-    const exists = await Student.findOne({
-      nationalId: req.body.nationalId
-    });
-
-   
-
     const className = normalizeClassName(req.body.className);
 
     const studentYear = normalizeStudentYear(
       req.body.studentYear
     );
+
+    const allowedYearsByClass = {
+      'يوحنا': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
+      'ابوسيفين': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
+      'العذراء': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
+      'خمسة و ستة': ['خمسة إبتدائي', 'سادسة إبتدائي'],
+      'إعدادي': ['اولى اعدادي', 'تانية اعدادي', 'ثالثة اعدادي']
+    };
+
+    if (!allowedYearsByClass[className] || !allowedYearsByClass[className].includes(studentYear)) {
+      return res.status(400).json({
+        error: 'السنة المختارة لا تناسب الخدمة المختارة'
+      });
+    }
 
     const passwordHash = await bcrypt.hash(
       req.body.password,
@@ -107,14 +114,29 @@ router.post('/register', async (req, res) => {
 
     res.status(201).json({
       message: 'Student registered',
-      studentCode: student.studentCode
+      studentCode: student.studentCode,
+      student: {
+        studentCode: student.studentCode,
+        fullName: student.fullName,
+        gender: student.gender,
+        className: student.className,
+        studentYear: student.studentYear,
+        birthDate: student.birthDate ? student.birthDate.toISOString().slice(0, 10) : '',
+        parentPhone: student.parentPhone,
+        studentPhone: student.studentPhone,
+        address: student.address,
+        canTravel: student.canTravel
+      }
     });
 
   } catch (err) {
 
     if (err.code === 11000) {
+      const duplicatedField = err.keyPattern ? Object.keys(err.keyPattern)[0] : 'field';
       return res.status(409).json({
-        error: 'كود المخدوم موجود بالفعل'
+        error: duplicatedField === 'studentCode'
+          ? 'كود المخدوم موجود بالفعل'
+          : `بيانات متكررة في قاعدة البيانات: ${duplicatedField}`
       });
     }
 

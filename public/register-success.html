@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>تم إنشاء الحساب</title>
+  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="icon" href="/public/logo-left.png" type="image/png">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
+  <div class="header-title"><h2>مهرجان حبة حنطة</h2></div>
+  <div class="header-right">
+    <nav class="header-actions">
+      <a href="/" class="btn-nav">الرئيسية</a>
+      <a href="/public/student-login.html" class="btn-nav login">تسجيل دخول</a>
+    </nav>
+    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+  </div>
+</header>
+
+<main>
+  <section class="card" id="successCard">
+    <h2>تم إنشاء الحساب بنجاح</h2>
+    <p class="success">احتفظ بكود المخدوم لأنه سيستخدمه في تسجيل الدخول.</p>
+
+    <div id="studentData"></div>
+
+    <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+      <a class="btn-nav login" href="/public/student-login.html">تسجيل الدخول</a>
+      <a class="btn-nav" href="/public/register.html">تسجيل مخدوم آخر</a>
+    </div>
+  </section>
+</main>
+
+<footer class="app-footer" dir="ltr">© 2026 CoptechAi. All rights reserved.</footer>
+<script src="/public/app.js"></script>
+<script>
+  const dataBox = document.getElementById('studentData');
+  const saved = sessionStorage.getItem('lastRegisteredStudent');
+
+  if (!saved) {
+    dataBox.innerHTML = '<p class="error">لا توجد بيانات تسجيل حديثة. من فضلك سجل مخدوم جديد.</p>';
+  } else {
+    const student = JSON.parse(saved);
+    dataBox.innerHTML = `
+      <table>
+        <tr><th>كود المخدوم / ID</th><td><strong>${escapeHtml(student.studentCode || '')}</strong></td></tr>
+        <tr><th>الاسم</th><td>${escapeHtml(student.fullName || '')}</td></tr>
+        <tr><th>النوع</th><td>${student.gender === 'male' ? 'ذكر' : 'أنثى'}</td></tr>
+        <tr><th>الخدمة</th><td>${escapeHtml(student.className || '')}</td></tr>
+        <tr><th>السنة</th><td>${escapeHtml(student.studentYear || '')}</td></tr>
+        <tr><th>تاريخ الميلاد</th><td>${escapeHtml(student.birthDate || '')}</td></tr>
+        <tr><th>رقم ولي الأمر</th><td>${escapeHtml(student.parentPhone || '')}</td></tr>
+        <tr><th>رقم المخدوم</th><td>${escapeHtml(student.studentPhone || 'لا يوجد')}</td></tr>
+        <tr><th>العنوان</th><td>${escapeHtml(student.address || '')}</td></tr>
+        <tr><th>السفر في حالة التأهل</th><td>${student.canTravel ? 'نعم' : 'لا'}</td></tr>
+      </table>
+    `;
+  }
+</script>
+</body>
+</html>
