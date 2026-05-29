@@ -4,9 +4,34 @@ const Activity = require('../models/Activity');
 const Category = require('../models/Category');
 const Teacher = require('../models/Teacher');
 const Team = require('../models/Team');
+const SystemSettings = require('../models/SystemSettings');
 const { requireTeacher, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
+
+
+async function getSystemSettings() {
+  let settings = await SystemSettings.findOne();
+
+  if (!settings) {
+    settings = await SystemSettings.create({ registrationOpen: true });
+  }
+
+  return settings;
+}
+
+router.get('/registration-status', requireAdmin, async (req, res) => {
+  const settings = await getSystemSettings();
+  res.json({ registrationOpen: settings.registrationOpen });
+});
+
+router.post('/registration-status', requireAdmin, async (req, res) => {
+  const settings = await getSystemSettings();
+  settings.registrationOpen = Boolean(req.body.registrationOpen);
+  await settings.save();
+
+  res.json({ registrationOpen: settings.registrationOpen });
+});
 
 router.post('/activities', requireAdmin, async (req, res) => {
   const name = (req.body.name || '').trim();

@@ -13,7 +13,7 @@
     <img src="/public/logo-right.png" class="header-logo" alt="Logo">
   </div>
 </header>
-<main><section class="card"><form id="form">
+<main><section class="card"><div id="registrationClosedBox" class="error" style="display:none;margin-bottom:12px;">تم إغلاق التسجيل حالياً بواسطة الإدارة.</div><form id="form">
 <label>الاسم ثلاثي<input name="fullName" required></label>
 <label>النوع<select name="gender" required><option value="male">ذكر</option><option value="female">انثى</option></select></label>
 <label>تاريخ الميلاد<input name="birthDate" type="date" required></label>
@@ -61,6 +61,35 @@
 <button id="submitBtn">حفظ البيانات</button><p id="msg"></p></form></section></main>
 <footer class="app-footer" dir="ltr">© 2026 David Hany. All rights reserved.</footer>
 <script src="/public/app.js"></script><script>
+
+
+async function checkRegistrationStatus() {
+  try {
+    const settings = await api('/api/students/registration-status');
+
+    if (!settings.registrationOpen) {
+      const box = document.getElementById('registrationClosedBox');
+      const form = document.getElementById('form');
+      const button = document.getElementById('submitBtn');
+
+      if (box) box.style.display = 'block';
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'التسجيل مغلق حالياً';
+      }
+
+      if (form) {
+        form.querySelectorAll('input, select, textarea').forEach(input => {
+          input.disabled = true;
+        });
+      }
+    }
+  } catch (err) {
+    // If status check fails, the server-side protection still handles registration.
+  }
+}
+
+checkRegistrationStatus();
 
 const yearOptionsByClass = {
   'يوحنا': [

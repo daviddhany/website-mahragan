@@ -22,6 +22,14 @@
 </header>
 
 <main>
+
+  <section class="card">
+    <h2>حالة التسجيل</h2>
+    <p id="registrationStatusText" class="muted">جاري تحميل حالة التسجيل...</p>
+    <button type="button" id="toggleRegistrationBtn">جاري التحميل...</button>
+    <p id="registrationMsg"></p>
+  </section>
+
   <section class="card">
     <h2>إضافة مستخدم</h2>
 
@@ -105,6 +113,61 @@
 <script src="/public/app.js"></script>
 
 <script>
+
+
+async function loadRegistrationStatus() {
+  const btn = document.getElementById('toggleRegistrationBtn');
+  const statusText = document.getElementById('registrationStatusText');
+
+  if (!btn || !statusText) return;
+
+  try {
+    const settings = await api('/api/admin/registration-status');
+
+    btn.dataset.registrationOpen = settings.registrationOpen ? 'true' : 'false';
+    btn.textContent = settings.registrationOpen ? 'إيقاف التسجيل' : 'فتح التسجيل';
+    btn.style.background = settings.registrationOpen ? '#e53935' : '#4CAF50';
+    statusText.textContent = settings.registrationOpen
+      ? 'التسجيل مفتوح حالياً والمخدومين يقدروا يعملوا حسابات جديدة.'
+      : 'التسجيل مغلق حالياً ولا يمكن إنشاء حسابات جديدة.';
+  } catch (err) {
+    statusText.textContent = 'فشل تحميل حالة التسجيل.';
+    message('registrationMsg', err.message, false);
+  }
+}
+
+const toggleRegistrationBtn = document.getElementById('toggleRegistrationBtn');
+if (toggleRegistrationBtn) {
+  toggleRegistrationBtn.addEventListener('click', async () => {
+    const isOpenNow = toggleRegistrationBtn.dataset.registrationOpen === 'true';
+    const confirmMessage = isOpenNow
+      ? 'هل تريد إيقاف التسجيل؟'
+      : 'هل تريد فتح التسجيل؟';
+
+    if (!confirm(confirmMessage)) return;
+
+    toggleRegistrationBtn.disabled = true;
+    toggleRegistrationBtn.textContent = 'جاري الحفظ...';
+
+    try {
+      const settings = await api('/api/admin/registration-status', {
+        method: 'POST',
+        body: JSON.stringify({ registrationOpen: !isOpenNow })
+      });
+
+      message(
+        'registrationMsg',
+        settings.registrationOpen ? 'تم فتح التسجيل' : 'تم إغلاق التسجيل'
+      );
+
+      await loadRegistrationStatus();
+    } catch (err) {
+      message('registrationMsg', err.message, false);
+    } finally {
+      toggleRegistrationBtn.disabled = false;
+    }
+  });
+}
 
 const roleSelect = document.getElementById('teacherRole');
 const yearSelect = document.getElementById('assignedYear');
@@ -205,6 +268,7 @@ if (teacherSearchInput) {
   });
 }
 
+loadRegistrationStatus();
 loadTeachers().catch(() => location.href = '/public/teacher-login.html');
 </script>
 <footer class="app-footer" dir="ltr">
