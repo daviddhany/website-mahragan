@@ -164,5 +164,14 @@ document.getElementById('activityForm').addEventListener('submit', async e => {
     button.textContent = 'إرسال التسجيل';
   }
 });
-loadMe().catch(()=>location.href='/public/student-login.html'); loadActivities().catch(()=>{});
+async function initStudentDashboard() {
+  try {
+    await loadMe();
+    await loadActivities();
+  } catch (err) {
+    location.href = '/public/student-login.html';
+  }
+}
+
+initStudentDashboard();
 </script></body></html>
