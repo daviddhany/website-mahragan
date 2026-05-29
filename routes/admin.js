@@ -10,19 +10,6 @@ const { requireTeacher, requireAdmin } = require('../middleware/auth');
 const router = express.Router();
 
 
-
-const PRIMARY_YEAR_GROUPS_FOR_ACCESS = [
-  ['اولى إبتدائي', 'تانية إبتدائي'],
-  ['ثالثة إبتدائي', 'رابعة إبتدائي'],
-  ['خمسة إبتدائي', 'سادسة إبتدائي']
-];
-
-function yearGroupForAccess(year) {
-  const normalizedYear = String(year || '').trim();
-  const group = PRIMARY_YEAR_GROUPS_FOR_ACCESS.find((years) => years.includes(normalizedYear));
-  return group || (normalizedYear ? [normalizedYear] : []);
-}
-
 async function getSystemSettings() {
   let settings = await SystemSettings.findOne();
 
@@ -108,10 +95,7 @@ async function getStudentFilterForTeacher(req) {
 
   if (currentTeacher.role === 'teacher') {
     if (currentTeacher.assignedClass) filter.className = currentTeacher.assignedClass;
-    if (currentTeacher.assignedYear) {
-      const yearGroup = yearGroupForAccess(currentTeacher.assignedYear);
-      filter.studentYear = yearGroup.length > 1 ? { $in: yearGroup } : currentTeacher.assignedYear;
-    }
+    if (currentTeacher.assignedYear) filter.studentYear = currentTeacher.assignedYear;
     if (currentTeacher.assignedGender) filter.gender = currentTeacher.assignedGender;
   }
 
@@ -134,15 +118,13 @@ router.get('/students', requireTeacher, async (req, res) => {
 
   if (req.query.search) {
     const q = new RegExp(req.query.search, 'i');
-    const matchingActivities = await Activity.find({ name: q }).select('_id');
-    const matchingActivityIds = matchingActivities.map((activity) => activity._id);
 
     filter.$and = [
       {
         $or: [
           { fullName: q },
-          { studentCode: q },
-          ...(matchingActivityIds.length ? [{ activities: { $in: matchingActivityIds } }] : [])
+          { nationalId: q },
+          { studentCode: q }
         ]
       }
     ];
@@ -186,11 +168,8 @@ async function canTeacherAccessStudent(currentTeacher, student) {
   if (currentTeacher.role === 'admin') return true;
 
   if (currentTeacher.role === 'teacher') {
-    const yearGroup = yearGroupForAccess(currentTeacher.assignedYear);
-    const allowedYears = yearGroup.length ? yearGroup : [currentTeacher.assignedYear];
-
     return student.className === currentTeacher.assignedClass &&
-      allowedYears.includes(student.studentYear) &&
+      student.studentYear === currentTeacher.assignedYear &&
       student.gender === currentTeacher.assignedGender;
   }
 
@@ -245,8 +224,7 @@ router.put('/students/:id', requireTeacher, async (req, res) => {
 
     // 🔒 Restrict teacher access
     if (currentTeacher.role === 'teacher') {
-      const allowedYears = yearGroupForAccess(currentTeacher.assignedYear);
-      if (student.className !== currentTeacher.assignedClass || !allowedYears.includes(student.studentYear) || student.gender !== currentTeacher.assignedGender) {
+      if (student.className !== currentTeacher.assignedClass || student.studentYear !== currentTeacher.assignedYear || student.gender !== currentTeacher.assignedGender) {
         return res.status(403).json({ error: 'غير مسموح' });
       }
     }
@@ -422,7 +400,7 @@ router.put('/students/:id/password', requireTeacher, async (req, res) => {
     if (currentTeacher.role !== 'admin') {
       const allowed =
         student.className === currentTeacher.assignedClass &&
-        yearGroupForAccess(currentTeacher.assignedYear).includes(student.studentYear) &&
+        student.studentYear === currentTeacher.assignedYear &&
         student.gender === currentTeacher.assignedGender;
 
       if (!allowed) {
