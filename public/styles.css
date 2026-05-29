@@ -465,13 +465,13 @@ body {
 }
 
 header {
-  position: sticky;
-  top: 0;
+  position: relative !important;
+  top: auto !important;
   z-index: 20;
   background: rgba(5,38,66,.94) !important;
   backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 10px 35px rgba(5,38,66,.18);
+  box-shadow: 0 4px 12px rgba(5,38,66,.10);
 }
 
 header img { width: 48px; height: 48px; object-fit: contain; }
@@ -842,4 +842,58 @@ tr:hover td { background: #fbfdff; }
 
 .collapsible-body.open {
   display: block;
+}
+/* ===== Compact Header ===== */
+
+.site-header {
+  padding: 8px 12px !important;
+  gap: 8px !important;
+}
+
+.header-logo,
+.header-right .header-logo {
+  width: 42px !important;
+  height: 42px !important;
+}
+
+.header-title h2 {
+  font-size: 18px !important;
+  line-height: 1.2 !important;
+}
+
+.header-title p {
+  font-size: 12px !important;
+  margin-top: 2px !important;
+}
+
+.header-actions {
+  gap: 6px !important;
+  margin-top: 4px !important;
+}
+
+.header-actions a,
+.header-actions button,
+.btn-nav,
+.btn-export,
+.btn-logout {
+  min-width: 95px !important;
+  min-height: 34px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+}
+
+@media (max-width: 768px) {
+  .site-header {
+    padding: 6px 8px !important;
+  }
+
+  .header-logo,
+  .header-right .header-logo {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .header-title h2 {
+    font-size: 16px !important;
+  }
 }
