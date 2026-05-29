@@ -125,8 +125,6 @@ function teamOwnerFilter(teacher, activityId) {
   };
 }
 
-const SHARED_TEAMS_34_YEARS = ['ثالثة إبتدائي', 'رابعة إبتدائي'];
-
 async function visibleTeamsFilterForTeacher(teacher, activityId) {
   const filter = {};
 
@@ -138,23 +136,29 @@ async function visibleTeamsFilterForTeacher(teacher, activityId) {
     return filter;
   }
 
-  // خدام تالتة ورابعة يشوفوا فرق بعض فقط، لكن المخدومين المتاحين يفضلوا حسب سنة الخادم نفسه.
-  if (teacher.role === 'teacher' && SHARED_TEAMS_34_YEARS.includes(teacher.assignedYear)) {
-    const teacherFilter = {
-      role: 'teacher',
-      assignedClass: teacher.assignedClass,
-      assignedYear: { $in: SHARED_TEAMS_34_YEARS }
-    };
+  // الفرق فقط هي اللي بتتشارك بين مجموعات السنين.
+  // مثال: خادم ثالثة يشوف فرق ثالثة ورابعة بطلابها،
+  // لكن المخدومين المتاحين للإضافة يفضلوا من سنة الخادم فقط.
+  if (teacher.role === 'teacher' && teacher.assignedYear) {
+    const yearGroup = yearGroupForTeams(teacher.assignedYear);
 
-    if (teacher.assignedGender && teacher.assignedGender !== 'all') {
-      teacherFilter.assignedGender = { $in: [teacher.assignedGender, 'all'] };
+    if (yearGroup && yearGroup.length > 1) {
+      const teacherFilter = {
+        role: 'teacher',
+        assignedClass: teacher.assignedClass,
+        assignedYear: { $in: yearGroup }
+      };
+
+      if (teacher.assignedGender && teacher.assignedGender !== 'all') {
+        teacherFilter.assignedGender = { $in: [teacher.assignedGender, 'all'] };
+      }
+
+      const peerTeachers = await Teacher.find(teacherFilter).select('_id');
+      const peerTeacherIds = peerTeachers.map((t) => t._id);
+
+      filter.teacher = { $in: peerTeacherIds.length ? peerTeacherIds : [teacher._id] };
+      return filter;
     }
-
-    const peerTeachers = await Teacher.find(teacherFilter).select('_id');
-    const peerTeacherIds = peerTeachers.map((t) => t._id);
-
-    filter.teacher = { $in: peerTeacherIds.length ? peerTeacherIds : [teacher._id] };
-    return filter;
   }
 
   filter.teacher = teacher._id;
@@ -279,11 +283,21 @@ router.get('/', requireTeacher, async (req, res) => {
 
   const teams = await Team.find(filter)
     .populate('activity')
-    .populate('students')
+    .populate({
+      path: 'students',
+      select: '-passwordHash',
+      populate: { path: 'activities' }
+    })
     .populate('teacher', 'fullName phone')
     .sort('name');
 
-  res.json(teams);
+  const result = teams.map((team) => {
+    const obj = team.toObject();
+    obj.canEdit = teacher.role === 'admin' || String(team.teacher?._id || team.teacher) === String(teacher._id);
+    return obj;
+  });
+
+  res.json(result);
 });
 
 router.get('/export/excel', requireTeacher, async (req, res) => {
