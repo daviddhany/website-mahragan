@@ -242,8 +242,7 @@ router.put('/students/:id', requireTeacher, async (req, res) => {
       'studentPhone',
       'address',
       'birthDate',
-      'canTravel',
-      'paymentMethod'
+      'canTravel'
     ];
 
     for (const field of allowedFields) {
@@ -310,6 +309,28 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
     .populate('activities')
     .sort('studentCode');
 
+  const activities = await Activity.find({ isActive: true }).sort('category name');
+
+  const fileLink = (filePath) => {
+    if (!filePath) return '';
+
+    if (/^https?:\/\//i.test(filePath)) {
+      return filePath;
+    }
+
+    const cleanPath = String(filePath).replace(/^\/+/, '');
+    const publicPath = cleanPath.startsWith('protected/')
+      ? cleanPath
+      : `protected/${cleanPath}`;
+
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+    const host = req.get('host');
+
+    return `${protocol}://${host}/${publicPath}`;
+  };
+
+  const activityHeaders = activities.map((activity) => activity.name);
+
   const header = [
     'Student Code',
     'Full Name',
@@ -317,43 +338,45 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
     'Birth Date',
     'Year',
     'Class',
-    'National ID',
     'Parent Phone',
+    'Student Phone',
     'Address',
-    'Payment Method',
-    'Payment Confirmed',
-    'Karaza Qualified',
-    'Student Photo Uploaded',
-    'Birth Certificate Uploaded',
-    'Payment Proof Uploaded',
+    'Paid',
+    'Can Travel',
+    'Student Photo Link',
+    'Birth Certificate Link',
     'Submission Status',
     'Submitted At',
-    'Activities',
-    'Created At'
+    'Created At',
+    ...activityHeaders
   ];
 
   const escapeCsv = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+  const phoneText = (value) => value ? `\t${String(value)}` : '';
 
-  const rows = students.map((s) => [
-    s.studentCode,
-    s.fullName,
-    s.gender,
-    s.birthDate ? s.birthDate.toISOString().slice(0, 10) : '',
-    s.studentYear,
-    s.className,
-    s.nationalId,
-    s.parentPhone,
-    s.address,
-    s.paymentMethod === 'instapay' ? 'Instapay' : 'With servant',
-    s.paymentConfirmed ? 'Yes' : 'No',
-    s.studentPhotoPath ? 'Yes' : 'No',
-    s.birthCertificatePath ? 'Yes' : 'No',
-    s.paymentProofPath ? 'Yes' : 'No',
-    s.submissionComplete ? 'Complete' : 'Incomplete',
-    s.submittedAt ? s.submittedAt.toISOString() : '',
-    s.activities.map((a) => a.name).join('; '),
-    s.createdAt ? s.createdAt.toISOString() : ''
-  ]);
+  const rows = students.map((s) => {
+    const selectedActivities = new Set((s.activities || []).map((activity) => String(activity._id)));
+
+    return [
+      s.studentCode || '',
+      s.fullName || '',
+      s.gender === 'male' ? 'Male' : 'Female',
+      s.birthDate ? s.birthDate.toISOString().slice(0, 10) : '',
+      s.studentYear || '',
+      s.className || '',
+      phoneText(s.parentPhone),
+      phoneText(s.studentPhone),
+      s.address || '',
+      s.paymentConfirmed ? 'Yes' : 'No',
+      s.canTravel ? 'Yes' : 'No',
+      fileLink(s.studentPhotoPath),
+      fileLink(s.birthCertificatePath),
+      s.submissionComplete ? 'Complete' : 'Incomplete',
+      s.submittedAt ? s.submittedAt.toISOString() : '',
+      s.createdAt ? s.createdAt.toISOString() : '',
+      ...activities.map((activity) => selectedActivities.has(String(activity._id)) ? 'Yes' : '')
+    ];
+  });
 
   const csv = [header, ...rows]
     .map((row) => row.map(escapeCsv).join(','))

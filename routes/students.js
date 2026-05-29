@@ -44,8 +44,7 @@ router.post('/register', async (req, res) => {
       'password',
       'parentPhone',
       'address',
-      'canTravel',
-      'paymentMethod'
+      'canTravel'
     ];
 
     const missing = requireFields(req.body, needed);
@@ -107,11 +106,6 @@ router.post('/register', async (req, res) => {
 
     const canTravel = req.body.canTravel === 'true';
 
-    const paymentMethod =
-      req.body.paymentMethod === 'instapay'
-        ? 'instapay'
-        : 'servant';
-
     const student = await Student.create({
       studentCode,
       fullName: req.body.fullName,
@@ -123,8 +117,7 @@ router.post('/register', async (req, res) => {
       passwordHash,
       parentPhone: req.body.parentPhone,
       address: req.body.address,
-      canTravel,
-      paymentMethod
+      canTravel
     });
 
     res.status(201).json({
@@ -191,8 +184,7 @@ router.put('/me', requireStudent, async (req, res) => {
       'studentPhone',
       'address',
       'birthDate',
-      'canTravel',
-      'paymentMethod'
+      'canTravel'
     ];
 
     const updates = {};
@@ -422,14 +414,6 @@ router.put('/me/activities', requireStudent, async (req, res) => {
       });
     }
 
-    if (
-      student.paymentMethod === 'instapay' &&
-      !student.paymentProofPath
-    ) {
-      return res.status(400).json({
-        error: 'يجب رفع إيصال الدفع عند اختيار الدفع عن طريق إنستا باي'
-      });
-    }
 
     await Student.findByIdAndUpdate(
       req.session.userId,

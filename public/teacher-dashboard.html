@@ -48,7 +48,6 @@
             <th>National ID</th>
             <th>Parent</th>
             <th>Status</th>
-            <th>طريقة الدفع</th>
             <th>تأكيد الدفع</th>
             <th>الإجمالي</th>
             <th>Photo</th>
@@ -103,13 +102,6 @@
       </label>
 
 
-      <label>
-        طريقة الدفع
-        <select name="paymentMethod" id="editPaymentMethod" required>
-          <option value="servant">مع الخادم</option>
-          <option value="instapay">إنستا باي</option>
-        </select>
-      </label>
 
       <div>
         <label>الانشطة المختارة</label>
@@ -248,7 +240,6 @@ function studentStatusHtml(student) {
   return '<span class="status-pill status-pending">⏳ Pending</span>';
 }
 
-function paymentLabel(value) { return value === 'instapay' ? 'إنستا باي' : 'مع الخادم'; }
 function paymentConfirmedLabel(value) { return value ? '✅ Confirmed' : '❌ Not confirmed'; }
 function yesNo(value) { return value ? 'نعم' : 'لا'; }
 function activityTotal(student) { return (student.activities || []).reduce((sum, a) => sum + Number(a.price || 0), 0); }
@@ -400,7 +391,6 @@ async function openEditStudent(id) {
     ? new Date(student.birthDate).toISOString().slice(0, 10)
     : '';
   document.getElementById('editCanTravel').value = student.canTravel ? 'true' : 'false';
-  document.getElementById('editPaymentMethod').value = student.paymentMethod || 'servant';
   await renderEditActivities(student);
 
   document.getElementById('editBox').scrollIntoView({ behavior: 'smooth' });
@@ -453,7 +443,6 @@ async function loadStudents() {
       <td>${escapeHtml(s.nationalId || '')}</td>
       <td>${escapeHtml(s.parentPhone || '')}</td>
       <td>${studentStatusHtml(s)}</td>
-      <td>${paymentLabel(s.paymentMethod)}</td>
       <td>
         <label class="checkbox-row" style="min-width:140px">
           <input
@@ -471,8 +460,6 @@ async function loadStudents() {
       </td>
       <td>
         ${documentHtml(s.birthCertificatePath, 'Birth Certificate')}
-        <hr>
-        ${documentHtml(s.paymentProofPath, 'Payment Proof')}
       </td>
       <td>
         ${(s.activities || []).map(a => `<span class="badge">${escapeHtml(a.name)}</span>`).join('')}

@@ -26,7 +26,6 @@
 <div class="upload-grid">
   <div class="upload-card"><form id="photoForm"><label id="photoLabel">الصورة الشخصية (مطلوبة للرياضي فقط)<input name="file" type="file"></label><button>رفع الصورة الشخصية</button></form><p id="photoMsg"></p></div>
   <div class="upload-card"><form id="birthForm"><label id="birthLabel">شهادة الميلاد (مطلوبة للرياضي فقط)<input name="file" type="file"></label><button>رفع شهادة الميلاد</button></form><p id="birthMsg"></p></div>
-  <div class="upload-card" id="paymentUploadCard"><form id="payForm"><label>إيصال الدفع إنستا باي<input name="file" type="file" required></label><button>رفع إيصال الدفع</button></form><p id="payMsg"></p></div>
 </div></section>
 <section class="card"><h2>اختيار الأنشطة</h2><p class="muted">اضغط على النشاط لاختياره. السعر الافتراضي لكل نشاط 10 ج.</p><form id="activityForm"><div id="activities"></div><div id="paymentTotal" class="payment-total">الإجمالي: 0 ج</div><button id="activitySubmitBtn">إرسال التسجيل</button></form><p id="actMsg"></p></section>
 <section class="card" id="summaryCard" style="display:none;"><h2>ملخص التسجيل</h2><div id="summary"></div></section>
@@ -37,7 +36,6 @@ let me = null;
 let activityData = [];
 
 function yesNo(v){ return v ? 'نعم' : 'لا'; }
-function paymentLabel(v){ return v === 'instapay' ? 'إنستا باي' : 'مع الخادم'; }
 function status(value){ return value ? '<span class="status-pill status-submitted">✅ تم الرفع</span>' : '<span class="status-pill status-missing">❌ ناقص</span>'; }
 function selectedActivities(){ return [...document.querySelectorAll('#activities input:checked')].map(x => x.value); }
 function selectedTotal(){
@@ -67,7 +65,6 @@ function updateTotal(){
 
 async function loadMe(){
   me = await api('/api/students/me');
-  document.getElementById('paymentUploadCard').style.display = me.paymentMethod === 'instapay' ? '' : 'none';
   document.getElementById('profile').innerHTML = `
     <div class="profile-grid">
       <div class="profile-item"><span>كود المخدوم</span><strong>${escapeHtml(me.studentCode || '')}</strong></div>
@@ -76,10 +73,8 @@ async function loadMe(){
       <div class="profile-item"><span>السنة</span><strong>${escapeHtml(me.studentYear || '')}</strong></div>
       <div class="profile-item"><span>رقم ولي الأمر</span><strong>${escapeHtml(me.parentPhone || '')}</strong></div>
       <div class="profile-item"><span>العنوان</span><strong>${escapeHtml(me.address || '')}</strong></div>
-      <div class="profile-item"><span>طريقة الدفع</span><strong>${paymentLabel(me.paymentMethod)}</strong></div>
       <div class="profile-item"><span>الصورة الشخصية</span><strong>${status(me.studentPhotoPath)}</strong></div>
       <div class="profile-item"><span>شهادة الميلاد</span><strong>${status(me.birthCertificatePath)}</strong></div>
-      <div class="profile-item"><span>إيصال الدفع</span><strong>${me.paymentMethod === 'instapay' ? status(me.paymentProofPath) : 'غير مطلوب'}</strong></div>
     </div>`;
   renderSummary();
 }
@@ -121,7 +116,6 @@ function renderSummary(){
       <div class="profile-item"><span>الخدمة والسنة</span><strong>${escapeHtml(me.className || '')} - ${escapeHtml(me.studentYear || '')}</strong></div>
       <div class="profile-item"><span>الأنشطة المختارة</span><strong>${chosen.map(a => escapeHtml(a.name)).join('، ') || 'لم يتم الاختيار'}</strong></div>
       <div class="profile-item"><span>إجمالي الدفع</span><strong>${chosen.reduce((sum,a)=>sum+Number(a.price||0),0)} ج</strong></div>
-      <div class="profile-item"><span>طريقة الدفع</span><strong>${paymentLabel(me.paymentMethod)}</strong></div>
     </div>`;
 }
 
@@ -133,7 +127,6 @@ async function upload(form, url, msg){
 }
 document.getElementById('photoForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/student-photo', 'photoMsg'); } catch(err){ message('photoMsg', err.message, false); } });
 document.getElementById('birthForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/birth-certificate', 'birthMsg'); } catch(err){ message('birthMsg', err.message, false); } });
-document.getElementById('payForm').addEventListener('submit', async e => { e.preventDefault(); try{ await upload(e.target, '/api/students/me/upload/payment-proof', 'payMsg'); } catch(err){ message('payMsg', err.message, false); } });
 
 document.getElementById('passwordForm').addEventListener('submit', async e => {
   e.preventDefault();
