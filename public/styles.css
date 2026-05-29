@@ -813,3 +813,45 @@ tr:hover td { background: #fbfdff; }
     font-size: 14px !important;
   }
 }
+
+/* ===== Collapsible dashboard cards ===== */
+.collapsible-card-header {
+  margin: -4px -4px 0;
+}
+
+.collapsible-card-toggle {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, var(--brand, #052642), var(--brand-2, #0f4c81)) !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  font-size: 18px !important;
+  text-align: right !important;
+  box-shadow: 0 10px 24px rgba(5,38,66,.16);
+}
+
+.collapsible-card-toggle span:first-child {
+  flex: 1;
+}
+
+.collapsible-arrow {
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.collapsible-card-content {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  .collapsible-card-toggle {
+    font-size: 16px !important;
+    padding: 13px 14px !important;
+  }
+}
+
