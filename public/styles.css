@@ -897,3 +897,24 @@ tr:hover td { background: #fbfdff; }
     font-size: 16px !important;
   }
 }
+
+
+/* Remove student from team button */
+.remove-team-btn {
+  width: auto !important;
+  min-width: 86px !important;
+  margin-top: 6px !important;
+  background: linear-gradient(135deg, #b91c1c, #ef4444) !important;
+  color: #fff !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-move-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .move-team-btn,
+  .remove-team-btn {
+    width: 100% !important;
+  }
+}

@@ -568,9 +568,12 @@ function teamOptionsHtml(currentTeamId = '') {
 
 function studentChip(student, currentTeamId = '') {
   const options = teamOptionsHtml(currentTeamId);
+  const removeButton = currentTeamId
+    ? `<button type="button" class="remove-team-btn">Remove</button>`
+    : '';
 
   return `
-    <div class="student-chip" draggable="true" data-student-id="${student._id}">
+    <div class="student-chip" draggable="true" data-student-id="${student._id}" data-current-team-id="${currentTeamId}">
       <div class="student-chip-main">
         <span class="drag-handle" aria-hidden="true">☰</span>
         <div>
@@ -585,6 +588,7 @@ function studentChip(student, currentTeamId = '') {
           ${options}
         </select>
         <button type="button" class="move-team-btn" ${options ? '' : 'disabled'}>Move</button>
+        ${removeButton}
       </div>
     </div>
   `;
@@ -611,6 +615,18 @@ function enableTeamMoving() {
           return;
         }
         await moveStudentToTeam(chip.dataset.studentId, teamId);
+      });
+    }
+
+    const removeButton = chip.querySelector('.remove-team-btn');
+    if (removeButton) {
+      removeButton.addEventListener('click', async () => {
+        const teamId = chip.dataset.currentTeamId;
+        if (!teamId) return;
+
+        if (!confirm('Remove this student from the team?')) return;
+
+        await removeStudentFromTeam(chip.dataset.studentId, teamId);
       });
     }
   });
@@ -729,6 +745,33 @@ async function moveStudentToTeam(studentId, teamId) {
     });
 
     message('teamMsg', 'Student moved successfully');
+    await loadTeams();
+  } catch (err) {
+    message('teamMsg', err.message, false);
+  }
+}
+
+async function removeStudentFromTeam(studentId, teamId) {
+  const team = cachedTeams.find(t => t._id === teamId);
+  if (!team) return;
+
+  if (team.locked) {
+    message('teamMsg', 'This team is locked. Unlock it before removing students.', false);
+    return;
+  }
+
+  const newStudentIds = (team.students || [])
+    .map(s => s._id)
+    .filter(id => id !== studentId);
+
+  setLoading('teamMsg', 'Removing student...');
+  try {
+    await api('/api/teams/' + teamId + '/students', {
+      method: 'PUT',
+      body: JSON.stringify({ studentIds: newStudentIds })
+    });
+
+    message('teamMsg', 'Student removed from team');
     await loadTeams();
   } catch (err) {
     message('teamMsg', err.message, false);
