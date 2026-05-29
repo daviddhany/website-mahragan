@@ -197,39 +197,33 @@ router.get('/', requireTeacher, async (req, res) => {
   res.json(teams);
 });
 
-router.get('/export/excel', requireTeacher, async (req, res) => {
-  const teacher = await getTeacher(req);
-  const filter = teacher.role === 'admin' ? {} : { teacher: teacher._id };
+const rows = [];
 
-  if (req.query.activityId) {
-    filter.activity = req.query.activityId;
-  }
+const studentMap = {};
 
-  const teams = await Team.find(filter)
-    .populate('activity')
-    .populate('students')
-    .sort('name');
+teams.forEach((team) => {
+  const activityName = team.activity?.name || '';
 
-  const rows = [];
-  teams.forEach((team) => {
-    if (!team.students.length) {
-      rows.push([team.activity?.name || '', team.name, team.locked ? 'Yes' : 'No', '', '', '', '', '']);
+  team.students.forEach((student) => {
+    const key = student._id.toString();
+
+    if (!studentMap[key]) {
+      studentMap[key] = {
+        الكود: student.studentCode || '',
+        الاسم: student.fullName || '',
+        السنة: student.studentYear || '',
+        الخدمة: student.className || '',
+        النوع: student.gender === 'male' ? 'ذكر' : 'أنثى'
+      };
     }
 
-    team.students.forEach((student) => {
-      rows.push([
-        team.activity?.name || '',
-        team.name,
-        team.locked ? 'Yes' : 'No',
-        student.studentCode || '',
-        student.fullName || '',
-        student.studentYear || '',
-        student.className || '',
-        student.gender || ''
-      ]);
-    });
+    studentMap[key][activityName] = team.name || '✓';
   });
+});
 
+Object.values(studentMap).forEach((studentRow) => {
+  rows.push(studentRow);
+});
   const htmlRows = rows.map((row) => `
     <tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}</tr>
   `).join('');
