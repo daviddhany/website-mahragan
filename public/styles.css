@@ -796,8 +796,8 @@ tr:hover td { background: #fbfdff; }
 
   .header-logo,
   .header-right .header-logo {
-    width: 54px !important;
-    height: 54px !important;
+    width: 80px !important;
+    height:80px !important;
   }
 
   .header-actions {
@@ -852,8 +852,8 @@ tr:hover td { background: #fbfdff; }
 
 .header-logo,
 .header-right .header-logo {
-  width: 42px !important;
-  height: 42px !important;
+  width: 80px !important;
+  height: 80px !important;
 }
 
 .header-title h2 {
@@ -889,8 +889,8 @@ tr:hover td { background: #fbfdff; }
 
   .header-logo,
   .header-right .header-logo {
-    width: 36px !important;
-    height: 36px !important;
+    width: 80px !important;
+    height: 80px !important;
   }
 
   .header-title h2 {
