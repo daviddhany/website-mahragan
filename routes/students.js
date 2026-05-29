@@ -14,6 +14,37 @@ const {
 
 const router = express.Router();
 
+function normalizeDuplicateText(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[أإآ]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/ـ/g, '')
+    .replace(/[ًٌٍَُِّْ]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+function getBirthDateRange(dateValue) {
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  const start = new Date(date);
+  start.setUTCHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setUTCDate(end.getUTCDate() + 1);
+
+  return { start, end };
+}
+
+
 const photoUpload = makeUpload('uploads/student-photos');
 const birthUpload = makeUpload('uploads/birth-certificates');
 const paymentUpload = makeUpload('uploads/payment-proofs');
@@ -90,6 +121,36 @@ router.post('/register', async (req, res) => {
     if (!allowedYearsByClass[className] || !allowedYearsByClass[className].includes(studentYear)) {
       return res.status(400).json({
         error: 'السنة المختارة لا تناسب الخدمة المختارة'
+      });
+    }
+
+    const birthDateRange = getBirthDateRange(req.body.birthDate);
+
+    if (!birthDateRange) {
+      return res.status(400).json({
+        error: 'تاريخ الميلاد غير صحيح'
+      });
+    }
+
+    const possibleDuplicateStudents = await Student.find({
+      parentPhone: String(req.body.parentPhone || '').trim(),
+      className,
+      studentYear,
+      birthDate: {
+        $gte: birthDateRange.start,
+        $lt: birthDateRange.end
+      }
+    }).select('fullName studentCode');
+
+    const normalizedNewName = normalizeDuplicateText(req.body.fullName);
+
+    const duplicateStudent = possibleDuplicateStudents.find((student) => {
+      return normalizeDuplicateText(student.fullName) === normalizedNewName;
+    });
+
+    if (duplicateStudent) {
+      return res.status(409).json({
+        error: `هذا المخدوم مسجل بالفعل بكود ${duplicateStudent.studentCode}`
       });
     }
 
