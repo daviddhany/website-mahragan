@@ -125,6 +125,42 @@ function teamOwnerFilter(teacher, activityId) {
   };
 }
 
+const SHARED_TEAMS_34_YEARS = ['ثالثة إبتدائي', 'رابعة إبتدائي'];
+
+async function visibleTeamsFilterForTeacher(teacher, activityId) {
+  const filter = {};
+
+  if (activityId) {
+    filter.activity = activityId;
+  }
+
+  if (teacher.role === 'admin') {
+    return filter;
+  }
+
+  // خدام تالتة ورابعة يشوفوا فرق بعض فقط، لكن المخدومين المتاحين يفضلوا حسب سنة الخادم نفسه.
+  if (teacher.role === 'teacher' && SHARED_TEAMS_34_YEARS.includes(teacher.assignedYear)) {
+    const teacherFilter = {
+      role: 'teacher',
+      assignedClass: teacher.assignedClass,
+      assignedYear: { $in: SHARED_TEAMS_34_YEARS }
+    };
+
+    if (teacher.assignedGender && teacher.assignedGender !== 'all') {
+      teacherFilter.assignedGender = { $in: [teacher.assignedGender, 'all'] };
+    }
+
+    const peerTeachers = await Teacher.find(teacherFilter).select('_id');
+    const peerTeacherIds = peerTeachers.map((t) => t._id);
+
+    filter.teacher = { $in: peerTeacherIds.length ? peerTeacherIds : [teacher._id] };
+    return filter;
+  }
+
+  filter.teacher = teacher._id;
+  return filter;
+}
+
 async function canAccessStudent(teacher, studentId, activityId) {
   const student = await Student.findById(studentId);
 
@@ -239,13 +275,7 @@ router.get('/eligible-students', requireTeacher, async (req, res) => {
 router.get('/', requireTeacher, async (req, res) => {
   const teacher = await getTeacher(req);
 
-  const filter = teacher.role === 'admin'
-    ? {}
-    : { teacher: teacher._id };
-
-  if (req.query.activityId) {
-    filter.activity = req.query.activityId;
-  }
+  const filter = await visibleTeamsFilterForTeacher(teacher, req.query.activityId);
 
   const teams = await Team.find(filter)
     .populate('activity')
@@ -258,11 +288,7 @@ router.get('/', requireTeacher, async (req, res) => {
 
 router.get('/export/excel', requireTeacher, async (req, res) => {
   const teacher = await getTeacher(req);
-  const filter = teacher.role === 'admin' ? {} : { teacher: teacher._id };
-
-  if (req.query.activityId) {
-    filter.activity = req.query.activityId;
-  }
+  const filter = await visibleTeamsFilterForTeacher(teacher, req.query.activityId);
 
   const teams = await Team.find(filter)
     .populate('activity')
@@ -313,11 +339,7 @@ router.get('/export/excel', requireTeacher, async (req, res) => {
 
 router.get('/export/pdf', requireTeacher, async (req, res) => {
   const teacher = await getTeacher(req);
-  const filter = teacher.role === 'admin' ? {} : { teacher: teacher._id };
-
-  if (req.query.activityId) {
-    filter.activity = req.query.activityId;
-  }
+  const filter = await visibleTeamsFilterForTeacher(teacher, req.query.activityId);
 
   const teams = await Team.find(filter)
     .populate('activity')
