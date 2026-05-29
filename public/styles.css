@@ -710,104 +710,15 @@ tr:hover td { background: #fbfdff; }
 }
 
 /* ===== Final Mobile Header Fix ===== */
-.site-header {
-  background: rgba(5, 38, 66, 0.96) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 18px !important;
-  padding: 16px 24px !important;
-  min-height: auto !important;
-  text-align: center !important;
-}
-
-.site-header .logo-link {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  flex: 0 0 auto !important;
-}
-
-.site-header .header-logo {
-  width: 74px !important;
-  height: 74px !important;
-  max-width: none !important;
-  object-fit: contain !important;
-}
-
-.site-header .header-title {
-  flex: 1 !important;
-  text-align: center !important;
-  min-width: 0 !important;
-}
-
-.site-header .header-title h2 {
-  margin: 0 !important;
-  color: white !important;
-  font-size: 28px !important;
-  line-height: 1.35 !important;
-}
-
-.site-header .header-title p {
-  margin: 6px 0 0 !important;
-  color: white !important;
-  font-weight: 700 !important;
-}
-
-.site-header .header-right {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 14px !important;
-  flex: 0 0 auto !important;
-}
-
-.site-header .header-actions {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 10px !important;
-  flex-wrap: wrap !important;
-  margin: 0 !important;
-}
-
-.site-header .header-actions a,
-.site-header .header-actions button,
-.site-header .btn-nav,
-.site-header .btn-export,
-.site-header .btn-logout {
-  width: auto !important;
-  min-width: 110px !important;
-  min-height: 42px !important;
-  padding: 9px 16px !important;
-  margin: 0 !important;
-  font-size: 15px !important;
-  border-radius: 13px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  white-space: nowrap !important;
-}
-
-@media (max-width: 768px) {
-  .site-header {
-    flex-direction: column !important;
-    justify-content: center !important;
-    padding: 16px 12px !important;
-    gap: 12px !important;
-  }
-
-
-/* ===== FINAL HEADER ===== */
+/* ===== CLEAN FINAL HEADER ===== */
 
 .site-header {
   background: rgba(5, 38, 66, 0.96) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 20px !important;
-  padding: 16px 24px !important;
-  text-align: center;
+  gap: 18px;
+  padding: 16px 22px !important;
 }
 
 .logo-link {
@@ -817,8 +728,8 @@ tr:hover td { background: #fbfdff; }
 }
 
 .header-logo {
-  width: 75px !important;
-  height: 75px !important;
+  width: 72px !important;
+  height: 72px !important;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -859,12 +770,12 @@ tr:hover td { background: #fbfdff; }
 .btn-export,
 .btn-logout {
   width: auto !important;
-  min-width: 115px;
+  min-width: 110px;
   min-height: 42px;
-  padding: 10px 16px !important;
+  padding: 9px 16px !important;
   border-radius: 14px !important;
-  font-size: 14px !important;
   margin: 0 !important;
+  font-size: 14px !important;
   white-space: nowrap;
 }
 
@@ -873,11 +784,11 @@ tr:hover td { background: #fbfdff; }
 @media (max-width: 768px) {
 
   .site-header {
-    flex-direction: column !important;
-    justify-content: center !important;
+    flex-direction: row !important;
     align-items: center !important;
-    gap: 14px !important;
-    padding: 18px 12px !important;
+    justify-content: space-between !important;
+    padding: 14px 10px !important;
+    gap: 10px;
   }
 
   .logo-link {
@@ -886,33 +797,33 @@ tr:hover td { background: #fbfdff; }
 
   .header-title {
     order: 2;
-    width: 100%;
+    flex: 1;
+    text-align: center;
   }
 
   .header-title h2 {
-    font-size: 24px !important;
+    font-size: 22px !important;
   }
 
   .header-right {
     order: 3;
-    width: 100%;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 14px !important;
+    gap: 10px;
   }
 
   .header-right .header-logo {
-    width: 72px !important;
-    height: 72px !important;
+    width: 58px !important;
+    height: 58px !important;
   }
 
   .header-actions {
-    width: 100%;
+    display: flex !important;
+    flex-direction: row !important;
     justify-content: center !important;
-    flex-wrap: wrap !important;
-    gap: 10px !important;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .header-actions a,
@@ -920,27 +831,9 @@ tr:hover td { background: #fbfdff; }
   .btn-nav,
   .btn-export,
   .btn-logout {
-    min-width: 130px !important;
-    min-height: 46px !important;
-    font-size: 15px !important;
-  }
-}
-
-/* ===== SMALL PHONES ===== */
-
-@media (max-width: 430px) {
-
-  .header-actions {
-    flex-direction: column !important;
-    width: 100%;
-  }
-
-  .header-actions a,
-  .header-actions button,
-  .btn-nav,
-  .btn-export,
-  .btn-logout {
-    width: 100% !important;
-    max-width: 280px;
+    min-width: 105px !important;
+    min-height: 40px !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
   }
 }
