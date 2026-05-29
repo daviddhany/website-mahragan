@@ -566,8 +566,8 @@ function teamOptionsHtml(currentTeamId = '') {
   `).join('');
 }
 
-function studentChip(student, currentTeamId = '', canMove = true) {
-  const options = canMove ? teamOptionsHtml(currentTeamId) : '';
+function studentChip(student, currentTeamId = '') {
+  const options = teamOptionsHtml(currentTeamId);
 
   return `
     <div class="student-chip" draggable="true" data-student-id="${student._id}">
@@ -580,11 +580,11 @@ function studentChip(student, currentTeamId = '', canMove = true) {
         </div>
       </div>
       <div class="mobile-move-row">
-        <select class="move-team-select" aria-label="Move ${student.fullName || 'student'} to team" ${options && canMove ? '' : 'disabled'}>
+        <select class="move-team-select" aria-label="Move ${student.fullName || 'student'} to team" ${options ? '' : 'disabled'}>
           <option value="">Move to team...</option>
           ${options}
         </select>
-        <button type="button" class="move-team-btn" ${options && canMove ? '' : 'disabled'}>${canMove ? 'Move' : 'View only'}</button>
+        <button type="button" class="move-team-btn" ${options ? '' : 'disabled'}>Move</button>
       </div>
     </div>
   `;
@@ -593,11 +593,6 @@ function studentChip(student, currentTeamId = '', canMove = true) {
 function enableTeamMoving() {
   document.querySelectorAll('.student-chip').forEach(chip => {
     chip.addEventListener('dragstart', e => {
-      const zone = chip.closest('.drop-zone');
-      if (zone && zone.dataset.canEdit === 'false') {
-        e.preventDefault();
-        return;
-      }
       if (e.target.closest('select, button')) {
         e.preventDefault();
         return;
@@ -621,7 +616,6 @@ function enableTeamMoving() {
   });
 
   document.querySelectorAll('.drop-zone').forEach(zone => {
-    if (zone.dataset.canEdit === 'false') return;
     zone.addEventListener('dragover', e => {
       e.preventDefault();
       zone.classList.add('drag-over');
@@ -684,17 +678,17 @@ function renderTeams() {
         <div class="team-card ${team.locked ? 'locked-team' : ''}">
           <div class="team-title-row">
             <h3>${escapeHtml(team.name)}</h3>
-            <span class="lock-badge">${team.canEdit === false ? '👀 View only' : (team.locked ? '🔒 Locked' : '🔓 Editable')}</span>
+            <span class="lock-badge">${team.locked ? '🔒 Locked' : '🔓 Editable'}</span>
           </div>
           <p><strong>${(team.students || []).length}</strong> students</p>
-          <div class="drop-zone chip-list" data-team-id="${escapeAttr(team._id)}" data-can-edit="${team.canEdit !== false ? 'true' : 'false'}">
-            ${(team.students || []).map(student => studentChip(student, team._id, team.canEdit !== false)).join('') || '<p class="muted">Move students here.</p>'}
+          <div class="drop-zone chip-list" data-team-id="${escapeAttr(team._id)}">
+            ${(team.students || []).map(student => studentChip(student, team._id)).join('') || '<p class="muted">Move students here.</p>'}
           </div>
           <div class="team-actions">
-            <button type="button" onclick="toggleTeamLock('${escapeAttr(team._id)}', ${team.locked ? 'false' : 'true'})" ${team.canEdit === false ? 'disabled' : ''}>
+            <button type="button" onclick="toggleTeamLock('${escapeAttr(team._id)}', ${team.locked ? 'false' : 'true'})">
               ${team.locked ? 'Unlock Team' : 'Lock Team'}
             </button>
-            <button type="button" onclick="deleteTeam('${escapeAttr(team._id)}')" ${team.locked || team.canEdit === false ? 'disabled' : ''}>Delete Team</button>
+            <button type="button" onclick="deleteTeam('${escapeAttr(team._id)}')" ${team.locked ? 'disabled' : ''}>Delete Team</button>
           </div>
         </div>
       `).join('') : '<p>No teams created for this activity yet. Create empty teams first, then move students into them.</p>'}
