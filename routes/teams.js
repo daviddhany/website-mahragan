@@ -89,6 +89,54 @@ function teamOwnerFilter(teacher, activityId) {
   };
 }
 
+async function visibleTeamFilterForTeacher(teacher, activityId) {
+  const filter = {};
+
+  if (activityId) {
+    filter.activity = activityId;
+  }
+
+  if (teacher.role === 'admin') {
+    return filter;
+  }
+
+  const teacherFilter = { role: 'teacher' };
+
+  if (teacher.assignedGender && teacher.assignedGender !== 'all') {
+    teacherFilter.assignedGender = teacher.assignedGender;
+  }
+
+  if (teacher.role === 'serviceLeader') {
+    if (teacher.assignedClass) {
+      teacherFilter.assignedClass = PREP_CLASSES.includes(teacher.assignedClass)
+        ? { $in: PREP_CLASSES }
+        : teacher.assignedClass;
+    }
+  } else if (teacher.role === 'teacher') {
+    if (teacher.assignedYear) {
+      const yearGroup = yearGroupForTeams(teacher.assignedYear);
+      teacherFilter.assignedYear = yearGroup && yearGroup.length > 1
+        ? { $in: yearGroup }
+        : teacher.assignedYear;
+    }
+
+    if (teacher.assignedClass) {
+      teacherFilter.assignedClass = PREP_CLASSES.includes(teacher.assignedClass)
+        ? { $in: PREP_CLASSES }
+        : teacher.assignedClass;
+    }
+  }
+
+  const visibleTeachers = await Teacher.find(teacherFilter).select('_id');
+  const visibleTeacherIds = visibleTeachers.map((t) => t._id);
+
+  filter.teacher = visibleTeacherIds.length
+    ? { $in: visibleTeacherIds }
+    : teacher._id;
+
+  return filter;
+}
+
 async function canAccessStudent(teacher, studentId, activityId) {
   const student = await Student.findById(studentId);
 
@@ -203,13 +251,7 @@ router.get('/eligible-students', requireTeacher, async (req, res) => {
 router.get('/', requireTeacher, async (req, res) => {
   const teacher = await getTeacher(req);
 
-  const filter = teacher.role === 'admin'
-    ? {}
-    : { teacher: teacher._id };
-
-  if (req.query.activityId) {
-    filter.activity = req.query.activityId;
-  }
+  const filter = await visibleTeamFilterForTeacher(teacher, req.query.activityId);
 
   const teams = await Team.find(filter)
     .populate('activity')
@@ -222,11 +264,7 @@ router.get('/', requireTeacher, async (req, res) => {
 
 router.get('/export/excel', requireTeacher, async (req, res) => {
   const teacher = await getTeacher(req);
-  const filter = teacher.role === 'admin' ? {} : { teacher: teacher._id };
-
-  if (req.query.activityId) {
-    filter.activity = req.query.activityId;
-  }
+  const filter = await visibleTeamFilterForTeacher(teacher, req.query.activityId);
 
   const teams = await Team.find(filter)
     .populate('activity')
@@ -277,11 +315,7 @@ router.get('/export/excel', requireTeacher, async (req, res) => {
 
 router.get('/export/pdf', requireTeacher, async (req, res) => {
   const teacher = await getTeacher(req);
-  const filter = teacher.role === 'admin' ? {} : { teacher: teacher._id };
-
-  if (req.query.activityId) {
-    filter.activity = req.query.activityId;
-  }
+  const filter = await visibleTeamFilterForTeacher(teacher, req.query.activityId);
 
   const teams = await Team.find(filter)
     .populate('activity')

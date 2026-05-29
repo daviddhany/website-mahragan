@@ -33,7 +33,7 @@
 
     <label>
       بحث
-      <input id="search" placeholder="Name, national ID, or student ID">
+      <input id="search" placeholder="Name, student ID, or activity">
     </label>
 
     <button onclick="loadStudents()">بحث</button>
@@ -364,7 +364,7 @@ async function deleteActivity(id) {
 }
 
 async function deleteStudent(id) {
-  if (!confirm('Are you sure you want to remove this student? This will free the national ID for reuse.')) {
+  if (!confirm('Are you sure you want to remove this student? This will remove the student from the system.')) {
     return;
   }
 
