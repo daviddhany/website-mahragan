@@ -100,6 +100,8 @@
   </section>
 
   <section class="card">
+    <button type="button" class="collapsible-toggle" data-show="عرض الخدام وأمناء الخدمة الحاليين" data-hide="إخفاء الخدام وأمناء الخدمة الحاليين" onclick="toggleSection('teachersListSection', this)">عرض الخدام وأمناء الخدمة الحاليين</button>
+    <div id="teachersListSection" class="collapsible-body">
     <h2>الخدام وأمناء الخدمة الحاليين</h2>
     <label>
       بحث
@@ -107,6 +109,7 @@
     </label>
     <button type="button" onclick="loadTeachers()">بحث</button>
     <div id="teachers"></div>
+    </div>
   </section>
 </main>
 

@@ -101,3 +101,18 @@ function escapeHtml(value) {
 function escapeAttr(value) {
   return escapeHtml(value).replace(/`/g, '&#096;');
 }
+
+
+function toggleSection(id, btn) {
+  const section = document.getElementById(id);
+  if (!section) return;
+
+  section.classList.toggle('open');
+
+  if (btn) {
+    btn.classList.toggle('open', section.classList.contains('open'));
+    const showText = btn.dataset.show || btn.textContent.replace('إخفاء', 'عرض');
+    const hideText = btn.dataset.hide || btn.textContent.replace('عرض', 'إخفاء');
+    btn.textContent = section.classList.contains('open') ? hideText : showText;
+  }
+}

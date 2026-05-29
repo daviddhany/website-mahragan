@@ -813,3 +813,33 @@ tr:hover td { background: #fbfdff; }
     font-size: 14px !important;
   }
 }
+
+
+/* ===== Safe collapsible sections ===== */
+.collapsible-toggle {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  margin: 0 0 14px 0 !important;
+  padding: 12px 16px !important;
+  font-size: 16px !important;
+}
+
+.collapsible-toggle::after {
+  content: '▼';
+  font-size: 13px;
+}
+
+.collapsible-toggle.open::after {
+  content: '▲';
+}
+
+.collapsible-body {
+  display: none;
+}
+
+.collapsible-body.open {
+  display: block;
+}

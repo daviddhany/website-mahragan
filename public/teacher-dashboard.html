@@ -27,6 +27,8 @@
 
 <main>
   <section class="card">
+    <button type="button" class="collapsible-toggle" data-show="عرض المخدومين" data-hide="إخفاء المخدومين" onclick="toggleSection('studentsSection', this)">عرض المخدومين</button>
+    <div id="studentsSection" class="collapsible-body">
     <h2>المخدومين</h2>
 
     <label>
@@ -59,6 +61,7 @@
 
         <tbody id="rows"></tbody>
       </table>
+    </div>
     </div>
   </section>
 
@@ -136,6 +139,8 @@
 
 
   <section class="card">
+    <button type="button" class="collapsible-toggle" data-show="عرض تقسيم الفرق" data-hide="إخفاء تقسيم الفرق" onclick="toggleSection('teamsSection', this)">عرض تقسيم الفرق</button>
+    <div id="teamsSection" class="collapsible-body">
     <h2>تقسيم فرق</h2>
 
     <div class="toolbar">
@@ -161,10 +166,13 @@
     <div id="teamBalanceWarning" class="warning-box" style="display:none;"></div>
     <p id="teamMsg"></p>
     <div id="teamsList"></div>
+    </div>
   </section>
 
   <div id="adminOnly">
     <section class="card">
+      <button type="button" class="collapsible-toggle" data-show="عرض Categories Menu" data-hide="إخفاء Categories Menu" onclick="toggleSection('categoriesSection', this)">عرض Categories Menu</button>
+      <div id="categoriesSection" class="collapsible-body">
       <h2>Categories Menu</h2>
 
       <form id="categoryAdd">
@@ -178,9 +186,12 @@
       </form>
 
       <div id="categoryList"></div>
+      </div>
     </section>
 
     <section class="card">
+      <button type="button" class="collapsible-toggle" data-show="عرض Add Activity" data-hide="إخفاء Add Activity" onclick="toggleSection('addActivitySection', this)">عرض Add Activity</button>
+      <div id="addActivitySection" class="collapsible-body">
       <h2>Add Activity</h2>
 
       <form id="activityAdd">
@@ -207,11 +218,15 @@
         <button>Add Activity</button>
         <p id="addMsg"></p>
       </form>
+      </div>
     </section>
 
     <section class="card">
+      <button type="button" class="collapsible-toggle" data-show="عرض Manage Activities" data-hide="إخفاء Manage Activities" onclick="toggleSection('manageActivitiesSection', this)">عرض Manage Activities</button>
+      <div id="manageActivitiesSection" class="collapsible-body">
       <h2>Manage Activities</h2>
       <div id="activityList"></div>
+      </div>
     </section>
   </div>
 </main>
