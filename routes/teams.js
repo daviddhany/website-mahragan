@@ -14,6 +14,21 @@ async function getTeacher(req) {
 const LOWER_SERVICE_CLASSES = ['يوحنا', 'ابوسيفين', 'العذراء'];
 const PREP_CLASSES = ['إعدادي', 'اعدادي'];
 
+const PRIMARY_YEAR_GROUPS = [
+  ['اولى إبتدائي', 'تانية إبتدائي'],
+  ['ثالثة إبتدائي', 'رابعة إبتدائي'],
+  ['خمسة إبتدائي', 'سادسة إبتدائي']
+];
+
+function yearGroupForTeams(year) {
+  if (!year) return null;
+
+  const normalizedYear = String(year).trim();
+  const group = PRIMARY_YEAR_GROUPS.find((years) => years.includes(normalizedYear));
+
+  return group || [normalizedYear];
+}
+
 function sameTeamScopeFilterForTeacher(teacher) {
   const filter = {};
 
@@ -36,10 +51,13 @@ function sameTeamScopeFilterForTeacher(teacher) {
 
   if (teacher.role === 'teacher') {
     if (teacher.assignedYear) {
-      filter.studentYear = teacher.assignedYear;
+      const yearGroup = yearGroupForTeams(teacher.assignedYear);
+      filter.studentYear = yearGroup && yearGroup.length > 1
+        ? { $in: yearGroup }
+        : teacher.assignedYear;
     }
 
-    // خادم أولى لرابعة في يوحنا/أبوسيفين/العذراء يشوف نفس السنة والنوع في كل الخدمات الثلاثة.
+    // خادم ابتدائي يشوف مجموعة السنين المناسبة: أولى+تانية، تالتة+رابعة، خامسة+سادسة.
     if (LOWER_SERVICE_CLASSES.includes(teacher.assignedClass)) {
       filter.className = { $in: LOWER_SERVICE_CLASSES };
       return filter;
@@ -59,7 +77,6 @@ function sameTeamScopeFilterForTeacher(teacher) {
 
 function buildTeacherStudentFilter(teacher, activityId) {
   return {
-    submissionComplete: true,
     activities: activityId,
     ...sameTeamScopeFilterForTeacher(teacher)
   };
@@ -75,7 +92,7 @@ function teamOwnerFilter(teacher, activityId) {
 async function canAccessStudent(teacher, studentId, activityId) {
   const student = await Student.findById(studentId);
 
-  if (!student || !student.submissionComplete) return false;
+  if (!student) return false;
 
   const isRegisteredForActivity = student.activities.some(
     (id) => String(id) === String(activityId)
@@ -90,8 +107,14 @@ async function canAccessStudent(teacher, studentId, activityId) {
     return false;
   }
 
-  if (scopeFilter.studentYear && student.studentYear !== scopeFilter.studentYear) {
-    return false;
+  if (scopeFilter.studentYear) {
+    if (scopeFilter.studentYear.$in) {
+      if (!scopeFilter.studentYear.$in.includes(student.studentYear)) {
+        return false;
+      }
+    } else if (student.studentYear !== scopeFilter.studentYear) {
+      return false;
+    }
   }
 
   if (scopeFilter.className) {
@@ -310,13 +333,31 @@ router.get('/export/pdf', requireTeacher, async (req, res) => {
 </html>`);
 });
 
+async function generateTeamName(activityId, activityName, teacher) {
+  const teacherName = teacher.fullName || teacher.phone || 'الخادم';
+
+  const filter = teacher.role === 'admin'
+    ? { activity: activityId, teacher: teacher._id }
+    : { activity: activityId, teacher: teacher._id };
+
+  let teamNumber = await Team.countDocuments(filter) + 1;
+  let teamName = `${activityName} - فريق ${teamNumber} - ${teacherName}`;
+
+  while (await Team.exists({ activity: activityId, teacher: teacher._id, name: teamName })) {
+    teamNumber += 1;
+    teamName = `${activityName} - فريق ${teamNumber} - ${teacherName}`;
+  }
+
+  return teamName;
+}
+
 router.post('/', requireTeacher, async (req, res) => {
   try {
     const teacher = await getTeacher(req);
-    const { name, activityId, studentIds = [] } = req.body;
+    const { activityId, studentIds = [] } = req.body;
 
-    if (!name || !activityId) {
-      return res.status(400).json({ error: 'اسم الفريق والنشاط مطلوبان' });
+    if (!activityId) {
+      return res.status(400).json({ error: 'النشاط مطلوب' });
     }
 
     if (!Array.isArray(studentIds)) {
@@ -331,6 +372,8 @@ router.post('/', requireTeacher, async (req, res) => {
 
     await validateStudents(teacher, studentIds, activityId);
     await removeStudentsFromOtherUnlockedTeams(teacher, activityId, null, studentIds);
+
+    const name = await generateTeamName(activityId, activity.name || 'نشاط', teacher);
 
     const team = await Team.create({
       name,

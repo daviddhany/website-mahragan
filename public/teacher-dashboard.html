@@ -148,14 +148,13 @@
     </div>
 
     <form id="manualTeamForm" class="grid">
-      <label>
-أسم الفريق
-        <input name="name" id="teamNameInput" placeholder="Team 1" required>
-      </label>
+      <p class="muted full-width">
+        اسم الفريق سيتم إنشاؤه تلقائيًا من اسم النشاط + رقم الفريق + اسم الخادم.
+      </p>
 
       <label>
         &nbsp;
-        <button>إنشاء فريق</button>
+        <button>إنشاء فريق تلقائيًا</button>
       </label>
     </form>
 
@@ -494,7 +493,7 @@ function activityMatchesStudent(student, activityId) {
 
 function eligibleStudentsForActivity(activityId) {
   return cachedTeamEligibleStudents
-    .filter(student => student.submissionComplete && activityMatchesStudent(student, activityId))
+    .filter(student => activityMatchesStudent(student, activityId))
     .sort((a, b) => {
       const yearCompare = (a.studentYear || '').localeCompare(b.studentYear || '');
       if (yearCompare) return yearCompare;
@@ -562,6 +561,7 @@ function studentChip(student, currentTeamId = '') {
         <div>
           <strong>${student.fullName || ''}</strong>
           <small>${student.studentCode || ''}</small>
+          <small>${student.studentYear || ''} - ${student.className || ''}</small>
         </div>
       </div>
       <div class="mobile-move-row">
@@ -763,21 +763,19 @@ if (teamGroupSelect) {
 document.getElementById('manualTeamForm').addEventListener('submit', async e => {
   e.preventDefault();
   const activityId = document.getElementById('teamActivitySelect').value;
-  const form = new FormData(e.target);
   const body = {
     activityId,
-    name: form.get('name'),
     studentIds: []
   };
 
-  setLoading('teamMsg', 'Creating team...');
+  setLoading('teamMsg', 'جاري إنشاء الفريق تلقائيًا...');
   try {
     await api('/api/teams', {
       method: 'POST',
       body: JSON.stringify(body)
     });
 
-    message('teamMsg', 'Team created. Move students into it.');
+    message('teamMsg', 'تم إنشاء الفريق باسم تلقائي. انقل المخدومين إليه.');
     e.target.reset();
     await loadTeams();
   } catch (err) {
