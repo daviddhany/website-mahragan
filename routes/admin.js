@@ -4,33 +4,54 @@ const Activity = require('../models/Activity');
 const Category = require('../models/Category');
 const Teacher = require('../models/Teacher');
 const Team = require('../models/Team');
-const SystemSettings = require('../models/SystemSettings');
 const { requireTeacher, requireAdmin } = require('../middleware/auth');
+const { getSystemSettings, getEffectiveRegistrationSettings, requireRegistrationOpenForNonAdmin } = require('../helpers/registrationControl');
 
 const router = express.Router();
 
 
-async function getSystemSettings() {
-  let settings = await SystemSettings.findOne();
-
-  if (!settings) {
-    settings = await SystemSettings.create({ registrationOpen: true });
-  }
-
-  return settings;
-}
-
 router.get('/registration-status', requireAdmin, async (req, res) => {
-  const settings = await getSystemSettings();
-  res.json({ registrationOpen: settings.registrationOpen });
+  const { settings, effectiveRegistrationOpen } = await getEffectiveRegistrationSettings();
+
+  res.json({
+    registrationOpen: effectiveRegistrationOpen,
+    registrationClosesAt: settings.registrationClosesAt
+      ? settings.registrationClosesAt.toISOString()
+      : null
+  });
 });
 
 router.post('/registration-status', requireAdmin, async (req, res) => {
   const settings = await getSystemSettings();
-  settings.registrationOpen = Boolean(req.body.registrationOpen);
+  const registrationOpen = Boolean(req.body.registrationOpen);
+  let registrationClosesAt = null;
+
+  if (req.body.registrationClosesAt) {
+    const closeDate = new Date(req.body.registrationClosesAt);
+
+    if (Number.isNaN(closeDate.getTime())) {
+      return res.status(400).json({ error: 'وقت الإغلاق غير صحيح' });
+    }
+
+    if (registrationOpen && closeDate.getTime() <= Date.now()) {
+      return res.status(400).json({ error: 'وقت الإغلاق يجب أن يكون في المستقبل' });
+    }
+
+    registrationClosesAt = closeDate;
+  }
+
+  settings.registrationOpen = registrationOpen;
+  settings.registrationClosesAt = registrationOpen ? registrationClosesAt : null;
   await settings.save();
 
-  res.json({ registrationOpen: settings.registrationOpen });
+  const { settings: updatedSettings, effectiveRegistrationOpen } = await getEffectiveRegistrationSettings();
+
+  res.json({
+    registrationOpen: effectiveRegistrationOpen,
+    registrationClosesAt: updatedSettings.registrationClosesAt
+      ? updatedSettings.registrationClosesAt.toISOString()
+      : null
+  });
 });
 
 router.post('/activities', requireAdmin, async (req, res) => {
@@ -116,18 +137,26 @@ router.get('/students', requireTeacher, async (req, res) => {
 
   const { filter } = result;
 
+  const andFilters = [];
+
   if (req.query.search) {
     const q = new RegExp(req.query.search, 'i');
 
-    filter.$and = [
-      {
-        $or: [
-          { fullName: q },
-          { nationalId: q },
-          { studentCode: q }
-        ]
-      }
-    ];
+    andFilters.push({
+      $or: [
+        { fullName: q },
+        { nationalId: q },
+        { studentCode: q }
+      ]
+    });
+  }
+
+  if (req.query.activityId) {
+    andFilters.push({ activities: req.query.activityId });
+  }
+
+  if (andFilters.length) {
+    filter.$and = andFilters;
   }
 
   const students = await Student.find(filter)
@@ -181,7 +210,7 @@ async function canTeacherAccessStudent(currentTeacher, student) {
   return false;
 }
 
-router.put('/students/:id/payment-confirmation', requireTeacher, async (req, res) => {
+router.put('/students/:id/payment-confirmation', requireTeacher, requireRegistrationOpenForNonAdmin, async (req, res) => {
   try {
     const currentTeacher = await Teacher.findById(req.session.userId);
     const student = await Student.findById(req.params.id);
@@ -209,7 +238,7 @@ router.put('/students/:id/payment-confirmation', requireTeacher, async (req, res
   }
 });
 
-router.put('/students/:id', requireTeacher, async (req, res) => {
+router.put('/students/:id', requireTeacher, requireRegistrationOpenForNonAdmin, async (req, res) => {
   try {
     const Student = require('../models/Student');
     const Teacher = require('../models/Teacher');
@@ -275,7 +304,7 @@ router.put('/students/:id', requireTeacher, async (req, res) => {
   }
 });
 
-router.delete('/students/:id', requireTeacher, async (req, res) => {
+router.delete('/students/:id', requireTeacher, requireRegistrationOpenForNonAdmin, async (req, res) => {
   const result = await getStudentFilterForTeacher(req);
 
   if (!result) {
@@ -337,6 +366,7 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
     'Gender',
     'Birth Date',
     'Year',
+    'Entry Year',
     'Class',
     'Parent Phone',
     'Student Phone',
@@ -363,6 +393,7 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
       s.gender === 'male' ? 'Male' : 'Female',
       s.birthDate ? s.birthDate.toISOString().slice(0, 10) : '',
       s.studentYear || '',
+      s.entryYear || '',
       s.className || '',
       phoneText(s.parentPhone),
       phoneText(s.studentPhone),
@@ -388,7 +419,7 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
 });
 const bcrypt = require('bcryptjs');
 
-router.put('/students/:id/password', requireTeacher, async (req, res) => {
+router.put('/students/:id/password', requireTeacher, requireRegistrationOpenForNonAdmin, async (req, res) => {
   try {
     const currentTeacher = await Teacher.findById(req.session.userId);
     const student = await Student.findById(req.params.id);

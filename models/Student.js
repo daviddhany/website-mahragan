@@ -46,6 +46,13 @@ const studentSchema = new mongoose.Schema(
       ]
     },
 
+    entryYear: {
+      type: Number,
+      default: null,
+      min: 2000,
+      max: 2099
+    },
+
     // ✅ Birthdate
     birthDate: {
       type: Date,
