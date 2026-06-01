@@ -41,35 +41,10 @@
   <option value="ثالثة اعدادي">ثالثة إعدادي</option>
 </select>
 </label>
-<label>سنة دخول أولى ابتدائي
-<select name="entryYear" id="entryYear" required>
-  <option value="">اختر السنة</option>
-  <option value="2026">2026</option>
-  <option value="2025">2025</option>
-  <option value="2024">2024</option>
-  <option value="2023">2023</option>
-  <option value="2022">2022</option>
-  <option value="2021">2021</option>
-  <option value="2020">2020</option>
-  <option value="2019">2019</option>
-  <option value="2018">2018</option>
-  <option value="2017">2017</option>
-  <option value="2016">2016</option>
-  <option value="2015">2015</option>
-</select>
-<small>هذه السنة هي أول سنة دخل فيها المخدوم أولى ابتدائي، وهي التي ستظهر أول رقمين في الكود.</small>
-</label>
 <label>كلمة السر*<input name="password" type="password" required></label>
 <label>رقم ولي الامر*<input name="parentPhone" required pattern="\d{11}" maxlength="11" placeholder="11 رقم"></label>
 <label>رقم تليفون المخدوم - اختياري<input name="studentPhone" pattern="\d{11}" maxlength="11" placeholder="11 رقم"></label>
 <label>العنوان*<textarea name="address" required></textarea></label>
-<label>هل يمكنه السفر في حالة التأهل؟
-  <select name="canTravel" required>
-    <option value="">اختر</option>
-    <option value="true">نعم</option>
-    <option value="false">لا</option>
-  </select>
-</label>
 <button id="submitBtn">حفظ البيانات</button><p id="msg"></p></form></section></main>
 <footer class="app-footer" dir="ltr">© 2026 David Hany. All rights reserved.</footer>
 <script src="/public/app.js"></script><script>
@@ -159,38 +134,9 @@ function updateYearOptions() {
   });
 
   yearSelect.disabled = years.length === 0;
-  updateEntryYearSuggestion();
-}
-
-function updateEntryYearSuggestion() {
-  const yearSelect = document.getElementById('studentYear');
-  const entryYearSelect = document.getElementById('entryYear');
-  const currentRegistrationYear = new Date().getFullYear();
-  const offsets = {
-    'اولى إبتدائي': 0,
-    'تانية إبتدائي': 1,
-    'ثالثة إبتدائي': 2,
-    'رابعة إبتدائي': 3,
-    'خمسة إبتدائي': 4,
-    'سادسة إبتدائي': 5,
-    'اولى اعدادي': 6,
-    'تانية اعدادي': 7,
-    'ثالثة اعدادي': 8
-  };
-
-  const offset = offsets[yearSelect.value];
-
-  if (offset === undefined) return;
-
-  const suggestedEntryYear = String(currentRegistrationYear - offset);
-
-  if ([...entryYearSelect.options].some(option => option.value === suggestedEntryYear)) {
-    entryYearSelect.value = suggestedEntryYear;
-  }
 }
 
 document.getElementById('className').addEventListener('change', updateYearOptions);
-document.getElementById('studentYear').addEventListener('change', updateEntryYearSuggestion);
 updateYearOptions();
 
 document.getElementById('form').addEventListener('submit', async e => {

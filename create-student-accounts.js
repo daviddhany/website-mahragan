@@ -16,7 +16,6 @@ const students = [
     studentYear: 'ثالثة إبتدائي',
     entryYear: 2024,
     birthDate: '2016-05-01',
-    canTravel: true,
     parentPhone: '01234567890',
     studentPhone: '',
     address: 'Alexandria',

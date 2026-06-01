@@ -9,7 +9,8 @@ const {
   generateStudentCode,
   requireFields,
   normalizeClassName,
-  normalizeStudentYear
+  normalizeStudentYear,
+  getEntryYearFromStudentYear
 } = require('../utils');
 
 const router = express.Router();
@@ -77,12 +78,10 @@ router.post('/register', async (req, res) => {
       'gender',
       'className',
       'studentYear',
-      'entryYear',
       'birthDate',
       'password',
       'parentPhone',
-      'address',
-      'canTravel'
+      'address'
     ];
 
     const missing = requireFields(req.body, needed);
@@ -117,11 +116,11 @@ router.post('/register', async (req, res) => {
       req.body.studentYear
     );
 
-    const entryYear = Number(req.body.entryYear);
+    const entryYear = getEntryYearFromStudentYear(studentYear);
 
-    if (!Number.isInteger(entryYear) || entryYear < 2000 || entryYear > 2099) {
+    if (!entryYear) {
       return res.status(400).json({
-        error: 'سنة دخول أولى ابتدائي غير صحيحة'
+        error: 'السنة الدراسية غير صحيحة'
       });
     }
 
@@ -180,7 +179,6 @@ router.post('/register', async (req, res) => {
       entryYear
     );
 
-    const canTravel = req.body.canTravel === 'true';
 
     const student = await Student.create({
       studentCode,
@@ -193,8 +191,7 @@ router.post('/register', async (req, res) => {
       studentPhone: req.body.studentPhone || '',
       passwordHash,
       parentPhone: req.body.parentPhone,
-      address: req.body.address,
-      canTravel
+      address: req.body.address
     });
 
     res.status(201).json({
@@ -210,8 +207,7 @@ router.post('/register', async (req, res) => {
         birthDate: student.birthDate ? student.birthDate.toISOString().slice(0, 10) : '',
         parentPhone: student.parentPhone,
         studentPhone: student.studentPhone,
-        address: student.address,
-        canTravel: student.canTravel
+        address: student.address
       }
     });
 
@@ -261,8 +257,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
       'parentPhone',
       'studentPhone',
       'address',
-      'birthDate',
-      'canTravel'
+      'birthDate'
     ];
 
     const updates = {};

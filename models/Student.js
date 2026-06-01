@@ -58,10 +58,6 @@ const studentSchema = new mongoose.Schema(
       type: Date,
       required: true
     },
-canTravel: {
-  type: Boolean,
-  required: true
-},
     // ✅ Parent phone (required)
     parentPhone: {
       type: String,

@@ -64,6 +64,23 @@ function normalizeStudentYear(value) {
     .replace(/اعدادى/g, 'اعدادي');
 }
 
+function getEntryYearFromStudentYear(studentYear) {
+  const normalized = normalizeStudentYear(studentYear);
+  const entryYearByStudentYear = {
+    'اولى إبتدائي': 2025,
+    'تانية إبتدائي': 2024,
+    'ثالثة إبتدائي': 2023,
+    'رابعة إبتدائي': 2022,
+    'خمسة إبتدائي': 2021,
+    'سادسة إبتدائي': 2020,
+    'اولى اعدادي': 2019,
+    'تانية اعدادي': 2018,
+    'ثالثة اعدادي': 2017
+  };
+
+  return entryYearByStudentYear[normalized] || null;
+}
+
 function normalizeArabicEducationValue(value) {
   return normalizeStudentYear(value);
 }
@@ -79,5 +96,6 @@ module.exports = {
   requireFields,
   normalizeClassName,
   normalizeStudentYear,
+  getEntryYearFromStudentYear,
   normalizeArabicEducationValue
 };

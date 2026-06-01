@@ -108,13 +108,7 @@
         <input name="birthDate" id="editBirthDate" type="date" required>
       </label>
 
-      <label>
-        هل يمكنه السفر في حالة التأهل؟
-        <select name="canTravel" id="editCanTravel" required>
-          <option value="true">نعم</option>
-          <option value="false">لا</option>
-        </select>
-      </label>
+      
 
 
 
@@ -436,7 +430,6 @@ async function openEditStudent(id) {
   document.getElementById('editBirthDate').value = student.birthDate
     ? new Date(student.birthDate).toISOString().slice(0, 10)
     : '';
-  document.getElementById('editCanTravel').value = student.canTravel ? 'true' : 'false';
   await renderEditActivities(student);
 
   document.getElementById('editBox').scrollIntoView({ behavior: 'smooth' });
@@ -899,7 +892,6 @@ document.getElementById('editStudentForm').addEventListener('submit', async e =>
   const id = body.studentId;
   delete body.studentId;
 
-  body.canTravel = body.canTravel === 'true';
   body.activityIds = formData.getAll('activityIds');
 
   setLoading('editMsg', 'Saving student changes...');

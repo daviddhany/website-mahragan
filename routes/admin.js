@@ -270,8 +270,7 @@ router.put('/students/:id', requireTeacher, requireRegistrationOpenForNonAdmin, 
       'parentPhone',
       'studentPhone',
       'address',
-      'birthDate',
-      'canTravel'
+      'birthDate'
     ];
 
     for (const field of allowedFields) {
@@ -372,7 +371,6 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
     'Student Phone',
     'Address',
     'Paid',
-    'Can Travel',
     'Student Photo Link',
     'Birth Certificate Link',
     'Submission Status',
@@ -399,7 +397,6 @@ router.get('/export/students.csv', requireTeacher, async (req, res) => {
       phoneText(s.studentPhone),
       s.address || '',
       s.paymentConfirmed ? 'Yes' : 'No',
-      s.canTravel ? 'Yes' : 'No',
       fileLink(s.studentPhotoPath),
       fileLink(s.birthCertificatePath),
       s.submissionComplete ? 'Complete' : 'Incomplete',
