@@ -11,7 +11,7 @@ async function seed() {
   await mongoose.connect(MONGODB_URI);
 
   const adminEmail = String(process.env.ADMIN_EMAIL || 'admin@example.com').trim().toLowerCase();
-  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123456!';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123456';
 
   if (!/^\S+@\S+\.\S+$/.test(adminEmail)) {
     throw new Error('ADMIN_EMAIL must be a valid email address.');
