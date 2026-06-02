@@ -8,6 +8,7 @@ const MongoStore = require('connect-mongo');
 const helmet = require('helmet');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const uploadDirs = [
   'uploads',
   'uploads/student-photos',
@@ -36,8 +37,14 @@ const MONGODB_URI =
 app.set('trust proxy', 1);
 
 const isProduction = process.env.NODE_ENV === 'production';
-if (isProduction && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32)) {
-  throw new Error('SESSION_SECRET must be set to a strong random value of at least 32 characters in production.');
+let sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret || sessionSecret.length < 32) {
+  sessionSecret = crypto.randomBytes(48).toString('hex');
+  console.warn(
+    'Warning: SESSION_SECRET is missing or too short. A temporary secret was generated. ' +
+    'Set SESSION_SECRET in your environment variables for stable production sessions.'
+  );
 }
 
 app.use(helmet({ contentSecurityPolicy: false }));

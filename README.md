@@ -1,103 +1,50 @@
-# Organization Registration & Team Management System
+# Fixed Login and Student Code Update
 
-A complete Node.js + MongoDB web application for managing organization, school, ministry, or festival registration.
+## Admin / Staff login
+The admin/staff login now uses email instead of phone number.
 
-## Main Features
+Default seeded admin account:
 
-- Online student/participant registration
-- Student login and password change
-- Supervisor dashboard
-- Admin dashboard
-- Role-based access control
-- Activity and category management
-- Team creation and team member management
-- Registration open/close control
-- Payment confirmation tracking
-- File uploads for required documents
-- Search and filtering
-- CSV/Excel export
-- Clean hidden page URLs
-- MongoDB session storage
-- Password hashing with bcrypt
-- Production-ready environment configuration
+- Email: admin@example.com
+- Password: Admin123456!
 
-## Tech Stack
-
-- Node.js 20
-- Express.js
-- MongoDB + Mongoose
-- HTML, CSS, JavaScript
-- Cloudinary for file uploads
-- Express Session + Connect Mongo
-- Helmet and rate limiting
-
-## Quick Start
+To create or refresh the admin account, run:
 
 ```bash
-npm install
-cp .env.example .env
 npm run seed
-npm start
 ```
 
-Open the app:
-
-```text
-http://localhost:3000
-```
-
-## Environment Setup
-
-Create a `.env` file using `.env.example`.
-
-Required values:
+You can change the default credentials in `.env`:
 
 ```env
-PORT=3000
-MONGODB_URI=mongodb://127.0.0.1:27017/student_activity_management
-SESSION_SECRET=replace_with_a_random_secret_at_least_32_characters
 ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=ChangeThisStrongPassword123!
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+ADMIN_PASSWORD=Admin123456!
 ```
 
-## Create First Admin
+## Student code method
+Student codes now use this generic format:
 
-```bash
-npm run seed
+```text
+YY + Gender + Department + Serial
 ```
 
-The admin email and password are read from `.env`.
+Example:
 
-## Production Checklist
+```text
+25MA001
+```
 
-Before using this system with real data:
+Meaning:
 
-- Change all `.env` values.
-- Use a strong `SESSION_SECRET`.
-- Use a strong admin password.
-- Use HTTPS.
-- Restrict MongoDB Atlas network access when possible.
-- Do not upload real client data in demo copies.
-- Back up the database regularly.
-- Review `docs/INSTALLATION_GUIDE.md`.
+- `25` = entry year 2025
+- `M` = Male, `F` = Female
+- `A` = Department A
+- `001` = serial number
 
-## Buyer Notes
+Department codes:
 
-This package does not include real student data, database credentials, Cloudinary keys, or private deployment secrets. Buyers must provide their own database and Cloudinary account.
-
-## Customization
-
-You can customize:
-
-- Logos inside `public/`
-- Page text inside `public/*.html`
-- Styles inside `public/styles.css`
-- Services/classes inside the relevant models and route validation files
-- Activities and categories from the admin dashboard
-
-## License
-
-See `BUYER_LICENSE.txt`.
+- Department A = A
+- Department B = B
+- Department C = C
+- Upper Department = D
+- Middle Department = E
