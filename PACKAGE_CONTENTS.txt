@@ -1,0 +1,26 @@
+Sellable Package Contents
+
+Included:
+- Full Node.js/Express/MongoDB source code
+- Public HTML/CSS/JS frontend
+- .env.example for buyer setup
+- README.md
+- docs/INSTALLATION_GUIDE.md
+- docs/INSTALLATION_GUIDE.pdf
+- MARKETPLACE_DESCRIPTION.md
+- BUYER_LICENSE.txt
+- sample-data/sample-students.csv
+
+Not included:
+- Real student data
+- Real database credentials
+- Real Cloudinary credentials
+- Real .env file
+- node_modules
+- private upload files
+
+Before publishing:
+- Add real screenshots to the screenshots folder.
+- Create a demo deployment with fake accounts.
+- Update BUYER_LICENSE.txt with your final terms.
+- Decide your support period and installation fee.

@@ -1,7 +1,7 @@
 {
-  "name": "school-activity-registration-app",
+  "name": "church-registration-management-system",
   "version": "1.0.0",
-  "description": "Simple and secure school activity registration website using Express and MongoDB",
+  "description": "Church, school, and festival registration management system using Express and MongoDB",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

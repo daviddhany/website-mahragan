@@ -1,93 +1,103 @@
-# School Activity Registration App
+# Church Registration & Team Management System
 
-A simple Express + MongoDB website for student activity registration.
+A complete Node.js + MongoDB web application for managing church, school, ministry, or festival registration.
 
-## Features
+## Main Features
 
-- Student registration
-- Student login with national ID and password
-- Unique national ID validation
-- Automatic student ID generation
-- Gender code: male = B, female = G
-- Class code: John = Y, Philo = S, Mary = M
-- Upload birth certificate and payment proof
-- Activity selection with checkboxes
-- Teacher/admin login
-- Teacher dashboard for all students
-- CSV export
+- Online student/participant registration
+- Student login and password change
+- Teacher/servant dashboard
+- Admin dashboard
+- Role-based access control
+- Activity and category management
+- Team creation and team member management
+- Registration open/close control
+- Payment confirmation tracking
+- File uploads for required documents
+- Search and filtering
+- CSV/Excel export
+- Clean hidden page URLs
+- MongoDB session storage
 - Password hashing with bcrypt
-- Session storage in MongoDB
+- Production-ready environment configuration
 
-## Requirements
+## Tech Stack
 
-- Node.js
-- MongoDB running locally or a MongoDB Atlas connection string
+- Node.js 20
+- Express.js
+- MongoDB + Mongoose
+- HTML, CSS, JavaScript
+- Cloudinary for file uploads
+- Express Session + Connect Mongo
+- Helmet and rate limiting
 
-## Setup
-
-1. Install dependencies:
+## Quick Start
 
 ```bash
 npm install
-```
-
-2. Create your environment file:
-
-```bash
 cp .env.example .env
-```
-
-3. Edit `.env` if needed:
-
-```env
-PORT=3000
-MONGODB_URI=mongodb://127.0.0.1:27017/school_activity_app
-SESSION_SECRET=replace-with-a-random-secret-at-least-32-characters
-ADMIN_PHONE=01012345678
-ADMIN_PASSWORD=replace-with-a-strong-admin-password
-```
-
-4. Seed the first teacher/admin and sample activities:
-
-```bash
 npm run seed
-```
-
-The admin login is created from `ADMIN_PHONE` and `ADMIN_PASSWORD` in `.env`. Do not use a default password in production.
-
-5. Start the app:
-
-```bash
 npm start
 ```
 
-Open:
+Open the app:
 
 ```text
 http://localhost:3000
 ```
 
-## Student ID Format
+## Environment Setup
 
-```text
-[Gender Code][Class Code]-[Year]-[Number]
+Create a `.env` file using `.env.example`.
+
+Required values:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb://127.0.0.1:27017/church_registration_app
+SESSION_SECRET=replace_with_a_random_secret_at_least_32_characters
+ADMIN_PHONE=01000000000
+ADMIN_PASSWORD=ChangeThisStrongPassword123!
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-Examples:
+## Create First Admin
 
-```text
-BY-2026-0001 = male student in John class
-GS-2026-0001 = female student in Philo class
-BM-2026-0001 = male student in Mary class
+```bash
+npm run seed
 ```
 
-## Important Production Notes
+The admin phone and password are read from `.env`.
 
-Before using this with real student data:
+## Production Checklist
 
+Before using this system with real data:
+
+- Change all `.env` values.
+- Use a strong `SESSION_SECRET`.
+- Use a strong admin password.
 - Use HTTPS.
-- Change SESSION_SECRET.
-- Change the default admin password.
-- Do not expose uploads publicly without access controls.
-- Use a secure MongoDB account and network restrictions.
+- Restrict MongoDB Atlas network access when possible.
+- Do not upload real client data in demo copies.
 - Back up the database regularly.
+- Review `docs/INSTALLATION_GUIDE.md`.
+
+## Buyer Notes
+
+This package does not include real student data, database credentials, Cloudinary keys, or private deployment secrets. Buyers must provide their own database and Cloudinary account.
+
+## Customization
+
+You can customize:
+
+- Logos inside `public/`
+- Page text inside `public/*.html`
+- Styles inside `public/styles.css`
+- Services/classes inside the relevant models and route validation files
+- Activities and categories from the admin dashboard
+
+## License
+
+See `BUYER_LICENSE.txt`.

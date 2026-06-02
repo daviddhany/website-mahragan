@@ -1,6 +1,5 @@
-node_modules
+node_modules/
 .env
-uploads/*
-!uploads/.gitkeep
-!uploads/birth-certificates/.gitkeep
-!uploads/payment-proofs/.gitkeep
+uploads/
+npm-debug.log*
+.DS_Store

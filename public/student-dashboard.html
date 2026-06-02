@@ -4,7 +4,7 @@
 <body>
 <header class="site-header">
   <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
-  <div class="header-title"><h2>مهرجان حبة حنطة</h2></div>
+  <div class="header-title"><h2>نظام التسجيل</h2></div>
   <div class="header-right">
     <nav class="header-actions"><button type="button" onclick="logout()" class="btn-logout">تسجيل خروج</button></nav>
     <img src="/public/logo-right.png" class="header-logo" alt="Logo">
@@ -30,7 +30,7 @@
 <section class="card"><h2>اختيار الأنشطة</h2><p class="muted">اضغط على النشاط لاختياره. السعر الافتراضي لكل نشاط 10 ج.</p><form id="activityForm"><div id="activities"></div><div id="paymentTotal" class="payment-total">الإجمالي: 0 ج</div><button id="activitySubmitBtn">إرسال التسجيل</button></form><p id="actMsg"></p></section>
 <section class="card" id="summaryCard" style="display:none;"><h2>ملخص التسجيل</h2><div id="summary"></div></section>
 </main>
-  <footer class="app-footer" dir="ltr">© 2026 David Hany. All rights reserved.</footer>
+  <footer class="app-footer" dir="ltr">© 2026 Your Organization. All rights reserved.</footer>
 <script src="/public/app.js"></script><script>
 let me = null;
 let activityData = [];
@@ -170,7 +170,7 @@ async function initStudentDashboard() {
     await loadMe();
     await loadActivities();
   } catch (err) {
-    location.href = '/public/student-login.html';
+    location.href = '/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5';
   }
 }
 
