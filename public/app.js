@@ -5,7 +5,7 @@ async function api(url, options = {}) {
     ...options
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'حدث خطأ. حاول مرة أخرى');
+  if (!res.ok) throw new Error(data.error || 'Something went wrong. Please try again.');
   return data;
 }
 
@@ -34,7 +34,7 @@ async function logout() {
 }
 
 
-function setLoading(id, text = 'جاري التحميل...') {
+function setLoading(id, text = 'Loading...') {
   const el = document.getElementById(id);
   if (!el) return;
   el.className = 'loading';
@@ -55,7 +55,7 @@ function setButtonLoading(button, isLoading, loadingText) {
   if (isLoading) {
     button.dataset.originalText = button.textContent;
     button.disabled = true;
-    button.textContent = loadingText || 'من فضلك انتظر...';
+    button.textContent = loadingText || 'Please wait...';
   } else {
     button.disabled = false;
     button.textContent = button.dataset.originalText || button.textContent;
@@ -63,8 +63,8 @@ function setButtonLoading(button, isLoading, loadingText) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.documentElement.lang = 'ar';
-  document.documentElement.dir = 'rtl';
+  document.documentElement.lang = 'en';
+  document.documentElement.dir = 'ltr';
 
   document.querySelectorAll('input[inputmode="numeric"], input[pattern*="\d"]').forEach(input => {
     input.addEventListener('input', () => {

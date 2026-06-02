@@ -44,24 +44,30 @@ router.post('/student/login', async (req, res) => {
 // ================= TEACHER / ADMIN LOGIN =================
 router.post('/teacher/login', async (req, res) => {
   try {
-    const { email, loginId, password } = req.body;
+    const { email, loginId, phone, password } = req.body;
 
-    const cleanEmail = String(email || loginId || '').trim().toLowerCase();
+    const cleanLogin = String(email || loginId || phone || '').trim().toLowerCase();
 
-    if (!cleanEmail) {
+    if (!cleanLogin) {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    const teacher = await Teacher.findOne({ email: cleanEmail });
+    // Backward compatible: allows new email login and old phone login while migrating.
+    const teacher = await Teacher.findOne({
+      $or: [
+        { email: cleanLogin },
+        { phone: cleanLogin }
+      ]
+    });
 
     if (!teacher) {
-      return res.status(401).json({ error: 'Invalid login ID or password' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     const ok = await bcrypt.compare(password, teacher.passwordHash);
 
     if (!ok) {
-      return res.status(401).json({ error: 'Invalid login ID or password' });
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     req.session.userId = teacher._id.toString();

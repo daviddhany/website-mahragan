@@ -32,7 +32,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI =
-  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/school_activity_app';
+  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/student_activity_management';
 app.set('trust proxy', 1);
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -60,7 +60,7 @@ const authLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'محاولات تسجيل دخول كثيرة. حاول مرة أخرى بعد 15 دقيقة.' }
+  message: { error: 'Too many login attempts. Try again after 15 minutes.' }
 });
 
 const registerLimiter = rateLimit({
@@ -68,7 +68,7 @@ const registerLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'محاولات تسجيل كثيرة. حاول مرة أخرى لاحقًا.' }
+  message: { error: 'Too many registration attempts. Try again later.' }
 });
 
 app.use('/api/auth/student/login', authLimiter);
