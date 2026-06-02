@@ -44,9 +44,9 @@ router.post('/student/login', async (req, res) => {
 // ================= TEACHER / ADMIN LOGIN =================
 router.post('/teacher/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, loginId, password } = req.body;
 
-    const cleanEmail = String(email || '').trim().toLowerCase();
+    const cleanEmail = String(email || loginId || '').trim().toLowerCase();
 
     if (!cleanEmail) {
       return res.status(400).json({ error: 'Email is required' });
