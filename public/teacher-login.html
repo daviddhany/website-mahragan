@@ -20,7 +20,7 @@
   <section class="card">
     <form id="form">
       <label>Email
-        <input name="loginId" type="text" required placeholder="admin@example.com" autocomplete="username">
+        <input name="email" type="email" required placeholder="admin@example.com" autocomplete="username">
       </label>
       <label>Password
         <input name="password" type="password" required autocomplete="current-password">
@@ -36,7 +36,7 @@
 document.getElementById('form').addEventListener('submit', async e => {
   e.preventDefault();
   const body = Object.fromEntries(new FormData(e.target));
-  body.loginId = String(body.loginId || '').trim().toLowerCase();
+  body.email = String(body.email || '').trim().toLowerCase();
 
   const button = e.target.querySelector('button');
   button.disabled = true;

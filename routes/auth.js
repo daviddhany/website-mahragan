@@ -47,24 +47,48 @@ router.post('/teacher/login', async (req, res) => {
     const { email, loginId, phone, password } = req.body;
 
     const cleanLogin = String(email || loginId || phone || '').trim().toLowerCase();
+    const cleanPassword = String(password || '');
 
-    if (!cleanLogin) {
-      return res.status(400).json({ error: 'Email is required' });
+    if (!cleanLogin || !cleanPassword) {
+      return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    // Backward compatible: allows new email login and old phone login while migrating.
-    const teacher = await Teacher.findOne({
+    let teacher = await Teacher.findOne({
       $or: [
         { email: cleanLogin },
         { phone: cleanLogin }
       ]
     });
 
+    // Self-healing demo admin login:
+    // If the admin account was not seeded in the same database, create it on first successful env/default login.
+    const adminEmail = String(process.env.ADMIN_EMAIL || 'admin@example.com').trim().toLowerCase();
+    const adminPassword = String(process.env.ADMIN_PASSWORD || 'Admin123456!');
+
+    if (!teacher && cleanLogin === adminEmail && cleanPassword === adminPassword) {
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      teacher = await Teacher.findOneAndUpdate(
+        { email: adminEmail },
+        {
+          $set: {
+            fullName: 'Main Admin',
+            email: adminEmail,
+            phone: '',
+            passwordHash,
+            role: 'admin',
+            assignedGender: 'all'
+          },
+          $unset: { assignedClass: '', assignedYear: '' }
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: false }
+      );
+    }
+
     if (!teacher) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    const ok = await bcrypt.compare(password, teacher.passwordHash);
+    const ok = await bcrypt.compare(cleanPassword, teacher.passwordHash);
 
     if (!ok) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -80,7 +104,8 @@ router.post('/teacher/login', async (req, res) => {
       role: teacher.role
     });
   } catch (err) {
-    res.status(500).json({ error: 'Login failed' });
+    console.error('Teacher login error:', err);
+    res.status(500).json({ error: 'Login failed. Check server console.' });
   }
 });
 
