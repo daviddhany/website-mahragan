@@ -1,35 +1,346 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
-  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>API Documentation</title>
+  <meta charset="utf-8">
+  <title>Staff Management</title>
   <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-generic.svg" type="image/png">
 </head>
+
 <body>
 <header class="site-header">
   <a href="/" class="logo-link"><img src="/public/logo-generic.svg" class="header-logo" alt="Logo"></a>
-  <div class="header-title"><h2>API Documentation</h2><p>توثيق مختصر لمسارات النظام الأساسية</p></div>
+  <div class="header-title"><h2>Staff Management</h2></div>
+  <div class="header-right">
+    <nav class="header-actions">
+      <a href="/c/3a7dcaf0-9901-83ea-b660-7e9e88d19bd8" class="btn-nav">Dashboard</a>
+      <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+    </nav>
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
+  </div>
 </header>
+
 <main>
+
   <section class="card">
-    <h2>Authentication</h2>
-    <div class="api-box">POST /api/auth/student/login<br>POST /api/auth/teacher/login<br>POST /api/auth/logout</div>
+    <h2>Registration Status</h2>
+    <p id="registrationStatusText" class="muted">جاري تحميل Registration Status...</p>
+    <label>
+      Optional automatic closing time
+      <input id="registrationClosesAt" type="datetime-local">
+    </label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <button type="button" id="toggleRegistrationBtn">Loading...</button>
+      <button type="button" id="saveAutoCloseBtn">Save Automatic Closing Time</button>
+    </div>
+    <p class="muted">When closed, student registration, team creation, and staff edits are blocked. Staff become viewers only.</p>
+    <p id="registrationMsg"></p>
   </section>
+
   <section class="card">
-    <h2>Students</h2>
-    <div class="api-box">POST /api/students/register<br>GET /api/students/me<br>POST /api/students/me/photo<br>POST /api/students/me/birth-certificate<br>POST /api/students/me/payment-proof</div>
+    <h2>Add User</h2>
+
+    <form id="teacherForm">
+      <label>
+        Full Name
+        <input name="fullName" required>
+      </label>
+
+      <label>
+        Email
+        <input name="email" type="email" required placeholder="user@example.com">
+      </label>
+
+      <label>
+        Phone - Optional
+        <input name="phone" pattern="\d{11}" maxlength="11" placeholder="11 digits">
+      </label>
+
+      <label>
+        Password
+        <input name="password" type="password" required>
+      </label>
+
+      <label>
+        Role
+        <select name="role" id="teacherRole" required>
+          <option value="teacher">Staff</option>
+          <option value="serviceLeader">Service Leader</option>
+          <option value="admin">Admin</option>
+        </select>
+      </label>
+
+      <label>
+        Department
+        <select name="assignedClass" required>
+          <option value="">Select department</option>
+          <option value="Department A">Department A</option>
+          <option value="Department B">Department B</option>
+          <option value="Department C">Department C</option>
+          <option value="Upper Department">Upper Department</option>
+          <option value="Middle Department">Middle Department</option>
+
+        </select>
+      </label>
+
+      <label>
+        Grade
+        <select name="assignedYear" id="assignedYear" required>
+  <option value="">Select grade</option>
+  <option value="Grade 1">Grade 1</option>
+  <option value="Grade 2">Grade 2</option>
+  <option value="Grade 3">Grade 3</option>
+  <option value="Grade 4">Grade 4</option>
+  <option value="Grade 5">Grade 5</option>
+  <option value="Grade 6">Grade 6</option>
+  <option value="Grade 7">Grade 7</option>
+  <option value="Grade 8">Grade 8</option>
+  <option value="Grade 9">Grade 9</option>
+</select>
+      </label>
+<label>
+  Gender
+  <select name="assignedGender" required>
+    <option value="">اختر Gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+  </select>
+</label>
+      <button>Add User</button>
+      <p id="msg"></p>
+    </form>
   </section>
+
   <section class="card">
-    <h2>Teacher / Admin</h2>
-    <div class="api-box">GET /api/admin/students<br>GET /api/admin/analytics<br>GET /api/admin/export/students.csv<br>GET /api/teams<br>POST /api/teams<br>GET /api/categories<br>POST /api/categories<br>GET /api/activities<br>POST /api/activities</div>
-  </section>
-  <section class="card">
-    <h2>JSON Documentation Endpoint</h2>
-    <p>يمكن قراءة التوثيق كـ JSON من هذا المسار:</p>
-    <div class="api-box">GET /api/docs</div>
+    <button type="button" class="collapsible-toggle" data-show="Show Current Staff and Service Leaders" data-hide="Hide Current Staff and Service Leaders" onclick="toggleSection('teachersListSection', this)">Show Current Staff and Service Leaders</button>
+    <div id="teachersListSection" class="collapsible-body">
+    <h2>Current Staff and Service Leaders</h2>
+    <label>
+      Search
+      <input id="teacherSearch" placeholder="اSearch بالاسم، التليفون، Department، أو Grade">
+    </label>
+    <button type="button" onclick="loadTeachers()">Search</button>
+    <div id="teachers"></div>
+    </div>
   </section>
 </main>
-</body>
+
+<script src="/public/app.js"></script>
+
+<script>
+
+
+function isoToLocalDatetimeValue(isoValue) {
+  if (!isoValue) return '';
+  const date = new Date(isoValue);
+  if (Number.isNaN(date.getTime())) return '';
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function localDatetimeValueToIso(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
+async function loadRegistrationStatus() {
+  const btn = document.getElementById('toggleRegistrationBtn');
+  const statusText = document.getElementById('registrationStatusText');
+  const closesAtInput = document.getElementById('registrationClosesAt');
+
+  if (!btn || !statusText) return;
+
+  try {
+    const settings = await api('/api/admin/registration-status');
+
+    btn.dataset.registrationOpen = settings.registrationOpen ? 'true' : 'false';
+    btn.textContent = settings.registrationOpen ? 'Close Registration Now' : 'Open Registration';
+    btn.style.background = settings.registrationOpen ? '#e53935' : '#4CAF50';
+
+    if (closesAtInput) {
+      closesAtInput.value = isoToLocalDatetimeValue(settings.registrationClosesAt);
+    }
+
+    const closeText = settings.registrationClosesAt
+      ? ` and will close automatically at ${new Date(settings.registrationClosesAt).toLocaleString('ar-EG')}.`
+      : '';
+
+    statusText.textContent = settings.registrationOpen
+      ? `Registration is currently open.${closeText}`
+      : 'Registration is closed. Student registration, teams, and staff edits are disabled. Staff are viewers only.';
+  } catch (err) {
+    statusText.textContent = 'فشل تحميل Registration Status.';
+    message('registrationMsg', err.message, false);
+  }
+}
+
+async function saveRegistrationSettings(registrationOpen, keepAutoClose = true) {
+  const closesAtInput = document.getElementById('registrationClosesAt');
+  const registrationClosesAt = keepAutoClose && closesAtInput
+    ? localDatetimeValueToIso(closesAtInput.value)
+    : null;
+
+  return api('/api/admin/registration-status', {
+    method: 'POST',
+    body: JSON.stringify({ registrationOpen, registrationClosesAt })
+  });
+}
+
+const toggleRegistrationBtn = document.getElementById('toggleRegistrationBtn');
+if (toggleRegistrationBtn) {
+  toggleRegistrationBtn.addEventListener('click', async () => {
+    const isOpenNow = toggleRegistrationBtn.dataset.registrationOpen === 'true';
+    const confirmMessage = isOpenNow
+      ? 'هل تريد Close Registration Now؟ كل التسجيلات والفرق وتعديل المشرفين سيقف.'
+      : 'هل تريد Open Registration؟';
+
+    if (!confirm(confirmMessage)) return;
+
+    toggleRegistrationBtn.disabled = true;
+    toggleRegistrationBtn.textContent = 'Saving...';
+
+    try {
+      const settings = await saveRegistrationSettings(!isOpenNow, !isOpenNow);
+
+      message(
+        'registrationMsg',
+        settings.registrationOpen ? 'تم Open Registration' : 'Registration closed'
+      );
+
+      await loadRegistrationStatus();
+    } catch (err) {
+      message('registrationMsg', err.message, false);
+    } finally {
+      toggleRegistrationBtn.disabled = false;
+    }
+  });
+}
+
+const saveAutoCloseBtn = document.getElementById('saveAutoCloseBtn');
+if (saveAutoCloseBtn) {
+  saveAutoCloseBtn.addEventListener('click', async () => {
+    saveAutoCloseBtn.disabled = true;
+    saveAutoCloseBtn.textContent = 'Saving...';
+
+    try {
+      const settings = await saveRegistrationSettings(true, true);
+      message('registrationMsg', settings.registrationClosesAt ? 'تم Save Automatic Closing Time' : 'تم Open Registration بدون وقت إغلاق تلقائي');
+      await loadRegistrationStatus();
+    } catch (err) {
+      message('registrationMsg', err.message, false);
+    } finally {
+      saveAutoCloseBtn.disabled = false;
+      saveAutoCloseBtn.textContent = 'Save Automatic Closing Time';
+    }
+  });
+}
+
+const roleSelect = document.getElementById('teacherRole');
+const yearSelect = document.getElementById('assignedYear');
+function updateYearRequirement() {
+  const classSelect = document.querySelector('[name="assignedClass"]');
+  const genderSelect = document.querySelector('[name="assignedGender"]');
+  const classLabel = classSelect.closest('label');
+  const genderLabel = genderSelect.closest('label');
+
+  if (roleSelect.value === 'admin') {
+    yearSelect.required = false;
+    classSelect.required = false;
+    genderSelect.required = false;
+    yearSelect.closest('label').style.display = 'none';
+    classLabel.style.display = 'none';
+    genderLabel.style.display = 'none';
+    yearSelect.value = '';
+    classSelect.value = '';
+    genderSelect.value = '';
+  } else if (roleSelect.value === 'serviceLeader') {
+    yearSelect.required = false;
+    classSelect.required = true;
+    genderSelect.required = true;
+    yearSelect.closest('label').style.display = 'none';
+    classLabel.style.display = '';
+    genderLabel.style.display = '';
+    yearSelect.value = '';
+  } else {
+    yearSelect.required = true;
+    classSelect.required = true;
+    genderSelect.required = true;
+    yearSelect.closest('label').style.display = '';
+    classLabel.style.display = '';
+    genderLabel.style.display = '';
+  }
+}
+roleSelect.addEventListener('change', updateYearRequirement);
+updateYearRequirement();
+
+async function loadTeachers() {
+  const q = document.getElementById('teacherSearch') ? document.getElementById('teacherSearch').value : '';
+  const teachers = await api('/api/teachers?search=' + encodeURIComponent(q));
+
+  document.getElementById('teachers').innerHTML = teachers.map(t => `
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd;padding:10px 0;">
+      <div>
+        <strong>${escapeHtml(t.fullName)}</strong><br>
+${escapeHtml(t.email || '')}<br>${escapeHtml(t.phone || '')}<br>      Role: ${
+  t.role === 'admin'
+    ? 'Admin / Staff'
+    : t.role === 'serviceLeader'
+      ? 'Service Leader'
+      : 'Staff'
+}<br>Department: ${escapeHtml(t.assignedClass || '')} - Grade: ${escapeHtml(t.assignedYear || 'All grades')}
+      </div>
+
+      <button onclick="deleteTeacher('${t._id}')">Delete</button>
+    </div>
+  `).join('');
+}
+
+async function deleteTeacher(id) {
+  if (!confirm('هل تريد Delete هذا المستخدم؟')) return;
+
+  await api('/api/teachers/' + id, {
+    method: 'DELETE'
+  });
+
+  loadTeachers();
+}
+
+document.getElementById('teacherForm').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const body = Object.fromEntries(new FormData(e.target));
+
+  try {
+    await api('/api/teachers', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+
+    message('msg', 'تم Add User');
+    e.target.reset();
+    loadTeachers();
+  } catch (err) {
+    message('msg', err.message, false);
+  }
+});
+
+const teacherSearchInput = document.getElementById('teacherSearch');
+if (teacherSearchInput) {
+  teacherSearchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      loadTeachers();
+    }
+  });
+}
+
+loadRegistrationStatus();
+loadTeachers().catch(() => location.href = '/c/2f6ccaf0-8809-83ea-b660-6d9e88d19bd7');
+</script>
+<footer class="app-footer" dir="ltr">
+  © 2026 Your Organization. All rights reserved.
+</footer></body>
 </html>

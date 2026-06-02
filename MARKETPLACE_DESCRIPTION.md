@@ -1,28 +1,53 @@
-require('dotenv').config();
+# Marketplace Description
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const Teacher = require('./models/Teacher');
+## Title Ideas
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/student_activity_management';
-const ADMIN_EMAIL = String(process.env.ADMIN_EMAIL || 'admin@example.com').trim().toLowerCase();
-const ADMIN_PASSWORD = String(process.env.ADMIN_PASSWORD || 'Admin123456!');
+- Organization Registration & Team Management System
+- Festival Registration Management Platform
+- Ministry Student Registration System
+- School Activity Registration Dashboard
 
-async function main() {
-  await mongoose.connect(MONGODB_URI);
-  const admin = await Teacher.findOne({ email: ADMIN_EMAIL });
-  console.log('Database:', MONGODB_URI);
-  console.log('Looking for:', ADMIN_EMAIL);
-  console.log('Admin exists:', Boolean(admin));
-  if (admin) {
-    const ok = await bcrypt.compare(ADMIN_PASSWORD, admin.passwordHash);
-    console.log('Password matches .env:', ok);
-    console.log('Role:', admin.role);
-  }
-  await mongoose.disconnect();
-}
+## Short Description
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+A complete Node.js and MongoDB registration management system with admin dashboard, teacher dashboard, student login, team management, activities, file uploads, payment confirmation, search, exports, and clean page URLs.
+
+## Suggested Price
+
+- Marketplace source-code license: $99 - $299
+- Direct client setup license: $300 - $1,000+
+- Custom installation and support: charge separately
+
+## Feature List
+
+- Student registration form
+- Student account login
+- Admin and teacher roles
+- Team creation and management
+- Activity and category management
+- Registration open/close switch
+- Payment confirmation
+- File upload support
+- Search and filters
+- CSV/Excel export
+- Secure password hashing
+- MongoDB session storage
+- Rate limiting and basic security headers
+- Deployment-ready environment file
+
+## What Buyers Receive
+
+- Full source code
+- `.env.example`
+- Installation guide
+- Buyer license file
+- Sample data template
+
+## Recommended Demo Accounts
+
+Create these in your own demo database before publishing:
+
+- Admin account
+- Teacher account
+- Student account
+
+Never include real user data in the downloadable package.

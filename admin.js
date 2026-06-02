@@ -1,12 +1,60 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Registration System Logo">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#052642"/>
-      <stop offset="1" stop-color="#0f4c81"/>
-    </linearGradient>
-  </defs>
-  <rect width="120" height="120" rx="28" fill="url(#g)"/>
-  <circle cx="60" cy="43" r="18" fill="#ffffff" opacity=".95"/>
-  <path d="M28 91c5-21 20-32 32-32s27 11 32 32" fill="#ffffff" opacity=".95"/>
-  <path d="M82 28h10v10h-10zM94 40h10v10H94zM78 52h10v10H78z" fill="#22c55e"/>
-</svg>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Admin / Staff Login</title>
+  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="icon" href="/public/logo-generic.svg" type="image/png">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-generic.svg" class="header-logo" alt="Logo"></a>
+  <div class="header-title"><h2>Admin / Staff Login</h2></div>
+  <div class="header-right">
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <form id="form">
+      <label>Email
+        <input name="email" type="email" required placeholder="admin@example.com" autocomplete="username">
+      </label>
+      <label>Password
+        <input name="password" type="password" required autocomplete="current-password">
+      </label>
+      <button type="submit">Login</button>
+      <p id="msg"></p>
+    </form>
+  </section>
+</main>
+
+<script src="/public/app.js"></script>
+<script>
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = Object.fromEntries(new FormData(e.target));
+  body.email = String(body.email || '').trim().toLowerCase();
+
+  const button = e.target.querySelector('button');
+  button.disabled = true;
+  button.textContent = 'Logging in...';
+
+  try {
+    await api('/api/auth/teacher/login', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    location.href = '/c/3a7dcaf0-9901-83ea-b660-7e9e88d19bd8';
+  } catch (err) {
+    message('msg', err.message, false);
+    button.disabled = false;
+    button.textContent = 'Login';
+  }
+});
+</script>
+<footer class="app-footer" dir="ltr">© 2026 Your Organization. All rights reserved.</footer>
+</body>
+</html>

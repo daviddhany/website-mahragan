@@ -1,148 +1,129 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>التقارير والتحليلات</title>
+  <meta charset="utf-8">
+  <title>Create Student Account</title>
   <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-generic.svg" type="image/png">
 </head>
 <body>
 <header class="site-header">
   <a href="/" class="logo-link"><img src="/public/logo-generic.svg" class="header-logo" alt="Logo"></a>
-  <div class="header-title">
-    <h2>التقارير والتحليلات</h2>
-    <p>متابعة أرقام التسجيل والأنشطة والدفع</p>
-  </div>
+  <div class="header-title"><h2>Student Activity Management System</h2></div>
   <div class="header-right">
     <nav class="header-actions">
-      <a href="/c/3a7dcaf0-9901-83ea-b660-7e9e88d19bd8" class="btn-export">Dashboard</a>
-      <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+      <a href="/" class="btn-nav">Home</a>
+      <a href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5" class="btn-nav login">Student Login</a>
     </nav>
     <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
   </div>
 </header>
 
-<main id="reportsApp" v-cloak>
-  <section class="reports-hero card">
-    <div>
-      <p class="portal-kicker">Reports & Analytics</p>
-      <h1>لوحة تحليلات متقدمة</h1>
-      <p>الأرقام بتتحسب مباشرة من بيانات المشاركين والأنشطة الحالية.</p>
-    </div>
-    <button type="button" @click="loadData">تحديث البيانات</button>
-  </section>
-
-  <section v-if="loading" class="card loading">جاري تحميل التقارير...</section>
-  <section v-if="error" class="card error">{{ error }}</section>
-
-  <section v-if="!loading && !error" class="stats-grid">
-    <article class="stat-card"><span>إجمالي المشاركين</span><strong>{{ stats.total }}</strong></article>
-    <article class="stat-card"><span>اكتمل التسجيل</span><strong>{{ stats.complete }}</strong></article>
-    <article class="stat-card"><span>الدفع مؤكد</span><strong>{{ stats.paid }}</strong></article>
-    <article class="stat-card"><span>إجمالي قيمة الأنشطة</span><strong>{{ stats.totalMoney }} ج</strong></article>
-  </section>
-
-  <section v-if="!loading && !error" class="reports-grid">
-    <article class="card">
-      <h2>الأنشطة الأكثر اختيارًا</h2>
-      <div class="bar-list">
-        <div v-for="item in topActivities" :key="item.name" class="bar-row">
-          <span>{{ item.name }}</span>
-          <strong>{{ item.count }}</strong>
-          <div><em :style="{width: percent(item.count, maxActivityCount) + '%'}"></em></div>
-        </div>
-      </div>
-    </article>
-
-    <article class="card">
-      <h2>التوزيع حسب الخدمة</h2>
-      <div class="bar-list">
-        <div v-for="item in classStats" :key="item.name" class="bar-row">
-          <span>{{ item.name }}</span>
-          <strong>{{ item.count }}</strong>
-          <div><em :style="{width: percent(item.count, maxClassCount) + '%'}"></em></div>
-        </div>
-      </div>
-    </article>
-
-    <article class="card">
-      <h2>حالة التسجيل</h2>
-      <div class="analytics-list">
-        <p><b>مكتمل:</b> {{ stats.complete }}</p>
-        <p><b>غير مكتمل:</b> {{ stats.incomplete }}</p>
-        <p><b>نسبة الاكتمال:</b> {{ completionRate }}%</p>
-      </div>
-    </article>
-
-    <article class="card">
-      <h2>حالة الدفع</h2>
-      <div class="analytics-list">
-        <p><b>مدفوع:</b> {{ stats.paid }}</p>
-        <p><b>غير مؤكد:</b> {{ stats.unpaid }}</p>
-        <p><b>نسبة التأكيد:</b> {{ paymentRate }}%</p>
-      </div>
-    </article>
-  </section>
+<main>
+<section class="card">
+<div id="registrationClosedBox" class="error" style="display:none;margin-bottom:12px;">Registration is currently closed.</div>
+<form id="form">
+  <label>Full Name <input name="fullName" required placeholder="First Middle Last"></label>
+  <label>Gender
+    <select name="gender" required>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </label>
+  <label>Birth Date <input name="birthDate" type="date" required></label>
+  <label>Department
+    <select name="className" id="className" required>
+      <option value="">Select department</option>
+      <option value="Department A">Department A</option>
+      <option value="Department B">Department B</option>
+      <option value="Department C">Department C</option>
+      <option value="Upper Department">Upper Department</option>
+      <option value="Middle Department">Middle Department</option>
+    </select>
+  </label>
+  <label>Grade
+    <select name="studentYear" id="studentYear" required>
+      <option value="">Select grade</option>
+    </select>
+  </label>
+  <label>Password <input name="password" type="password" required></label>
+  <label>Parent Phone <input name="parentPhone" required pattern="\d{11}" maxlength="11" placeholder="11 digits"></label>
+  <label>Student Phone - Optional <input name="studentPhone" pattern="\d{11}" maxlength="11" placeholder="11 digits"></label>
+  <label>Address <textarea name="address" required></textarea></label>
+  <button id="submitBtn">Create Account</button>
+  <p id="msg"></p>
+</form>
+</section>
 </main>
-
-<script src="/public/app.js"></script>
-<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script>
-Vue.createApp({
-  data() {
-    return {
-      loading: true,
-      error: '',
-      students: []
-    };
-  },
-  computed: {
-    stats() {
-      const total = this.students.length;
-      const complete = this.students.filter(s => s.submissionComplete).length;
-      const paid = this.students.filter(s => s.paymentConfirmed).length;
-      const totalMoney = this.students.reduce((sum, s) => sum + (s.activities || []).reduce((a, x) => a + Number(x.price || 0), 0), 0);
-      return { total, complete, incomplete: total - complete, paid, unpaid: total - paid, totalMoney };
-    },
-    topActivities() {
-      const map = new Map();
-      this.students.forEach(s => (s.activities || []).forEach(a => {
-        const name = a.name || 'بدون اسم';
-        map.set(name, (map.get(name) || 0) + 1);
-      }));
-      return [...map.entries()].map(([name, count]) => ({ name, count })).sort((a,b) => b.count - a.count).slice(0, 10);
-    },
-    classStats() {
-      const map = new Map();
-      this.students.forEach(s => {
-        const name = s.className || 'غير محدد';
-        map.set(name, (map.get(name) || 0) + 1);
-      });
-      return [...map.entries()].map(([name, count]) => ({ name, count })).sort((a,b) => b.count - a.count);
-    },
-    maxActivityCount() { return Math.max(1, ...this.topActivities.map(x => x.count)); },
-    maxClassCount() { return Math.max(1, ...this.classStats.map(x => x.count)); },
-    completionRate() { return this.stats.total ? Math.round((this.stats.complete / this.stats.total) * 100) : 0; },
-    paymentRate() { return this.stats.total ? Math.round((this.stats.paid / this.stats.total) * 100) : 0; }
-  },
-  methods: {
-    percent(value, max) { return Math.max(6, Math.round((value / max) * 100)); },
-    async loadData() {
-      this.loading = true;
-      this.error = '';
-      try {
-        this.students = await api('/api/admin/students');
-      } catch (err) {
-        this.error = err.message || 'فشل تحميل التقارير';
-      } finally {
-        this.loading = false;
-      }
-    }
-  },
-  mounted() { this.loadData(); }
-}).mount('#reportsApp');
-</script>
 <footer class="app-footer" dir="ltr">© 2026 Your Organization. All rights reserved.</footer>
+<script src="/public/app.js"></script>
+<script>
+async function checkRegistrationStatus() {
+  try {
+    const settings = await api('/api/students/registration-status');
+    if (!settings.registrationOpen) {
+      const box = document.getElementById('registrationClosedBox');
+      const form = document.getElementById('form');
+      const button = document.getElementById('submitBtn');
+      box.style.display = 'block';
+      box.textContent = 'Registration is currently closed by the administration.';
+      button.disabled = true;
+      button.textContent = 'Registration Closed';
+      form.querySelectorAll('input, select, textarea').forEach(input => input.disabled = true);
+    } else if (settings.registrationClosesAt) {
+      const box = document.getElementById('registrationClosedBox');
+      box.style.display = 'block';
+      box.className = 'success';
+      box.textContent = `Registration is open and will close automatically at ${new Date(settings.registrationClosesAt).toLocaleString('en-US')}.`;
+    }
+  } catch (err) {}
+}
+checkRegistrationStatus();
+
+const yearOptionsByClass = {
+  'Department A': [['Grade 1','Grade 1'], ['Grade 2','Grade 2'], ['Grade 3','Grade 3'], ['Grade 4','Grade 4']],
+  'Department B': [['Grade 1','Grade 1'], ['Grade 2','Grade 2'], ['Grade 3','Grade 3'], ['Grade 4','Grade 4']],
+  'Department C': [['Grade 1','Grade 1'], ['Grade 2','Grade 2'], ['Grade 3','Grade 3'], ['Grade 4','Grade 4']],
+  'Upper Department': [['Grade 5','Grade 5'], ['Grade 6','Grade 6']],
+  'Middle Department': [['Grade 7','Grade 7'], ['Grade 8','Grade 8'], ['Grade 9','Grade 9']]
+};
+
+function updateYearOptions() {
+  const classSelect = document.getElementById('className');
+  const yearSelect = document.getElementById('studentYear');
+  const years = yearOptionsByClass[classSelect.value] || [];
+  yearSelect.innerHTML = '<option value="">Select grade</option>';
+  years.forEach(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    yearSelect.appendChild(option);
+  });
+  yearSelect.disabled = years.length === 0;
+}
+
+document.getElementById('className').addEventListener('change', updateYearOptions);
+updateYearOptions();
+
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = Object.fromEntries(new FormData(e.target));
+  const button = document.getElementById('submitBtn');
+  button.disabled = true;
+  button.textContent = 'Saving...';
+  try {
+    const data = await api('/api/students/register', { method:'POST', body: JSON.stringify(body) });
+    sessionStorage.setItem('lastRegisteredStudent', JSON.stringify(data.student || {}));
+    sessionStorage.setItem('lastStudentCode', data.studentCode || '');
+    message('msg', `Student saved. Student code: ${data.studentCode}. Opening details page...`);
+    setTimeout(() => { location.href = '/c/8c3fcaf0-5506-83ea-b660-3a9e88d19bd4'; }, 700);
+  } catch(err) {
+    message('msg', err.message, false);
+    button.disabled = false;
+    button.textContent = 'Create Account';
+  }
+});
+</script>
 </body>
 </html>

@@ -1,42 +1,26 @@
-require('dotenv').config();
+Sellable Package Contents
 
-const mongoose = require('mongoose');
-const Teacher = require('./models/Teacher');
+Included:
+- Full Node.js/Express/MongoDB source code
+- Public HTML/CSS/JS frontend
+- .env.example for buyer setup
+- README.md
+- docs/INSTALLATION_GUIDE.md
+- docs/INSTALLATION_GUIDE.pdf
+- MARKETPLACE_DESCRIPTION.md
+- BUYER_LICENSE.txt
+- sample-data/sample-students.csv
 
-const MONGODB_URI =
-  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/student_activity_management';
+Not included:
+- Real student data
+- Real database credentials
+- Real Cloudinary credentials
+- Real .env file
+- node_modules
+- private upload files
 
-async function cleanup() {
-  await mongoose.connect(MONGODB_URI);
-
-  const admins = await Teacher.find({ role: 'admin' }).sort({ email: 1, createdAt: 1 });
-  const idsToDelete = [];
-  const seenEmails = new Set();
-
-  for (const admin of admins) {
-    const email = String(admin.email || '').trim().toLowerCase();
-
-    if (!email) {
-      idsToDelete.push(admin._id);
-      continue;
-    }
-
-    if (seenEmails.has(email)) {
-      idsToDelete.push(admin._id);
-    } else {
-      seenEmails.add(email);
-    }
-  }
-
-  if (idsToDelete.length) {
-    await Teacher.deleteMany({ _id: { $in: idsToDelete } });
-  }
-
-  console.log(`Admin cleanup complete. Removed ${idsToDelete.length} duplicate/broken admin record(s).`);
-  await mongoose.disconnect();
-}
-
-cleanup().catch(err => {
-  console.error(err);
-  process.exit(1);
-});
+Before publishing:
+- Add real screenshots to the screenshots folder.
+- Create a demo deployment with fake accounts.
+- Update BUYER_LICENSE.txt with your final terms.
+- Decide your support period and installation fee.
