@@ -2,24 +2,17 @@
 
 ## 1. Requirements
 
-Install these first:
+- Node.js 18 or newer
+- MongoDB database (local MongoDB or MongoDB Atlas)
+- Cloudinary account if you want cloud file uploads
 
-- Node.js 20+
-- npm
-- MongoDB local database or MongoDB Atlas account
-- Cloudinary account for uploaded files
-
-## 2. Extract the Package
-
-Unzip the package on your computer or server.
-
-## 3. Install Dependencies
+## 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-## 4. Create Environment File
+## 3. Configure Environment Variables
 
 Copy `.env.example` to `.env`:
 
@@ -27,54 +20,24 @@ Copy `.env.example` to `.env`:
 cp .env.example .env
 ```
 
-On Windows, you can copy it manually and rename it to `.env`.
-
-## 5. Configure Database
-
-For local MongoDB:
+Example configuration:
 
 ```env
-MONGODB_URI=mongodb://127.0.0.1:27017/church_registration_app
-```
-
-For MongoDB Atlas, paste your Atlas connection string:
-
-```env
-MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/church_registration_app
-```
-
-## 6. Configure Cloudinary
-
-Add your Cloudinary values:
-
-```env
+PORT=3000
+MONGODB_URI=mongodb://127.0.0.1:27017/student_activity_management
+SESSION_SECRET=replace-with-a-long-random-secret
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-## 7. Configure Security
-
-Use a long random session secret:
+For MongoDB Atlas, use a connection string like:
 
 ```env
-SESSION_SECRET=replace_with_a_random_secret_at_least_32_characters
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/student_activity_management
 ```
 
-Set first admin credentials:
-
-```env
-ADMIN_PHONE=01000000000
-ADMIN_PASSWORD=ChangeThisStrongPassword123!
-```
-
-## 8. Create First Admin
-
-```bash
-npm run seed
-```
-
-## 9. Start the Website
+## 4. Run the App
 
 ```bash
 npm start
@@ -86,27 +49,31 @@ Open:
 http://localhost:3000
 ```
 
-## 10. Deployment Notes
+## 5. Create Admin User
 
-Recommended hosting:
+Use the seed script or create an admin user manually in the database. Change all demo credentials before production.
 
-- Railway
-- Render
-- VPS
-- Any Node.js hosting provider
+## 6. Production Checklist
 
-Make sure production environment variables are added in the hosting dashboard.
+- Use HTTPS.
+- Set a strong `SESSION_SECRET`.
+- Use MongoDB Atlas or another production database.
+- Configure Cloudinary credentials.
+- Remove sample data.
+- Test student registration, login, uploads, activities, teams, and exports.
+- Update organization name, logo, colors, and default activity categories.
 
-## 11. Common Problems
+## 7. Main Pages
 
-### MongoDB connection failed
-Check `MONGODB_URI`, username, password, and network access.
+- Home / Landing page
+- Student registration
+- Student login
+- Student dashboard
+- Teacher login
+- Teacher dashboard
+- Admin management pages
+- Reports page
 
-### Upload failed
-Check Cloudinary credentials and allowed file type.
+## 8. Support Notes
 
-### Admin cannot login
-Run `npm run seed` again after checking `ADMIN_PHONE` and `ADMIN_PASSWORD`.
-
-### Session/cookie issues in production
-Set `NODE_ENV=production` and use HTTPS.
+This is a source-code product. Buyers are expected to know how to install Node.js applications or hire a developer for setup.

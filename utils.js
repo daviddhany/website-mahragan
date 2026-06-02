@@ -4,22 +4,18 @@ async function generateStudentCode(gender, className, entryYear) {
   const genderCode = gender === 'male' ? 'M' : 'F';
 
   const classCodes = {
-    'يوحنا': 'A',
-    'يوحنا الحبيب': 'A',
-    'ابوسيفين': 'B',
-    'ابو سيفين': 'B',
-    'أبو سيفين': 'B',
-    'العذراء': 'C',
-    'خمسة و ستة': 'D',
-    'إعدادي': 'E',
-    'اعدادي': 'E'
+    'Department A': 'A',
+    'Department B': 'B',
+    'Department C': 'C',
+    'Upper Primary': 'D',
+    'Middle School': 'E'
   };
 
   const classCode = classCodes[className];
   const yearNumber = Number(entryYear);
 
   if (!classCode) {
-    throw new Error('Invalid class name for student code');
+    throw new Error('Invalid department name for student code');
   }
 
   if (!Number.isInteger(yearNumber) || yearNumber < 2000 || yearNumber > 2099) {
@@ -50,38 +46,32 @@ async function generateStudentCode(gender, className, entryYear) {
 
 function normalizeClassName(value) {
   if (value === undefined || value === null) return value;
-  const text = String(value).trim();
-  if (['اعدادي', 'إعدادي', 'اعدادى', 'إعدادى'].includes(text)) return 'إعدادي';
-  return text;
+  return String(value).trim();
 }
 
 function normalizeStudentYear(value) {
   if (value === undefined || value === null) return value;
-  return String(value)
-    .trim()
-    .replace(/إعدادي/g, 'اعدادي')
-    .replace(/إعدادى/g, 'اعدادي')
-    .replace(/اعدادى/g, 'اعدادي');
+  return String(value).trim();
 }
 
 function getEntryYearFromStudentYear(studentYear) {
   const normalized = normalizeStudentYear(studentYear);
   const entryYearByStudentYear = {
-    'اولى إبتدائي': 2025,
-    'تانية إبتدائي': 2024,
-    'ثالثة إبتدائي': 2023,
-    'رابعة إبتدائي': 2022,
-    'خمسة إبتدائي': 2021,
-    'سادسة إبتدائي': 2020,
-    'اولى اعدادي': 2019,
-    'تانية اعدادي': 2018,
-    'ثالثة اعدادي': 2017
+    'Grade 1': 2025,
+    'Grade 2': 2024,
+    'Grade 3': 2023,
+    'Grade 4': 2022,
+    'Grade 5': 2021,
+    'Grade 6': 2020,
+    'Grade 7': 2019,
+    'Grade 8': 2018,
+    'Grade 9': 2017
   };
 
   return entryYearByStudentYear[normalized] || null;
 }
 
-function normalizeArabicEducationValue(value) {
+function normalizeEducationValue(value) {
   return normalizeStudentYear(value);
 }
 
@@ -97,5 +87,6 @@ module.exports = {
   normalizeClassName,
   normalizeStudentYear,
   getEntryYearFromStudentYear,
-  normalizeArabicEducationValue
+  normalizeArabicEducationValue: normalizeEducationValue,
+  normalizeEducationValue
 };

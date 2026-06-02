@@ -5,7 +5,7 @@ async function api(url, options = {}) {
     ...options
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'حدث خطأ. حاول مرة أخرى');
+  if (!res.ok) throw new Error(data.error || 'An error occurred. Please try again.');
   return data;
 }
 
@@ -34,7 +34,7 @@ async function logout() {
 }
 
 
-function setLoading(id, text = 'جاري التحميل...') {
+function setLoading(id, text = 'Loading...') {
   const el = document.getElementById(id);
   if (!el) return;
   el.className = 'loading';
@@ -55,7 +55,7 @@ function setButtonLoading(button, isLoading, loadingText) {
   if (isLoading) {
     button.dataset.originalText = button.textContent;
     button.disabled = true;
-    button.textContent = loadingText || 'من فضلك انتظر...';
+    button.textContent = loadingText || 'Please wait...';
   } else {
     button.disabled = false;
     button.textContent = button.dataset.originalText || button.textContent;
@@ -111,8 +111,8 @@ function toggleSection(id, btn) {
 
   if (btn) {
     btn.classList.toggle('open', section.classList.contains('open'));
-    const showText = btn.dataset.show || btn.textContent.replace('إخفاء', 'عرض');
-    const hideText = btn.dataset.hide || btn.textContent.replace('عرض', 'إخفاء');
+    const showText = btn.dataset.show || btn.textContent.replace('Hide', 'Show');
+    const hideText = btn.dataset.hide || btn.textContent.replace('Show', 'Hide');
     btn.textContent = section.classList.contains('open') ? hideText : showText;
   }
 }

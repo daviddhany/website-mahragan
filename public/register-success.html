@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
-  <title>تم إنشاء الحساب</title>
+  <title>Account Created</title>
 
   <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-left.png" type="image/png">
@@ -139,13 +139,13 @@
   </a>
 
   <div class="header-title">
-    <h2>نظام التسجيل</h2>
+    <h2>Student Activity Management System</h2>
   </div>
 
   <div class="header-right">
     <nav class="header-actions">
-      <a href="/" class="btn-nav">الرئيسية</a>
-      <a href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5" class="btn-nav login">تسجيل دخول</a>
+      <a href="/" class="btn-nav">Home</a>
+      <a href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5" class="btn-nav login">Login</a>
     </nav>
 
     <img src="/public/logo-right.png" class="header-logo" alt="Logo">
@@ -154,17 +154,17 @@
 
 <main>
   <section class="card" id="successCard">
-    <h2>تم إنشاء الحساب بنجاح</h2>
+    <h2>Account created successfully</h2>
 
     <p class="success">
-      احتفظ بكود المخدوم لأنه سيستخدمه في تسجيل الدخول.
+      Keep the student code because it will be used for login.
     </p>
 
     <div id="studentData"></div>
 
     <div class="success-buttons" style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-      <a class="btn-nav login" href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5">تسجيل الدخول</a>
-      <a class="btn-nav" href="/c/7b2ecaf0-4405-83ea-b660-2f9e88d19bd3">تسجيل مخدوم آخر</a>
+      <a class="btn-nav login" href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5">Login</a>
+      <a class="btn-nav" href="/c/7b2ecaf0-4405-83ea-b660-2f9e88d19bd3">Register another student</a>
     </div>
   </section>
 </main>
@@ -189,59 +189,59 @@
   }
 
   if (!saved) {
-    dataBox.innerHTML = '<p class="error">لا توجد بيانات تسجيل حديثة. من فضلك سجل مخدوم جديد.</p>';
+    dataBox.innerHTML = '<p class="error">No recent registration data. Please register a new student.</p>';
   } else {
     const student = JSON.parse(saved);
 
     dataBox.innerHTML = `
       <table>
         <tr>
-          <th>كود المخدوم / ID</th>
+          <th>Student Code / ID</th>
           <td><strong>${safeText(student.studentCode)}</strong></td>
         </tr>
 
         <tr>
-          <th>الاسم</th>
+          <th>Name</th>
           <td>${safeText(student.fullName)}</td>
         </tr>
 
         <tr>
-          <th>النوع</th>
-          <td>${student.gender === 'male' ? 'ذكر' : 'أنثى'}</td>
+          <th>Gender</th>
+          <td>${student.gender === 'male' ? 'Male' : 'Female'}</td>
         </tr>
 
         <tr>
-          <th>الخدمة</th>
+          <th>Department</th>
           <td>${safeText(student.className)}</td>
         </tr>
 
         <tr>
-          <th>السنة</th>
+          <th>Grade</th>
           <td>${safeText(student.studentYear)}</td>
         </tr>
 
         <tr>
-          <th>سنة دخول أولى ابتدائي</th>
+          <th>Entry Year</th>
           <td>${safeText(student.entryYear)}</td>
         </tr>
 
         <tr>
-          <th>تاريخ الميلاد</th>
+          <th>Date of Birth</th>
           <td>${safeText(student.birthDate)}</td>
         </tr>
 
         <tr>
-          <th>رقم ولي الأمر</th>
+          <th>Guardian Phone</th>
           <td>${safeText(student.parentPhone)}</td>
         </tr>
 
         <tr>
-          <th>رقم المخدوم</th>
-          <td>${safeText(student.studentPhone || 'لا يوجد')}</td>
+          <th>Student Phone</th>
+          <td>${safeText(student.studentPhone || 'None')}</td>
         </tr>
 
         <tr>
-          <th>العنوان</th>
+          <th>Address</th>
           <td>${safeText(student.address)}</td>
         </tr>
 

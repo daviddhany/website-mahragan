@@ -12,13 +12,13 @@ async function getTeacher(req) {
   return Teacher.findById(req.session.userId);
 }
 
-const LOWER_SERVICE_CLASSES = ['يوحنا', 'ابوسيفين', 'العذراء'];
-const PREP_CLASSES = ['إعدادي', 'اعدادي'];
+const LOWER_SERVICE_CLASSES = ['Department A', 'Department B', 'Department C'];
+const PREP_CLASSES = ['Middle School'];
 
 const PRIMARY_YEAR_GROUPS = [
-  ['اولى إبتدائي', 'تانية إبتدائي'],
-  ['ثالثة إبتدائي', 'رابعة إبتدائي'],
-  ['خمسة إبتدائي', 'سادسة إبتدائي']
+  ['Grade 1', 'Grade 2'],
+  ['Grade 3', 'Grade 4'],
+  ['Grade 5', 'Grade 6']
 ];
 
 function yearGroupForTeams(year) {
@@ -58,13 +58,13 @@ function sameTeamScopeFilterForTeacher(teacher) {
         : teacher.assignedYear;
     }
 
-    // خادم ابتدائي يشوف مجموعة السنين المناسبة: أولى+تانية، تالتة+رابعة، خامسة+سادسة.
+    // Primary teachers can see the matching grade group: 1+2, 3+4, 5+6.
     if (LOWER_SERVICE_CLASSES.includes(teacher.assignedClass)) {
       filter.className = { $in: LOWER_SERVICE_CLASSES };
       return filter;
     }
 
-    // خادم إعدادي يشوف نفس سنة إعدادي ونفس النوع في كل إعدادي، مع دعم الإملاءين.
+    // Middle-school teachers can see the same middle-school grade and gender.
     if (PREP_CLASSES.includes(teacher.assignedClass)) {
       filter.className = { $in: PREP_CLASSES };
       return filter;
@@ -134,7 +134,7 @@ async function validateStudents(teacher, studentIds, activityId) {
     const allowed = await canAccessStudent(teacher, studentId, activityId);
 
     if (!allowed) {
-      const err = new Error('لا يمكنك إضافة هذا المخدوم إلى هذا الفريق');
+      const err = new Error('You cannot add this student to this team');
       err.status = 403;
       throw err;
     }
@@ -152,7 +152,7 @@ async function removeStudentsFromOtherUnlockedTeams(teacher, activityId, current
   });
 
   if (lockedConflict) {
-    const err = new Error('يوجد مخدوم داخل فريق مقفول بالفعل');
+    const err = new Error('A student is already inside a locked team');
     err.status = 409;
     throw err;
   }
@@ -184,7 +184,7 @@ router.get('/eligible-students', requireTeacher, async (req, res) => {
     const { activityId } = req.query;
 
     if (!activityId) {
-      return res.status(400).json({ error: 'النشاط مطلوب' });
+      return res.status(400).json({ error: 'Activity is required' });
     }
 
     const filter = buildTeacherStudentFilter(teacher, activityId);
@@ -197,7 +197,7 @@ router.get('/eligible-students', requireTeacher, async (req, res) => {
     res.json(students);
   } catch (err) {
     console.error('Eligible team students error:', err);
-    res.status(500).json({ error: 'فشل تحميل المخدومين المتاحين للفريق' });
+    res.status(500).json({ error: 'Failed to load available students for the team' });
   }
 });
 
@@ -335,18 +335,18 @@ router.get('/export/pdf', requireTeacher, async (req, res) => {
 });
 
 async function generateTeamName(activityId, activityName, teacher) {
-  const teacherName = teacher.fullName || teacher.phone || 'الخادم';
+  const teacherName = teacher.fullName || teacher.phone || 'teacher';
 
   const filter = teacher.role === 'admin'
     ? { activity: activityId, teacher: teacher._id }
     : { activity: activityId, teacher: teacher._id };
 
   let teamNumber = await Team.countDocuments(filter) + 1;
-  let teamName = `${activityName} - فريق ${teamNumber} - ${teacherName}`;
+  let teamName = `${activityName} - Team ${teamNumber} - ${teacherName}`;
 
   while (await Team.exists({ activity: activityId, teacher: teacher._id, name: teamName })) {
     teamNumber += 1;
-    teamName = `${activityName} - فريق ${teamNumber} - ${teacherName}`;
+    teamName = `${activityName} - Team ${teamNumber} - ${teacherName}`;
   }
 
   return teamName;
@@ -358,23 +358,23 @@ router.post('/', requireTeacher, requireRegistrationOpen, async (req, res) => {
     const { activityId, studentIds = [] } = req.body;
 
     if (!activityId) {
-      return res.status(400).json({ error: 'النشاط مطلوب' });
+      return res.status(400).json({ error: 'Activity is required' });
     }
 
     if (!Array.isArray(studentIds)) {
-      return res.status(400).json({ error: 'قائمة المخدومين غير صحيحة' });
+      return res.status(400).json({ error: 'Invalid students list' });
     }
 
     const activity = await Activity.findById(activityId);
 
     if (!activity) {
-      return res.status(404).json({ error: 'النشاط غير موجود' });
+      return res.status(404).json({ error: 'activity not found' });
     }
 
     await validateStudents(teacher, studentIds, activityId);
     await removeStudentsFromOtherUnlockedTeams(teacher, activityId, null, studentIds);
 
-    const name = await generateTeamName(activityId, activity.name || 'نشاط', teacher);
+    const name = await generateTeamName(activityId, activity.name || 'activity', teacher);
 
     const team = await Team.create({
       name,
@@ -390,7 +390,7 @@ router.post('/', requireTeacher, requireRegistrationOpen, async (req, res) => {
 
     res.status(201).json(populatedTeam);
   } catch (err) {
-    res.status(err.status || 500).json({ error: err.message || 'فشل إنشاء الفريق' });
+    res.status(err.status || 500).json({ error: err.message || 'Failed to create team' });
   }
 });
 
@@ -400,21 +400,21 @@ router.put('/:id/students', requireTeacher, requireRegistrationOpen, async (req,
     const { studentIds } = req.body;
 
     if (!Array.isArray(studentIds)) {
-      return res.status(400).json({ error: 'قائمة المخدومين غير صحيحة' });
+      return res.status(400).json({ error: 'Invalid students list' });
     }
 
     const team = await Team.findById(req.params.id);
 
     if (!team) {
-      return res.status(404).json({ error: 'الفريق غير موجود' });
+      return res.status(404).json({ error: 'team not found' });
     }
 
     if (teacher.role !== 'admin' && String(team.teacher) !== String(teacher._id)) {
-      return res.status(403).json({ error: 'غير مسموح' });
+      return res.status(403).json({ error: 'Not allowed' });
     }
 
     if (team.locked) {
-      return res.status(423).json({ error: 'الفريق مقفول. افتحه قبل التعديل.' });
+      return res.status(423).json({ error: 'Team is locked. Unlock it before editing.' });
     }
 
     await validateStudents(teacher, studentIds, team.activity);
@@ -423,9 +423,9 @@ router.put('/:id/students', requireTeacher, requireRegistrationOpen, async (req,
     team.students = studentIds;
     await team.save();
 
-    res.json({ message: 'تم تعديل الفريق' });
+    res.json({ message: 'Team updated' });
   } catch (err) {
-    res.status(err.status || 500).json({ error: err.message || 'فشل تعديل الفريق' });
+    res.status(err.status || 500).json({ error: err.message || 'Failed to update team' });
   }
 });
 
@@ -434,18 +434,18 @@ router.put('/:id/lock', requireTeacher, requireRegistrationOpen, async (req, res
   const team = await Team.findById(req.params.id);
 
   if (!team) {
-    return res.status(404).json({ error: 'الفريق غير موجود' });
+    return res.status(404).json({ error: 'team not found' });
   }
 
   if (teacher.role !== 'admin' && String(team.teacher) !== String(teacher._id)) {
-    return res.status(403).json({ error: 'غير مسموح' });
+    return res.status(403).json({ error: 'Not allowed' });
   }
 
   team.locked = true;
   team.lockedAt = new Date();
   await team.save();
 
-  res.json({ message: 'تم قفل الفريق' });
+  res.json({ message: 'Team locked' });
 });
 
 router.put('/:id/unlock', requireTeacher, requireRegistrationOpen, async (req, res) => {
@@ -453,18 +453,18 @@ router.put('/:id/unlock', requireTeacher, requireRegistrationOpen, async (req, r
   const team = await Team.findById(req.params.id);
 
   if (!team) {
-    return res.status(404).json({ error: 'الفريق غير موجود' });
+    return res.status(404).json({ error: 'team not found' });
   }
 
   if (teacher.role !== 'admin' && String(team.teacher) !== String(teacher._id)) {
-    return res.status(403).json({ error: 'غير مسموح' });
+    return res.status(403).json({ error: 'Not allowed' });
   }
 
   team.locked = false;
   team.lockedAt = null;
   await team.save();
 
-  res.json({ message: 'تم فتح الفريق' });
+  res.json({ message: 'Team unlocked' });
 });
 
 router.delete('/:id', requireTeacher, requireRegistrationOpen, async (req, res) => {
@@ -472,20 +472,20 @@ router.delete('/:id', requireTeacher, requireRegistrationOpen, async (req, res) 
   const team = await Team.findById(req.params.id);
 
   if (!team) {
-    return res.status(404).json({ error: 'الفريق غير موجود' });
+    return res.status(404).json({ error: 'team not found' });
   }
 
   if (teacher.role !== 'admin' && String(team.teacher) !== String(teacher._id)) {
-    return res.status(403).json({ error: 'غير مسموح' });
+    return res.status(403).json({ error: 'Not allowed' });
   }
 
   if (team.locked) {
-    return res.status(423).json({ error: 'الفريق مقفول. افتحه قبل الحذف.' });
+    return res.status(423).json({ error: 'Team is locked. Unlock it before deleting.' });
   }
 
   await Team.findByIdAndDelete(req.params.id);
 
-  res.json({ message: 'تم حذف الفريق' });
+  res.json({ message: 'Team deleted' });
 });
 
 module.exports = router;

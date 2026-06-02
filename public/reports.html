@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>التقارير والتحليلات</title>
+  <title>Reports & Analytics</title>
   <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-left.png" type="image/png">
 </head>
@@ -11,8 +11,8 @@
 <header class="site-header">
   <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
   <div class="header-title">
-    <h2>التقارير والتحليلات</h2>
-    <p>متابعة أرقام التسجيل والأنشطة والدفع</p>
+    <h2>Reports & Analytics</h2>
+    <p>Track registration, activities, and payments</p>
   </div>
   <div class="header-right">
     <nav class="header-actions">
@@ -27,25 +27,25 @@
   <section class="reports-hero card">
     <div>
       <p class="portal-kicker">Reports & Analytics</p>
-      <h1>لوحة تحليلات متقدمة</h1>
-      <p>الأرقام بتتحسب مباشرة من بيانات المخدومين والأنشطة الحالية.</p>
+      <h1>Advanced Analytics Dashboard</h1>
+      <p>Numbers are calculated from current students and activities.</p>
     </div>
-    <button type="button" @click="loadData">تحديث البيانات</button>
+    <button type="button" @click="loadData">Refresh Data</button>
   </section>
 
-  <section v-if="loading" class="card loading">جاري تحميل التقارير...</section>
+  <section v-if="loading" class="card loading">Loading reports...</section>
   <section v-if="error" class="card error">{{ error }}</section>
 
   <section v-if="!loading && !error" class="stats-grid">
-    <article class="stat-card"><span>إجمالي المخدومين</span><strong>{{ stats.total }}</strong></article>
-    <article class="stat-card"><span>اكتمل التسجيل</span><strong>{{ stats.complete }}</strong></article>
-    <article class="stat-card"><span>الدفع مؤكد</span><strong>{{ stats.paid }}</strong></article>
-    <article class="stat-card"><span>إجمالي قيمة الأنشطة</span><strong>{{ stats.totalMoney }} ج</strong></article>
+    <article class="stat-card"><span>Total Students</span><strong>{{ stats.total }}</strong></article>
+    <article class="stat-card"><span>Completed Registrations</span><strong>{{ stats.complete }}</strong></article>
+    <article class="stat-card"><span>Payment Confirmed</span><strong>{{ stats.paid }}</strong></article>
+    <article class="stat-card"><span>Total Activity Value</span><strong>{{ stats.totalMoney }} EGP</strong></article>
   </section>
 
   <section v-if="!loading && !error" class="reports-grid">
     <article class="card">
-      <h2>الأنشطة الأكثر اختيارًا</h2>
+      <h2>Most Selected Activities</h2>
       <div class="bar-list">
         <div v-for="item in topActivities" :key="item.name" class="bar-row">
           <span>{{ item.name }}</span>
@@ -56,7 +56,7 @@
     </article>
 
     <article class="card">
-      <h2>التوزيع حسب الخدمة</h2>
+      <h2>Distribution by Department</h2>
       <div class="bar-list">
         <div v-for="item in classStats" :key="item.name" class="bar-row">
           <span>{{ item.name }}</span>
@@ -67,20 +67,20 @@
     </article>
 
     <article class="card">
-      <h2>حالة التسجيل</h2>
+      <h2>Registration Status</h2>
       <div class="analytics-list">
-        <p><b>مكتمل:</b> {{ stats.complete }}</p>
-        <p><b>غير مكتمل:</b> {{ stats.incomplete }}</p>
-        <p><b>نسبة الاكتمال:</b> {{ completionRate }}%</p>
+        <p><b>Complete:</b> {{ stats.complete }}</p>
+        <p><b>Incomplete:</b> {{ stats.incomplete }}</p>
+        <p><b>Completion Rate:</b> {{ completionRate }}%</p>
       </div>
     </article>
 
     <article class="card">
-      <h2>حالة الدفع</h2>
+      <h2>Payment Status</h2>
       <div class="analytics-list">
-        <p><b>مدفوع:</b> {{ stats.paid }}</p>
-        <p><b>غير مؤكد:</b> {{ stats.unpaid }}</p>
-        <p><b>نسبة التأكيد:</b> {{ paymentRate }}%</p>
+        <p><b>Paid:</b> {{ stats.paid }}</p>
+        <p><b>Unconfirmed:</b> {{ stats.unpaid }}</p>
+        <p><b>Confirmation Rate:</b> {{ paymentRate }}%</p>
       </div>
     </article>
   </section>
@@ -108,7 +108,7 @@ Vue.createApp({
     topActivities() {
       const map = new Map();
       this.students.forEach(s => (s.activities || []).forEach(a => {
-        const name = a.name || 'بدون اسم';
+        const name = a.name || 'Unnamed';
         map.set(name, (map.get(name) || 0) + 1);
       }));
       return [...map.entries()].map(([name, count]) => ({ name, count })).sort((a,b) => b.count - a.count).slice(0, 10);
@@ -116,7 +116,7 @@ Vue.createApp({
     classStats() {
       const map = new Map();
       this.students.forEach(s => {
-        const name = s.className || 'غير محدد';
+        const name = s.className || 'Not specified';
         map.set(name, (map.get(name) || 0) + 1);
       });
       return [...map.entries()].map(([name, count]) => ({ name, count })).sort((a,b) => b.count - a.count);
@@ -134,7 +134,7 @@ Vue.createApp({
       try {
         this.students = await api('/api/admin/students');
       } catch (err) {
-        this.error = err.message || 'فشل تحميل التقارير';
+        this.error = err.message || 'Failed to load reports';
       } finally {
         this.loading = false;
       }

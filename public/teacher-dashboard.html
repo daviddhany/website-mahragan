@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
-  <title>صفحة الخادم</title>
+  <title>Teacher Page</title>
   <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-left.png" type="image/png">
 </head>
@@ -12,8 +12,8 @@
 <header class="site-header">
   <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
   <div class="header-title">
-    <h2>نظام التسجيل</h2>
-    <p id="teacherName">واجهة الخادم</p>
+    <h2>Student Activity Management System</h2>
+    <p id="teacherName">Teacher Dashboard</p>
   </div>
   <div class="header-right">
     <nav class="header-actions">
@@ -28,25 +28,25 @@
 
 <main>
   <section class="card">
-    <button type="button" class="collapsible-toggle" data-show="عرض المخدومين" data-hide="إخفاء المخدومين" onclick="toggleSection('studentsSection', this)">عرض المخدومين</button>
+    <button type="button" class="collapsible-toggle" data-show="Show students" data-hide="Hide students" onclick="toggleSection('studentsSection', this)">Show students</button>
     <div id="studentsSection" class="collapsible-body">
-    <h2>المخدومين</h2>
+    <h2>students</h2>
 
     <div class="search-panel">
       <label>
-        بحث
+        Search
         <input id="search" placeholder="Name, national ID, or student ID">
       </label>
 
       <label>
-        بحث بالنشاط
+        Search by Activity
         <select id="studentActivityFilter">
-          <option value="">كل الأنشطة</option>
+          <option value="">All activities</option>
         </select>
       </label>
 
-      <button onclick="loadStudents()">بحث</button>
-      <button type="button" class="secondary-action" onclick="clearStudentFilters()">مسح الفلتر</button>
+      <button onclick="loadStudents()">Search</button>
+      <button type="button" class="secondary-action" onclick="clearStudentFilters()">Clear Filter</button>
     </div>
 
     <div style="overflow:auto">
@@ -62,8 +62,8 @@
           <th>National ID</th>
             <th>Parent</th>
             <th>Status</th>
-            <th>تأكيد الدفع</th>
-            <th>الإجمالي</th>
+            <th>Payment Confirmation</th>
+            <th>Total</th>
             <th>Photo</th>
             <th>Documents</th>
             <th>Activities</th>
@@ -78,33 +78,33 @@
   </section>
 
   <section class="card" id="editBox" style="display:none;">
-    <h2>تعديل بيانات المخدوم</h2>
+    <h2>Edit Student Data</h2>
 
     <form id="editStudentForm">
       <input type="hidden" name="studentId" id="editStudentId">
 
       <label>
-        الاسم ثلاثي
+        Full Name
         <input name="fullName" id="editFullName" required>
       </label>
 
       <label>
-        رقم ولي الأمر
+        Guardian Phone
         <input name="parentPhone" id="editParentPhone" pattern="\d{11}" maxlength="11" required>
       </label>
 
       <label>
-        رقم المخدوم - اختياري
+        Student Phone - Optional
         <input name="studentPhone" id="editStudentPhone" pattern="\d{11}" maxlength="11">
       </label>
 
       <label>
-        العنوان
+        Address
         <textarea name="address" id="editAddress" required></textarea>
       </label>
 
       <label>
-        تاريخ الميلاد
+        Date of Birth
         <input name="birthDate" id="editBirthDate" type="date" required>
       </label>
 
@@ -113,40 +113,40 @@
 
 
       <div>
-        <label>الانشطة المختارة</label>
+        <label>Selected Activities</label>
         <div id="editActivities" class="checkbox-list"></div>
         <small class="muted">Teacher can update the activities for this student.</small>
       </div>
 
-      <button>حفظ التعديل</button>
-      <button type="button" onclick="closeEditBox()">إلغاء</button>
+      <button>Save Changes</button>
+      <button type="button" onclick="closeEditBox()">Cancel</button>
       <p id="editMsg"></p>
     </form>
   </section>
 
   <section class="card">
-    <button type="button" class="collapsible-toggle" data-show="عرض تغيير كلمة السر" data-hide="إخفاء تغيير كلمة السر" onclick="toggleSection('passwordSection', this)">عرض تغيير كلمة السر</button>
+    <button type="button" class="collapsible-toggle" data-show="Show Change Password" data-hide="Hide Change Password" onclick="toggleSection('passwordSection', this)">Show Change Password</button>
     <div id="passwordSection" class="collapsible-body">
-      <h2>تغيير كلمة السر</h2>
+      <h2>Change Password</h2>
 
       <form id="passwordForm" class="grid">
         <label>
-          كلمة السر القديمة
+          Old password
           <input name="oldPassword" type="password" autocomplete="current-password" required>
         </label>
 
         <label>
-          كلمة السر الجديدة
+          New password
           <input name="newPassword" type="password" minlength="8" autocomplete="new-password" required>
         </label>
 
         <label>
-          تأكيد كلمة السر الجديدة
+          Confirm New Password
           <input name="confirmPassword" type="password" minlength="8" autocomplete="new-password" required>
         </label>
 
         <div class="full-width">
-          <button type="submit">تغيير كلمة السر</button>
+          <button type="submit">Change Password</button>
           <p id="passMsg"></p>
         </div>
       </form>
@@ -156,13 +156,13 @@
 
 
   <section class="card">
-    <button type="button" class="collapsible-toggle" data-show="عرض تقسيم الفرق" data-hide="إخفاء تقسيم الفرق" onclick="toggleSection('teamsSection', this)">عرض تقسيم الفرق</button>
+    <button type="button" class="collapsible-toggle" data-show="Show Team Assignment" data-hide="Hide Team Assignment" onclick="toggleSection('teamsSection', this)">Show Team Assignment</button>
     <div id="teamsSection" class="collapsible-body">
-    <h2>تقسيم فرق</h2>
+    <h2>Team Assignment</h2>
 
     <div class="toolbar">
       <label>
-        النشاط
+        activity
         <select name="activityId" id="teamActivitySelect" required></select>
       </label>
             <a id="exportTeamsExcel" href="#" class="btn-export">Export Teams Excel</a>
@@ -171,12 +171,12 @@
 
     <form id="manualTeamForm" class="grid">
       <p class="muted full-width">
-        اسم الفريق سيتم إنشاؤه تلقائيًا من اسم النشاط + رقم الفريق + اسم الخادم.
+        The team name will be generated automatically from the activity name, team number, and teacher name.
       </p>
 
       <label>
         &nbsp;
-        <button>إنشاء فريق تلقائيًا</button>
+        <button>Create Team Automatically</button>
       </label>
     </form>
 
@@ -188,14 +188,14 @@
 
   <div id="adminOnly">
     <section class="card">
-      <button type="button" class="collapsible-toggle" data-show="عرض Categories Menu" data-hide="إخفاء Categories Menu" onclick="toggleSection('categoriesSection', this)">عرض Categories Menu</button>
+      <button type="button" class="collapsible-toggle" data-show="Show Categories Menu" data-hide="Hide Categories Menu" onclick="toggleSection('categoriesSection', this)">Show Categories Menu</button>
       <div id="categoriesSection" class="collapsible-body">
       <h2>Categories Menu</h2>
 
       <form id="categoryAdd">
         <label>
           Menu / Category Name
-          <input name="name" placeholder="مثال: ألحان / كشافة / رياضة" required>
+          <input name="name" placeholder="Example: Music / Scouts / Sports" required>
         </label>
 
         <button>Add Menu / Category</button>
@@ -207,7 +207,7 @@
     </section>
 
     <section class="card">
-      <button type="button" class="collapsible-toggle" data-show="عرض Add Activity" data-hide="إخفاء Add Activity" onclick="toggleSection('addActivitySection', this)">عرض Add Activity</button>
+      <button type="button" class="collapsible-toggle" data-show="Show Add Activity" data-hide="Hide Add Activity" onclick="toggleSection('addActivitySection', this)">Show Add Activity</button>
       <div id="addActivitySection" class="collapsible-body">
       <h2>Add Activity</h2>
 
@@ -239,7 +239,7 @@
     </section>
 
     <section class="card">
-      <button type="button" class="collapsible-toggle" data-show="عرض Manage Activities" data-hide="إخفاء Manage Activities" onclick="toggleSection('manageActivitiesSection', this)">عرض Manage Activities</button>
+      <button type="button" class="collapsible-toggle" data-show="Show Manage Activities" data-hide="Hide Manage Activities" onclick="toggleSection('manageActivitiesSection', this)">Show Manage Activities</button>
       <div id="manageActivitiesSection" class="collapsible-body">
       <h2>Manage Activities</h2>
       <div id="activityList"></div>
@@ -272,7 +272,7 @@ function studentStatusHtml(student) {
 }
 
 function paymentConfirmedLabel(value) { return value ? '✅ Confirmed' : '❌ Not confirmed'; }
-function yesNo(value) { return value ? 'نعم' : 'لا'; }
+function yesNo(value) { return value ? 'Yes' : 'No'; }
 function activityTotal(student) { return (student.activities || []).reduce((sum, a) => sum + Number(a.price || 0), 0); }
 
 function documentHtml(path, label) {
@@ -307,7 +307,7 @@ async function loadMe() {
   currentUser = await api('/api/auth/me');
 
   document.getElementById('teacherName').textContent =
-    currentUser.fullName ? `أهلاً ${currentUser.fullName}` : 'Teacher Dashboard';
+    currentUser.fullName ? `Welcome ${currentUser.fullName}` : 'Teacher Dashboard';
 
   if (currentUser.role !== 'admin') {
     document.getElementById('adminOnly').style.display = 'none';
@@ -359,7 +359,7 @@ async function loadActivities() {
   const studentActivityFilter = document.getElementById('studentActivityFilter');
   if (studentActivityFilter) {
     const currentValue = studentActivityFilter.value;
-    studentActivityFilter.innerHTML = '<option value="">كل الأنشطة</option>' + activities.map(a => `
+    studentActivityFilter.innerHTML = '<option value="">All activities</option>' + activities.map(a => `
       <option value="${escapeAttr(a._id)}">${escapeHtml(a.name)} - ${escapeHtml(a.category || '')}</option>
     `).join('');
     studentActivityFilter.value = currentValue;
@@ -371,7 +371,7 @@ async function loadActivities() {
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
         <strong>${escapeHtml(a.name)}</strong>
         <span class="badge">${escapeHtml(a.category || '')}</span>
-        <span class="badge">${Number(a.price || 0)} ج</span>
+        <span class="badge">${Number(a.price || 0)} EGP</span>
         <button onclick="deleteActivity('${escapeAttr(a._id)}')">Remove</button>
       </div>
     `).join('');
@@ -412,7 +412,7 @@ async function renderEditActivities(student) {
   box.innerHTML = cachedActivities.map(activity => `
     <label class="checkbox-row">
       <input type="checkbox" name="activityIds" value="${escapeAttr(activity._id)}" ${selected.has(activity._id) ? 'checked' : ''}>
-      ${escapeHtml(activity.name)} - ${escapeHtml(activity.category || '')} - ${Number(activity.price || 0)} ج
+      ${escapeHtml(activity.name)} - ${escapeHtml(activity.category || '')} - ${Number(activity.price || 0)} EGP
     </label>
   `).join('') || '<p class="muted">No activities available.</p>';
 }
@@ -478,7 +478,7 @@ async function loadStudents() {
   }
 
   if (!students.length) {
-    rows.innerHTML = '<tr><td colspan="16" class="muted">لا يوجد مخدومين مطابقين للبحث أو النشاط المختار.</td></tr>';
+    rows.innerHTML = '<tr><td colspan="16" class="muted">No students match the search or selected activity.</td></tr>';
     return;
   }
 
@@ -504,7 +504,7 @@ async function loadStudents() {
           <span id="paymentStatus-${escapeAttr(s._id)}">${paymentConfirmedLabel(s.paymentConfirmed)}</span>
         </label>
       </td>
-      <td>${activityTotal(s)} ج</td>
+      <td>${activityTotal(s)} EGP</td>
       <td>
         ${documentHtml(s.studentPhotoPath, 'Student Photo')}
       </td>
@@ -846,7 +846,7 @@ async function toggleTeamLock(id, shouldLock) {
 }
 
 document.getElementById('teamActivitySelect').addEventListener('change', async () => {
-  setLoading('teamMsg', 'تحميل المخدومين المتاحين للفريق...');
+  setLoading('teamMsg', 'Loading available students for the team...');
   try {
     await loadTeamEligibleStudents();
     clearMessage('teamMsg');
@@ -869,14 +869,14 @@ document.getElementById('manualTeamForm').addEventListener('submit', async e => 
     studentIds: []
   };
 
-  setLoading('teamMsg', 'جاري إنشاء الفريق تلقائيًا...');
+  setLoading('teamMsg', 'Creating team automatically...');
   try {
     await api('/api/teams', {
       method: 'POST',
       body: JSON.stringify(body)
     });
 
-    message('teamMsg', 'تم إنشاء الفريق باسم تلقائي. انقل المخدومين إليه.');
+    message('teamMsg', 'Team created automatically. Move students into it.');
     e.target.reset();
     await loadTeams();
   } catch (err) {
@@ -901,7 +901,7 @@ document.getElementById('editStudentForm').addEventListener('submit', async e =>
       body: JSON.stringify(body)
     });
 
-    message('editMsg', 'تم حفظ التعديل');
+    message('editMsg', 'Changes saved');
     closeEditBox();
     await loadStudents();
     await loadTeams();
@@ -917,7 +917,7 @@ document.getElementById('passwordForm').addEventListener('submit', async e => {
   const body = Object.fromEntries(new FormData(form));
 
   if (body.newPassword !== body.confirmPassword) {
-    message('passMsg', 'تأكيد كلمة السر غير مطابق', false);
+    message('passMsg', 'Password confirmation does not match', false);
     return;
   }
 
@@ -925,7 +925,7 @@ document.getElementById('passwordForm').addEventListener('submit', async e => {
 
   const submitBtn = form.querySelector('button[type="submit"]');
   submitBtn.disabled = true;
-  setLoading('passMsg', 'جاري تغيير كلمة السر...');
+  setLoading('passMsg', 'Changing password...');
 
   try {
     await api('/api/auth/teacher/change-password', {
@@ -933,10 +933,10 @@ document.getElementById('passwordForm').addEventListener('submit', async e => {
       body: JSON.stringify(body)
     });
 
-    message('passMsg', 'تم تغيير كلمة السر بنجاح');
+    message('passMsg', 'Password changed successfully');
     form.reset();
   } catch (err) {
-    message('passMsg', err.message || 'فشل تغيير كلمة السر', false);
+    message('passMsg', err.message || 'Failed to change password', false);
   } finally {
     submitBtn.disabled = false;
   }

@@ -1,53 +1,41 @@
 # Marketplace Description
 
-## Title Ideas
+## Product Name Ideas
 
-- Church Registration & Team Management System
-- Festival Registration Management Platform
-- Ministry Student Registration System
-- School Activity Registration Dashboard
+- Student Activity Management System
+- Student Registration & Team Management Platform
+- School Activity Enrollment System
+- Training Center Registration Dashboard
 
 ## Short Description
 
-A complete Node.js and MongoDB registration management system with admin dashboard, teacher dashboard, student login, team management, activities, file uploads, payment confirmation, search, exports, and clean page URLs.
+A complete Node.js and MongoDB system for student registration, activity enrollment, team assignment, file uploads, teacher/admin dashboards, reports, and exports.
 
-## Suggested Price
+## Key Features
 
-- Marketplace source-code license: $99 - $299
-- Direct client setup license: $300 - $1,000+
-- Custom installation and support: charge separately
-
-## Feature List
-
-- Student registration form
-- Student account login
-- Admin and teacher roles
-- Team creation and management
+- Student registration and login
+- Admin dashboard
+- Teacher dashboard
 - Activity and category management
-- Registration open/close switch
-- Payment confirmation
+- Team creation and assignment
 - File upload support
-- Search and filters
-- CSV/Excel export
-- Secure password hashing
-- MongoDB session storage
-- Rate limiting and basic security headers
-- Deployment-ready environment file
+- Payment confirmation tracking
+- Registration open/close control
+- Reports and exports
+- Clean URL routing
+- Responsive web interface
 
-## What Buyers Receive
+## Best For
 
-- Full source code
-- `.env.example`
-- Installation guide
-- Buyer license file
-- Sample data template
+- Schools
+- Training centers
+- Academies
+- Clubs
+- Camps
+- Activity-based organizations
 
-## Recommended Demo Accounts
+## Suggested Price Range
 
-Create these in your own demo database before publishing:
-
-- Admin account
-- Teacher account
-- Student account
-
-Never include real user data in the downloadable package.
+- Marketplace license: $99–$299
+- Direct custom setup: $300–$1,500+
+- SaaS version: monthly or yearly subscription per organization

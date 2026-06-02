@@ -1,102 +1,72 @@
-# Church Registration & Team Management System
+# Student Activity Management System
 
-A complete Node.js + MongoDB web application for managing church, school, ministry, or festival registration.
+A complete Node.js + MongoDB web application for managing student registrations, activity enrollment, teacher/admin dashboards, file uploads, team assignment, payment confirmation, and exports.
 
 ## Main Features
 
-- Online student/participant registration
-- Student login and password change
-- Teacher/servant dashboard
-- Admin dashboard
-- Role-based access control
-- Activity and category management
-- Team creation and team member management
-- Registration open/close control
-- Payment confirmation tracking
-- File uploads for required documents
-- Search and filtering
-- CSV/Excel export
-- Clean hidden page URLs
-- MongoDB session storage
-- Password hashing with bcrypt
-- Production-ready environment configuration
+- Public student registration form
+- Student login using generated student code
+- Student dashboard with file upload and activity selection
+- Teacher dashboard for viewing assigned students
+- Admin dashboard for users, activities, categories, teams, reports, and exports
+- Team builder with drag-and-drop / mobile move controls
+- Registration open/close control with optional auto-close time
+- Excel/CSV export endpoints
+- MongoDB database using Mongoose
+- Cloudinary-ready file upload configuration
+- Clean URL routing
 
 ## Tech Stack
 
-- Node.js 20
+- Node.js
 - Express.js
 - MongoDB + Mongoose
 - HTML, CSS, JavaScript
-- Cloudinary for file uploads
-- Express Session + Connect Mongo
-- Helmet and rate limiting
+- bcryptjs authentication
+- express-session + connect-mongo
+- multer / Cloudinary storage
 
 ## Quick Start
 
 ```bash
 npm install
 cp .env.example .env
-npm run seed
 npm start
 ```
 
-Open the app:
+Then open:
 
 ```text
 http://localhost:3000
 ```
 
-## Environment Setup
+## Environment Variables
 
-Create a `.env` file using `.env.example`.
-
-Required values:
+Copy `.env.example` to `.env` and fill in your values:
 
 ```env
 PORT=3000
-MONGODB_URI=mongodb://127.0.0.1:27017/church_registration_app
-SESSION_SECRET=replace_with_a_random_secret_at_least_32_characters
-ADMIN_PHONE=01000000000
-ADMIN_PASSWORD=ChangeThisStrongPassword123!
+MONGODB_URI=mongodb://127.0.0.1:27017/student_activity_management
+SESSION_SECRET=change-this-secret
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
-## Create First Admin
+## Demo Admin
 
-```bash
-npm run seed
-```
+Create your first admin account using the seed script or your own database setup. Change all demo credentials before production use.
 
-The admin phone and password are read from `.env`.
+## Production Notes
 
-## Production Checklist
+Before selling or deploying for a client:
 
-Before using this system with real data:
-
-- Change all `.env` values.
-- Use a strong `SESSION_SECRET`.
-- Use a strong admin password.
-- Use HTTPS.
-- Restrict MongoDB Atlas network access when possible.
-- Do not upload real client data in demo copies.
-- Back up the database regularly.
-- Review `docs/INSTALLATION_GUIDE.md`.
-
-## Buyer Notes
-
-This package does not include real student data, database credentials, Cloudinary keys, or private deployment secrets. Buyers must provide their own database and Cloudinary account.
-
-## Customization
-
-You can customize:
-
-- Logos inside `public/`
-- Page text inside `public/*.html`
-- Styles inside `public/styles.css`
-- Services/classes inside the relevant models and route validation files
-- Activities and categories from the admin dashboard
+- Change all secrets in `.env`
+- Use a real MongoDB Atlas database
+- Configure Cloudinary or another upload provider
+- Remove sample data
+- Use HTTPS
+- Set strong passwords
 
 ## License
 

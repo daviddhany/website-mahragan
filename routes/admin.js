@@ -30,11 +30,11 @@ router.post('/registration-status', requireAdmin, async (req, res) => {
     const closeDate = new Date(req.body.registrationClosesAt);
 
     if (Number.isNaN(closeDate.getTime())) {
-      return res.status(400).json({ error: 'وقت الإغلاق غير صحيح' });
+      return res.status(400).json({ error: 'Invalid close time' });
     }
 
     if (registrationOpen && closeDate.getTime() <= Date.now()) {
-      return res.status(400).json({ error: 'وقت الإغلاق يجب أن يكون في المستقبل' });
+      return res.status(400).json({ error: 'Close time must be in the future' });
     }
 
     registrationClosesAt = closeDate;
@@ -61,24 +61,24 @@ router.post('/activities', requireAdmin, async (req, res) => {
   const price = Number.isFinite(Number(req.body.price)) ? Number(req.body.price) : 10;
 
   if (!name) {
-    return res.status(400).json({ error: 'اسم النشاط مطلوب' });
+    return res.status(400).json({ error: 'Activity name is required' });
   }
 
   if (!category) {
-    return res.status(400).json({ error: 'تصنيف النشاط مطلوب' });
+    return res.status(400).json({ error: 'Activity category is required' });
   }
 
   try {
     const selectedCategory = await Category.findOne({ name: category, isActive: true });
 
     if (!selectedCategory) {
-      return res.status(400).json({ error: 'تصنيف النشاط غير موجود' });
+      return res.status(400).json({ error: 'Category activity not found' });
     }
 
     const existingActivity = await Activity.findOne({ name });
 
     if (existingActivity) {
-      return res.status(409).json({ error: 'هذا النشاط موجود بالفعل' });
+      return res.status(409).json({ error: 'This activity already exists' });
     }
 
     const activity = await Activity.create({
@@ -92,11 +92,11 @@ router.post('/activities', requireAdmin, async (req, res) => {
     return res.json(activity);
   } catch (err) {
     if (err && err.code === 11000) {
-      return res.status(409).json({ error: 'هذا النشاط موجود بالفعل' });
+      return res.status(409).json({ error: 'This activity already exists' });
     }
 
     console.error('Create activity error:', err);
-    return res.status(500).json({ error: 'فشل إضافة النشاط. حاول مرة أخرى' });
+    return res.status(500).json({ error: 'Failed to add activity. Please try again' });
   }
 });
 
@@ -216,25 +216,25 @@ router.put('/students/:id/payment-confirmation', requireTeacher, requireRegistra
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ error: 'المخدوم غير موجود' });
+      return res.status(404).json({ error: 'student not found' });
     }
 
     const allowed = await canTeacherAccessStudent(currentTeacher, student);
 
     if (!allowed) {
-      return res.status(403).json({ error: 'غير مسموح' });
+      return res.status(403).json({ error: 'Not allowed' });
     }
 
     student.paymentConfirmed = Boolean(req.body.paymentConfirmed);
     await student.save();
 
     res.json({
-      message: student.paymentConfirmed ? 'تم تأكيد الدفع' : 'تم إلغاء تأكيد الدفع',
+      message: student.paymentConfirmed ? 'Payment confirmed' : 'Payment confirmation canceled',
       paymentConfirmed: student.paymentConfirmed
     });
   } catch (err) {
     console.error('Payment confirmation error:', err);
-    res.status(500).json({ error: 'فشل تحديث حالة الدفع' });
+    res.status(500).json({ error: 'Failed to update payment status' });
   }
 });
 
@@ -246,7 +246,7 @@ router.put('/students/:id', requireTeacher, requireRegistrationOpenForNonAdmin, 
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ error: 'المخدوم غير موجود' });
+      return res.status(404).json({ error: 'student not found' });
     }
 
     const currentTeacher = await Teacher.findById(req.session.userId);
@@ -254,13 +254,13 @@ router.put('/students/:id', requireTeacher, requireRegistrationOpenForNonAdmin, 
     // 🔒 Restrict teacher access
     if (currentTeacher.role === 'teacher') {
       if (student.className !== currentTeacher.assignedClass || student.studentYear !== currentTeacher.assignedYear || student.gender !== currentTeacher.assignedGender) {
-        return res.status(403).json({ error: 'غير مسموح' });
+        return res.status(403).json({ error: 'Not allowed' });
       }
     }
 
     if (currentTeacher.role === 'serviceLeader') {
       if (student.className !== currentTeacher.assignedClass || student.gender !== currentTeacher.assignedGender) {
-        return res.status(403).json({ error: 'غير مسموح' });
+        return res.status(403).json({ error: 'Not allowed' });
       }
     }
 
@@ -299,7 +299,7 @@ router.put('/students/:id', requireTeacher, requireRegistrationOpenForNonAdmin, 
     res.json({ message: 'Student updated successfully' });
 
   } catch (err) {
-    res.status(500).json({ error: 'فشل التعديل' });
+    res.status(500).json({ error: 'Failed to update' });
   }
 });
 
@@ -422,7 +422,7 @@ router.put('/students/:id/password', requireTeacher, requireRegistrationOpenForN
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ error: 'المخدوم غير موجود' });
+      return res.status(404).json({ error: 'student not found' });
     }
 
     if (currentTeacher.role !== 'admin') {
@@ -432,22 +432,22 @@ router.put('/students/:id/password', requireTeacher, requireRegistrationOpenForN
         student.gender === currentTeacher.assignedGender;
 
       if (!allowed) {
-        return res.status(403).json({ error: 'غير مسموح' });
+        return res.status(403).json({ error: 'Not allowed' });
       }
     }
 
     const { newPassword } = req.body;
 
     if (!newPassword) {
-      return res.status(400).json({ error: 'كلمة السر الجديدة مطلوبة' });
+      return res.status(400).json({ error: 'New password is required' });
     }
 
     student.passwordHash = await bcrypt.hash(newPassword, 12);
     await student.save();
 
-    res.json({ message: 'تم تغيير كلمة سر المخدوم' });
+    res.json({ message: 'Student password changed' });
   } catch (err) {
-    res.status(500).json({ error: 'فشل تغيير كلمة سر المخدوم' });
+    res.status(500).json({ error: 'Failed to change student password' });
   }
 });
 module.exports = router;

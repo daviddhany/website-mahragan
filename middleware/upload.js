@@ -55,7 +55,7 @@ return {
       const validMimeTypes = allowedTypes[ext] || [];
 
       if (!normalizedExtensions.includes(ext) || !validMimeTypes.includes(file.mimetype)) {
-        return cb(new Error('نوع الملف غير مسموح. ارفع JPG أو PNG أو WEBP أو PDF فقط.'));
+        return cb(new Error('File type is not allowed. Upload JPG, PNG, WEBP, or PDF only.'));
       }
 
       cb(null, true);

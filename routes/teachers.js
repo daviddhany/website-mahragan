@@ -37,13 +37,13 @@ router.post('/', requireAdmin, async (req, res) => {
 
   if (!fullName || !phone || !password) {
     return res.status(400).json({
-      error: 'من فضلك أكمل بيانات المستخدم'
+      error: 'Please complete user data'
     });
   }
 
   if (teacherRole !== 'admin' && (!assignedClass || !assignedGender || (teacherRole === 'teacher' && !assignedYear))) {
     return res.status(400).json({
-      error: 'من فضلك أكمل بيانات الخادم'
+      error: 'Please complete teacher data'
     });
   }
 
@@ -52,48 +52,47 @@ router.post('/', requireAdmin, async (req, res) => {
 
   if (!/^\d{11}$/.test(phone)) {
     return res.status(400).json({
-      error: 'رقم تليفون الخادم يجب أن يكون 11 رقم'
+      error: 'Teacher phone must be 11 digits'
     });
   }
 
   const allowedClasses = [
-    'خمسة و ستة',
-    'إعدادي',
-    'اعدادي',
-    'يوحنا',
-    'ابوسيفين',
-    'العذراء'
+    'Department A',
+    'Department B',
+    'Department C',
+    'Upper Primary',
+    'Middle School'
   ];
 
   if (teacherRole !== 'admin' && !allowedClasses.includes(normalizedAssignedClass)) {
-    return res.status(400).json({ error: 'الخدمة غير صحيحة' });
+    return res.status(400).json({ error: 'Invalid department' });
   }
 
   const allowedYears = [
-    'اولى إبتدائي',
-    'تانية إبتدائي',
-    'ثالثة إبتدائي',
-    'رابعة إبتدائي',
-    'خمسة إبتدائي',
-    'سادسة إبتدائي',
-    'اولى اعدادي',
-    'تانية اعدادي',
-    'ثالثة اعدادي'
+    'Grade 1',
+    'Grade 2',
+    'Grade 3',
+    'Grade 4',
+    'Grade 5',
+    'Grade 6',
+    'Grade 7',
+    'Grade 8',
+    'Grade 9'
   ];
 
   if (teacherRole === 'teacher' && !allowedYears.includes(normalizedAssignedYear)) {
-    return res.status(400).json({ error: 'السنة غير صحيحة' });
+    return res.status(400).json({ error: 'Invalid grade' });
   }
 
   if (teacherRole !== 'admin' && !['male', 'female'].includes(assignedGender)) {
-    return res.status(400).json({ error: 'النوع غير صحيح' });
+    return res.status(400).json({ error: 'Invalid gender' });
   }
 
   const exists = await Teacher.findOne({ phone });
 
   if (exists) {
     return res.status(409).json({
-      error: 'رقم تليفون الخادم موجود بالفعل'
+      error: 'Teacher phone already exists'
     });
   }
 
@@ -115,7 +114,7 @@ router.post('/', requireAdmin, async (req, res) => {
   const teacher = await Teacher.create(teacherData);
 
   res.status(201).json({
-    message: 'تم إنشاء الخادم',
+    message: 'Teacher created',
     teacher: {
       id: teacher._id,
       fullName: teacher.fullName,
@@ -132,16 +131,16 @@ router.delete('/:id', requireAdmin, async (req, res) => {
   const teacher = await Teacher.findById(req.params.id);
 
   if (!teacher) {
-    return res.status(404).json({ error: 'المستخدم غير موجود' });
+    return res.status(404).json({ error: 'User not found' });
   }
 
   if (!['teacher', 'serviceLeader'].includes(teacher.role)) {
-    return res.status(403).json({ error: 'لا يمكن حذف الأدمن من هنا' });
+    return res.status(403).json({ error: 'Admin users cannot be deleted here' });
   }
 
   await Teacher.deleteOne({ _id: teacher._id });
 
-  res.json({ message: 'تم حذف المستخدم' });
+  res.json({ message: 'User deleted' });
 });
 
 module.exports = router;
