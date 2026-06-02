@@ -40,14 +40,14 @@ async function requireRegistrationOpen(req, res, next) {
 
     if (!effectiveRegistrationOpen) {
       return res.status(403).json({
-        error: 'Registration is currently closed by the administrator'
+        error: 'تم إغلاق التسجيل حالياً بواسطة الإدارة'
       });
     }
 
     return next();
   } catch (err) {
     console.error('Registration guard error:', err);
-    return res.status(500).json({ error: 'Failed to check registration status' });
+    return res.status(500).json({ error: 'فشل التحقق من حالة التسجيل' });
   }
 }
 
@@ -60,7 +60,7 @@ async function requireRegistrationOpenForNonAdmin(req, res, next) {
     return requireRegistrationOpen(req, res, next);
   } catch (err) {
     console.error('Registration non-admin guard error:', err);
-    return res.status(500).json({ error: 'Failed to check registration status' });
+    return res.status(500).json({ error: 'فشل التحقق من حالة التسجيل' });
   }
 }
 

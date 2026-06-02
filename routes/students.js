@@ -19,7 +19,13 @@ function normalizeDuplicateText(value) {
   return String(value || '')
     .trim()
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/gi, '')
+    .replace(/[أإآ]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .replace(/ـ/g, '')
+    .replace(/[ًٌٍَُِّْ]/g, '')
     .replace(/\s+/g, ' ');
 }
 
@@ -63,7 +69,7 @@ router.post('/register', async (req, res) => {
 
     if (!effectiveRegistrationOpen) {
       return res.status(403).json({
-        error: 'Registration is currently closed by the administrator'
+        error: 'تم إغلاق التسجيل حالياً بواسطة الإدارة'
       });
     }
 
@@ -82,25 +88,25 @@ router.post('/register', async (req, res) => {
 
     if (missing.length) {
       return res.status(400).json({
-        error: `Please complete the required fields: ${missing.join(', ')}`
+        error: `من فضلك أكمل البيانات المطلوبة: ${missing.join(', ')}`
       });
     }
 
     if (String(req.body.fullName).trim().split(/\s+/).length < 3) {
       return res.status(400).json({
-        error: 'Full name must contain at least three names'
+        error: 'الاسم يجب أن يكون ثلاثي'
       });
     }
 
     if (!/^\d{11}$/.test(req.body.parentPhone)) {
       return res.status(400).json({
-        error: 'Guardian phone must be 11 digits'
+        error: 'رقم ولي الأمر يجب أن يكون 11 رقم'
       });
     }
 
     if (req.body.studentPhone && !/^\d{11}$/.test(req.body.studentPhone)) {
       return res.status(400).json({
-        error: 'Student phone must be 11 digits'
+        error: 'رقم تليفون المخدوم يجب أن يكون 11 رقم'
       });
     }
 
@@ -114,21 +120,21 @@ router.post('/register', async (req, res) => {
 
     if (!entryYear) {
       return res.status(400).json({
-        error: 'Invalid grade'
+        error: 'السنة الدراسية غير صحيحة'
       });
     }
 
     const allowedYearsByClass = {
-      'Department A': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'],
-      'Department B': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'],
-      'Department C': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'],
-      'Upper Primary': ['Grade 5', 'Grade 6'],
-      'Middle School': ['Grade 7', 'Grade 8', 'Grade 9']
+      'يوحنا': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
+      'ابوسيفين': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
+      'العذراء': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
+      'خمسة و ستة': ['خمسة إبتدائي', 'سادسة إبتدائي'],
+      'إعدادي': ['اولى اعدادي', 'تانية اعدادي', 'ثالثة اعدادي']
     };
 
     if (!allowedYearsByClass[className] || !allowedYearsByClass[className].includes(studentYear)) {
       return res.status(400).json({
-        error: 'Selected grade does not match the selected department'
+        error: 'السنة المختارة لا تناسب الخدمة المختارة'
       });
     }
 
@@ -136,7 +142,7 @@ router.post('/register', async (req, res) => {
 
     if (!birthDateRange) {
       return res.status(400).json({
-        error: 'Invalid date of birth'
+        error: 'تاريخ الميلاد غير صحيح'
       });
     }
 
@@ -158,7 +164,7 @@ router.post('/register', async (req, res) => {
 
     if (duplicateStudent) {
       return res.status(409).json({
-        error: `This student is already registered with code ${duplicateStudent.studentCode}`
+        error: `هذا المخدوم مسجل بالفعل بكود ${duplicateStudent.studentCode}`
       });
     }
 
@@ -211,15 +217,15 @@ router.post('/register', async (req, res) => {
       const duplicatedField = err.keyPattern ? Object.keys(err.keyPattern)[0] : 'field';
       return res.status(409).json({
         error: duplicatedField === 'studentCode'
-          ? 'Student code already exists'
-          : `Duplicate data in database: ${duplicatedField}`
+          ? 'كود المخدوم موجود بالفعل'
+          : `بيانات متكررة في قاعدة البيانات: ${duplicatedField}`
       });
     }
 
     console.error(err);
 
     res.status(500).json({
-      error: 'Failed to create account. Please review the data and try again'
+      error: 'فشل إنشاء الحساب. من فضلك راجع البيانات وحاول مرة أخرى'
     });
   }
 });
@@ -238,7 +244,7 @@ router.get('/me', requireStudent, async (req, res) => {
   } catch (err) {
 
     res.status(500).json({
-      error: 'Failed to load student data'
+      error: 'فشل تحميل بيانات المخدوم'
     });
   }
 });
@@ -267,7 +273,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
       String(updates.fullName).trim().split(/\s+/).length < 3
     ) {
       return res.status(400).json({
-        error: 'Full name must contain at least three names'
+        error: 'الاسم يجب أن يكون ثلاثي'
       });
     }
 
@@ -276,7 +282,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
       !/^\d{11}$/.test(updates.parentPhone)
     ) {
       return res.status(400).json({
-        error: 'Guardian phone must be 11 digits'
+        error: 'رقم ولي الأمر يجب أن يكون 11 رقم'
       });
     }
 
@@ -285,7 +291,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
       !/^\d{11}$/.test(updates.studentPhone)
     ) {
       return res.status(400).json({
-        error: 'Student phone must be 11 digits'
+        error: 'رقم تليفون المخدوم يجب أن يكون 11 رقم'
       });
     }
 
@@ -303,7 +309,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
   } catch (err) {
 
     res.status(500).json({
-      error: 'Failed to update student data'
+      error: 'فشل تعديل بيانات المخدوم'
     });
   }
 });
@@ -319,7 +325,7 @@ router.post(
 
       if (!req.file) {
         return res.status(400).json({
-          error: 'Profile photo is required'
+          error: 'الصورة الشخصية مطلوبة'
         });
       }
 
@@ -331,7 +337,7 @@ router.post(
       );
 
       res.json({
-        message: 'Profile photo uploaded'
+        message: 'تم رفع الصورة الشخصية'
       });
 
     } catch (err) {
@@ -339,7 +345,7 @@ router.post(
       console.error(err);
 
       res.status(500).json({
-        error: 'Failed to upload profile photo'
+        error: 'فشل رفع الصورة الشخصية'
       });
     }
   }
@@ -356,7 +362,7 @@ router.post(
 
       if (!req.file) {
         return res.status(400).json({
-          error: 'File is required'
+          error: 'الملف مطلوب'
         });
       }
 
@@ -369,7 +375,7 @@ birthCertificatePath: req.file.path.endsWith('.pdf')
       );
 
       res.json({
-        message: 'Birth certificate uploaded'
+        message: 'تم رفع شهادة الميلاد'
       });
 
     } catch (err) {
@@ -377,7 +383,7 @@ birthCertificatePath: req.file.path.endsWith('.pdf')
       console.error(err);
 
       res.status(500).json({
-        error: 'Failed to upload birth certificate'
+        error: 'فشل رفع شهادة الميلاد'
       });
     }
   }
@@ -394,7 +400,7 @@ router.post(
 
       if (!req.file) {
         return res.status(400).json({
-          error: 'File is required'
+          error: 'الملف مطلوب'
         });
       }
 
@@ -406,7 +412,7 @@ router.post(
       );
 
       res.json({
-        message: 'Payment receipt uploaded'
+        message: 'تم رفع إيصال الدفع'
       });
 
     } catch (err) {
@@ -414,7 +420,7 @@ router.post(
       console.error(err);
 
       res.status(500).json({
-        error: 'Failed to upload payment receipt'
+        error: 'فشل رفع إيصال الدفع'
       });
     }
   }
@@ -439,7 +445,7 @@ router.get('/me/activities', requireStudent, async (req, res) => {
   } catch (err) {
 
     res.status(500).json({
-      error: 'Failed to load activities'
+      error: 'فشل تحميل الأنشطة'
     });
   }
 });
@@ -457,7 +463,7 @@ router.put('/me/activities', requireStudent, requireRegistrationOpen, async (req
 
     if (activityIds.length === 0) {
       return res.status(400).json({
-        error: 'Please choose at least one activity'
+        error: 'من فضلك اختر نشاط واحد على الأقل'
       });
     }
 
@@ -469,18 +475,18 @@ router.put('/me/activities', requireStudent, requireRegistrationOpen, async (req
     const hasSportsActivity = valid.some((activity) => {
       const name = String(activity.name || '');
       const category = String(activity.category || '');
-      return name.includes('Sports') || category.includes('Sports');
+      return name.includes('رياضي') || category.includes('رياضي');
     });
 
     if (hasSportsActivity && !student.studentPhotoPath) {
       return res.status(400).json({
-        error: 'Profile photo is required when choosing a sports activity'
+        error: 'يجب رفع الصورة الشخصية عند اختيار نشاط رياضي'
       });
     }
 
     if (hasSportsActivity && !student.birthCertificatePath) {
       return res.status(400).json({
-        error: 'Birth certificate is required when choosing a sports activity'
+        error: 'يجب رفع شهادة الميلاد عند اختيار نشاط رياضي'
       });
     }
 
@@ -495,7 +501,7 @@ router.put('/me/activities', requireStudent, requireRegistrationOpen, async (req
     );
 
     res.json({
-      message: 'Registration submitted successfully'
+      message: 'تم إرسال التسجيل بنجاح'
     });
 
   } catch (err) {
@@ -503,7 +509,7 @@ router.put('/me/activities', requireStudent, requireRegistrationOpen, async (req
     console.error(err);
 
     res.status(500).json({
-      error: 'Failed to submit registration'
+      error: 'فشل إرسال التسجيل'
     });
   }
 });

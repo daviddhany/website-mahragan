@@ -4,16 +4,16 @@ const bcrypt = require('bcryptjs');
 const Student = require('./models/Student');
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const DEFAULT_PASSWORD = '12345678'; // Change before running if needed
+const DEFAULT_PASSWORD = '12345678'; // غيرها قبل التشغيل لو عايز
 
-// Add student records here
+// اكتب بيانات المخدومين هنا
 const students = [
   {
     studentCode: '24MA001',
     fullName: 'Example Student Name Four',
     gender: 'male',
-    className: 'Department A',
-    studentYear: 'Grade 3',
+    className: 'يوحنا',
+    studentYear: 'ثالثة إبتدائي',
     entryYear: 2024,
     birthDate: '2016-05-01',
     parentPhone: '01234567890',

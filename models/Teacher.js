@@ -28,7 +28,7 @@ const teacherSchema = new mongoose.Schema(
 
     assignedClass: {
       type: String,
-      enum: ['Department A', 'Department B', 'Department C', 'Upper Primary', 'Middle School'],
+      enum: ['خمسة و ستة', 'إعدادي', 'اعدادي', 'يوحنا', 'ابوسيفين', 'العذراء'],
       required: function () {
         return this.role === 'teacher' || this.role === 'serviceLeader';
       }
@@ -46,15 +46,18 @@ const teacherSchema = new mongoose.Schema(
         return this.role === 'teacher';
       },
       enum: [
-        'Grade 1',
-        'Grade 2',
-        'Grade 3',
-        'Grade 4',
-        'Grade 5',
-        'Grade 6',
-        'Grade 7',
-        'Grade 8',
-        'Grade 9'
+        'اولى إبتدائي',
+        'تانية إبتدائي',
+        'ثالثة إبتدائي',
+        'رابعة إبتدائي',
+        'خمسة إبتدائي',
+        'سادسة إبتدائي',
+        'اولى اعدادي',
+        'تانية اعدادي',
+        'ثالثة اعدادي',
+        'اولى إعدادي',
+        'تانية إعدادي',
+        'ثالثة إعدادي'
       ]
     }
   },

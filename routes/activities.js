@@ -17,24 +17,24 @@ router.post('/', requireAdmin, async (req, res) => {
   const price = Number.isFinite(Number(req.body.price)) ? Number(req.body.price) : 10;
 
   if (!name) {
-    return res.status(400).json({ error: 'Activity name is required' });
+    return res.status(400).json({ error: 'اسم النشاط مطلوب' });
   }
 
   if (!category) {
-    return res.status(400).json({ error: 'Activity category is required' });
+    return res.status(400).json({ error: 'تصنيف النشاط مطلوب' });
   }
 
   try {
     const selectedCategory = await Category.findOne({ name: category, isActive: true });
 
     if (!selectedCategory) {
-      return res.status(400).json({ error: 'Category activity not found' });
+      return res.status(400).json({ error: 'تصنيف النشاط غير موجود' });
     }
 
     const existingActivity = await Activity.findOne({ name });
 
     if (existingActivity) {
-      return res.status(409).json({ error: 'This activity already exists' });
+      return res.status(409).json({ error: 'هذا النشاط موجود بالفعل' });
     }
 
     const activity = await Activity.create({
@@ -48,11 +48,11 @@ router.post('/', requireAdmin, async (req, res) => {
     return res.json(activity);
   } catch (err) {
     if (err && err.code === 11000) {
-      return res.status(409).json({ error: 'This activity already exists' });
+      return res.status(409).json({ error: 'هذا النشاط موجود بالفعل' });
     }
 
     console.error('Create activity error:', err);
-    return res.status(500).json({ error: 'Failed to add activity. Please try again' });
+    return res.status(500).json({ error: 'فشل إضافة النشاط. حاول مرة أخرى' });
   }
 });
 

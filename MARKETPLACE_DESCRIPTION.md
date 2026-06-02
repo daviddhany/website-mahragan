@@ -1,41 +1,53 @@
 # Marketplace Description
 
-## Product Name Ideas
+## Title Ideas
 
-- Student Activity Management System
-- Student Registration & Team Management Platform
-- School Activity Enrollment System
-- Training Center Registration Dashboard
+- Church Registration & Team Management System
+- Festival Registration Management Platform
+- Ministry Student Registration System
+- School Activity Registration Dashboard
 
 ## Short Description
 
-A complete Node.js and MongoDB system for student registration, activity enrollment, team assignment, file uploads, teacher/admin dashboards, reports, and exports.
+A complete Node.js and MongoDB registration management system with admin dashboard, teacher dashboard, student login, team management, activities, file uploads, payment confirmation, search, exports, and clean page URLs.
 
-## Key Features
+## Suggested Price
 
-- Student registration and login
-- Admin dashboard
-- Teacher dashboard
+- Marketplace source-code license: $99 - $299
+- Direct client setup license: $300 - $1,000+
+- Custom installation and support: charge separately
+
+## Feature List
+
+- Student registration form
+- Student account login
+- Admin and teacher roles
+- Team creation and management
 - Activity and category management
-- Team creation and assignment
+- Registration open/close switch
+- Payment confirmation
 - File upload support
-- Payment confirmation tracking
-- Registration open/close control
-- Reports and exports
-- Clean URL routing
-- Responsive web interface
+- Search and filters
+- CSV/Excel export
+- Secure password hashing
+- MongoDB session storage
+- Rate limiting and basic security headers
+- Deployment-ready environment file
 
-## Best For
+## What Buyers Receive
 
-- Schools
-- Training centers
-- Academies
-- Clubs
-- Camps
-- Activity-based organizations
+- Full source code
+- `.env.example`
+- Installation guide
+- Buyer license file
+- Sample data template
 
-## Suggested Price Range
+## Recommended Demo Accounts
 
-- Marketplace license: $99–$299
-- Direct custom setup: $300–$1,500+
-- SaaS version: monthly or yearly subscription per organization
+Create these in your own demo database before publishing:
+
+- Admin account
+- Teacher account
+- Student account
+
+Never include real user data in the downloadable package.

@@ -31,7 +31,7 @@ router.post('/', requireAdmin, async (req, res) => {
   const name = (req.body.name || '').trim();
 
   if (!name) {
-    return res.status(400).json({ error: 'Category name is required' });
+    return res.status(400).json({ error: 'اسم الـ menu / التصنيف مطلوب' });
   }
 
   try {
@@ -44,18 +44,18 @@ router.post('/', requireAdmin, async (req, res) => {
         return res.json(existingCategory);
       }
 
-      return res.status(409).json({ error: 'This category already exists' });
+      return res.status(409).json({ error: 'هذا الـ menu / التصنيف موجود بالفعل' });
     }
 
     const category = await Category.create({ name, isActive: true });
     return res.json(category);
   } catch (err) {
     if (err && err.code === 11000) {
-      return res.status(409).json({ error: 'This category already exists' });
+      return res.status(409).json({ error: 'هذا الـ menu / التصنيف موجود بالفعل' });
     }
 
     console.error('Create category error:', err);
-    return res.status(500).json({ error: 'Failed to add category. Please try again' });
+    return res.status(500).json({ error: 'فشل إضافة الـ menu / التصنيف. حاول مرة أخرى' });
   }
 });
 
@@ -63,7 +63,7 @@ router.delete('/:id', requireAdmin, async (req, res) => {
   const category = await Category.findById(req.params.id);
 
   if (!category) {
-    return res.status(404).json({ error: 'Category not found' });
+    return res.status(404).json({ error: 'الـ menu / التصنيف غير موجود' });
   }
 
   category.isActive = false;

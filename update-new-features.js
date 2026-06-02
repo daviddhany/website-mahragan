@@ -23,8 +23,8 @@ async function main() {
   );
 
   await Student.updateMany(
-    { activityQualified: { $exists: false } },
-    { $set: { activityQualified: false } }
+    { karazaQualified: { $exists: false } },
+    { $set: { karazaQualified: false } }
   );
 
   console.log('Updated existing activities/students for new features.');

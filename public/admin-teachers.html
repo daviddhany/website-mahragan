@@ -3,7 +3,7 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
-  <title>Teacher Page</title>
+  <title>صفحة الخادم</title>
   <link rel="stylesheet" href="/public/styles.css">
   <link rel="icon" href="/public/logo-left.png" type="image/png">
 </head>
@@ -11,11 +11,11 @@
 <body>
 <header class="site-header">
   <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
-  <div class="header-title"><h2>User Management</h2></div>
+  <div class="header-title"><h2>إدارة الخدام</h2></div>
   <div class="header-right">
     <nav class="header-actions">
-      <a href="/c/3a7dcaf0-9901-83ea-b660-7e9e88d19bd8" class="btn-nav">Dashboard</a>
-      <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+      <a href="/c/3a7dcaf0-9901-83ea-b660-7e9e88d19bd8" class="btn-nav">لوحة البيانات</a>
+      <button type="button" onclick="logout()" class="btn-logout">تسجيل خروج</button>
     </nav>
     <img src="/public/logo-right.png" class="header-logo" alt="Logo">
   </div>
@@ -24,98 +24,98 @@
 <main>
 
   <section class="card">
-    <h2>Registration Status</h2>
-    <p id="registrationStatusText" class="muted">Loading registration status...</p>
+    <h2>حالة التسجيل</h2>
+    <p id="registrationStatusText" class="muted">جاري تحميل حالة التسجيل...</p>
     <label>
-      Optional auto-close time
+      وقت الإغلاق التلقائي اختياري
       <input id="registrationClosesAt" type="datetime-local">
     </label>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-      <button type="button" id="toggleRegistrationBtn">Loading...</button>
-      <button type="button" id="saveAutoCloseBtn">Save auto-close time</button>
+      <button type="button" id="toggleRegistrationBtn">جاري التحميل...</button>
+      <button type="button" id="saveAutoCloseBtn">حفظ وقت الإغلاق التلقائي</button>
     </div>
-    <p class="muted">When closed, student registration and team edits stop. Teachers become view-only.</p>
+    <p class="muted">عند الإغلاق: تسجيل المخدومين يقف، تكوين/تعديل الفرق يقف، والخادم يقدر يشاهد البيانات فقط.</p>
     <p id="registrationMsg"></p>
   </section>
 
   <section class="card">
-    <h2>Add User</h2>
+    <h2>إضافة مستخدم</h2>
 
     <form id="teacherForm">
       <label>
-        User Name
+        اسم المستخدم
         <input name="fullName" required>
       </label>
 
       <label>
-  Phone Number
-  <input name="phone" required pattern="\d{11}" maxlength="11" placeholder="11 digits">
+  رقم التليفون
+  <input name="phone" required pattern="\d{11}" maxlength="11" placeholder="11 رقم">
   </label>
 
       <label>
-        Password
+        كلمة السر
         <input name="password" type="password" required>
       </label>
 
       <label>
-        Role
+        الدور
         <select name="role" id="teacherRole" required>
-          <option value="teacher">teacher</option>
-          <option value="serviceLeader">Coordinator</option>
-          <option value="admin">Admin</option>
+          <option value="teacher">خادم</option>
+          <option value="serviceLeader">أمين خدمة</option>
+          <option value="admin">أدمن</option>
         </select>
       </label>
 
       <label>
-        Department
+        الخدمة
         <select name="assignedClass" required>
-          <option value="">Select Department</option>
-          <option value="Department A">Department A</option>
-          <option value="Department B">Department B</option>
-          <option value="Department C">Department C</option>
-          <option value="Upper Primary">Upper Primary</option>
-          <option value="Middle School">Middle School</option>
+          <option value="">اختر الخدمة</option>
+          <option value="يوحنا">يوحنا</option>
+          <option value="ابوسيفين">ابوسيفين</option>
+          <option value="العذراء">العذراء</option>
+          <option value="خمسة و ستة">خمسة و ستة</option>
+          <option value="إعدادي">إعدادي</option>
 
         </select>
       </label>
 
       <label>
-        Grade
+        السنة
         <select name="assignedYear" id="assignedYear" required>
-  <option value="">Select Grade</option>
-  <option value="Grade 1">Grade 1</option>
-  <option value="Grade 2">Grade 2</option>
-  <option value="Grade 3">Grade 3</option>
-  <option value="Grade 4">Grade 4</option>
-  <option value="Grade 5">Grade 5</option>
-  <option value="Grade 6">Grade 6</option>
-  <option value="Grade 7">Grade 7</option>
-  <option value="Grade 8">Grade 8</option>
-  <option value="Grade 9">Grade 9</option>
+  <option value="">اختر السنة</option>
+  <option value="اولى إبتدائي">اولى إبتدائي</option>
+  <option value="تانية إبتدائي">تانية إبتدائي</option>
+  <option value="ثالثة إبتدائي">ثالثة إبتدائي</option>
+  <option value="رابعة إبتدائي">رابعة إبتدائي</option>
+  <option value="خمسة إبتدائي">خمسة إبتدائي</option>
+  <option value="سادسة إبتدائي">سادسة إبتدائي</option>
+  <option value="اولى اعدادي">اولى اعدادي</option>
+  <option value="تانية اعدادي">تانية اعدادي</option>
+  <option value="ثالثة اعدادي">ثالثة اعدادي</option>
 </select>
       </label>
 <label>
-  Gender
+  النوع
   <select name="assignedGender" required>
-    <option value="">Select Gender</option>
-    <option value="male">Male</option>
-    <option value="female">Female</option>
+    <option value="">اختر النوع</option>
+    <option value="male">بنين</option>
+    <option value="female">بنات</option>
   </select>
 </label>
-      <button>Add User</button>
+      <button>إضافة المستخدم</button>
       <p id="msg"></p>
     </form>
   </section>
 
   <section class="card">
-    <button type="button" class="collapsible-toggle" data-show="Show Current Users and Coordinators" data-hide="Hide Current Users and Coordinators" onclick="toggleSection('teachersListSection', this)">Show Current Users and Coordinators</button>
+    <button type="button" class="collapsible-toggle" data-show="عرض الخدام وأمناء الخدمة الحاليين" data-hide="إخفاء الخدام وأمناء الخدمة الحاليين" onclick="toggleSection('teachersListSection', this)">عرض الخدام وأمناء الخدمة الحاليين</button>
     <div id="teachersListSection" class="collapsible-body">
-    <h2>Current Users and Coordinators</h2>
+    <h2>الخدام وأمناء الخدمة الحاليين</h2>
     <label>
-      Search
-      <input id="teacherSearch" placeholder="Search by name, phone, department, or grade">
+      بحث
+      <input id="teacherSearch" placeholder="ابحث بالاسم، التليفون، الخدمة، أو السنة">
     </label>
-    <button type="button" onclick="loadTeachers()">Search</button>
+    <button type="button" onclick="loadTeachers()">بحث</button>
     <div id="teachers"></div>
     </div>
   </section>
@@ -152,7 +152,7 @@ async function loadRegistrationStatus() {
     const settings = await api('/api/admin/registration-status');
 
     btn.dataset.registrationOpen = settings.registrationOpen ? 'true' : 'false';
-    btn.textContent = settings.registrationOpen ? 'Close registration now' : 'Open registration';
+    btn.textContent = settings.registrationOpen ? 'إيقاف التسجيل الآن' : 'فتح التسجيل';
     btn.style.background = settings.registrationOpen ? '#e53935' : '#4CAF50';
 
     if (closesAtInput) {
@@ -160,14 +160,14 @@ async function loadRegistrationStatus() {
     }
 
     const closeText = settings.registrationClosesAt
-      ? ` and will close automatically at ${new Date(settings.registrationClosesAt).toLocaleString('en-US')}.`
+      ? ` وسيتم إغلاقه تلقائياً في ${new Date(settings.registrationClosesAt).toLocaleString('ar-EG')}.`
       : '';
 
     statusText.textContent = settings.registrationOpen
-      ? `Registration is currently open.${closeText}`
-      : 'Registration is currently closed: student registration, team changes, and teacher edits are disabled. Teachers are view-only.';
+      ? `التسجيل مفتوح حالياً.${closeText}`
+      : 'التسجيل مغلق حالياً: تسجيل المخدومين والفرق وتعديل الخدام متوقف، والخدام Viewer فقط.';
   } catch (err) {
-    statusText.textContent = 'Failed to load registration status.';
+    statusText.textContent = 'فشل تحميل حالة التسجيل.';
     message('registrationMsg', err.message, false);
   }
 }
@@ -189,20 +189,20 @@ if (toggleRegistrationBtn) {
   toggleRegistrationBtn.addEventListener('click', async () => {
     const isOpenNow = toggleRegistrationBtn.dataset.registrationOpen === 'true';
     const confirmMessage = isOpenNow
-      ? 'Close registration now? New registrations, team changes, and teacher edits will be disabled.'
-      : 'Open registration?';
+      ? 'هل تريد إيقاف التسجيل الآن؟ كل التسجيلات والفرق وتعديل الخدام سيقف.'
+      : 'هل تريد فتح التسجيل؟';
 
     if (!confirm(confirmMessage)) return;
 
     toggleRegistrationBtn.disabled = true;
-    toggleRegistrationBtn.textContent = 'Saving...';
+    toggleRegistrationBtn.textContent = 'جاري الحفظ...';
 
     try {
       const settings = await saveRegistrationSettings(!isOpenNow, !isOpenNow);
 
       message(
         'registrationMsg',
-        settings.registrationOpen ? 'Registration opened' : 'Registration closed'
+        settings.registrationOpen ? 'تم فتح التسجيل' : 'تم إغلاق التسجيل'
       );
 
       await loadRegistrationStatus();
@@ -218,17 +218,17 @@ const saveAutoCloseBtn = document.getElementById('saveAutoCloseBtn');
 if (saveAutoCloseBtn) {
   saveAutoCloseBtn.addEventListener('click', async () => {
     saveAutoCloseBtn.disabled = true;
-    saveAutoCloseBtn.textContent = 'Saving...';
+    saveAutoCloseBtn.textContent = 'جاري الحفظ...';
 
     try {
       const settings = await saveRegistrationSettings(true, true);
-      message('registrationMsg', settings.registrationClosesAt ? 'Auto-close time saved' : 'Registration opened without auto-close time');
+      message('registrationMsg', settings.registrationClosesAt ? 'تم حفظ وقت الإغلاق التلقائي' : 'تم فتح التسجيل بدون وقت إغلاق تلقائي');
       await loadRegistrationStatus();
     } catch (err) {
       message('registrationMsg', err.message, false);
     } finally {
       saveAutoCloseBtn.disabled = false;
-      saveAutoCloseBtn.textContent = 'Save auto-close time';
+      saveAutoCloseBtn.textContent = 'حفظ وقت الإغلاق التلقائي';
     }
   });
 }
@@ -279,22 +279,22 @@ async function loadTeachers() {
     <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd;padding:10px 0;">
       <div>
         <strong>${escapeHtml(t.fullName)}</strong><br>
-${escapeHtml(t.phone || '')}<br>      Role: ${
+${escapeHtml(t.phone || '')}<br>      الدور: ${
   t.role === 'admin'
-    ? 'Admin / teacher'
+    ? 'أدمن / خادم'
     : t.role === 'serviceLeader'
-      ? 'Coordinator'
-      : 'teacher'
-}<br>Department: ${escapeHtml(t.assignedClass || '')} - Grade: ${escapeHtml(t.assignedYear || 'All grades')}
+      ? 'أمين خدمة'
+      : 'خادم'
+}<br>الخدمة: ${escapeHtml(t.assignedClass || '')} - السنة: ${escapeHtml(t.assignedYear || 'كل السنوات')}
       </div>
 
-      <button onclick="deleteTeacher('${t._id}')">Delete</button>
+      <button onclick="deleteTeacher('${t._id}')">حذف</button>
     </div>
   `).join('');
 }
 
 async function deleteTeacher(id) {
-  if (!confirm('Delete this user?')) return;
+  if (!confirm('هل تريد حذف هذا المستخدم؟')) return;
 
   await api('/api/teachers/' + id, {
     method: 'DELETE'
@@ -314,7 +314,7 @@ document.getElementById('teacherForm').addEventListener('submit', async e => {
       body: JSON.stringify(body)
     });
 
-    message('msg', 'User added');
+    message('msg', 'تم إضافة المستخدم');
     e.target.reset();
     loadTeachers();
   } catch (err) {

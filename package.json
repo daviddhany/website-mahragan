@@ -1,7 +1,7 @@
 {
-  "name": "student-activity-management-system",
+  "name": "church-registration-management-system",
   "version": "1.0.0",
-  "description": "Student activity registration and management system using Express and MongoDB",
+  "description": "Church, school, and festival registration management system using Express and MongoDB",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

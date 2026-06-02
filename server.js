@@ -60,7 +60,7 @@ const authLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many login attempts. Try again after 15 minutes.' }
+  message: { error: 'محاولات تسجيل دخول كثيرة. حاول مرة أخرى بعد 15 دقيقة.' }
 });
 
 const registerLimiter = rateLimit({
@@ -68,7 +68,7 @@ const registerLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many registration attempts. Please try again later.' }
+  message: { error: 'محاولات تسجيل كثيرة. حاول مرة أخرى لاحقًا.' }
 });
 
 app.use('/api/auth/student/login', authLimiter);

@@ -4,7 +4,7 @@ const studentSchema = new mongoose.Schema(
   {
     studentCode: { type: String, required: true, unique: true, trim: true },
 
-    // Full name (at least 3 names)
+    // ✅ Full name (at least 3 names)
     fullName: {
       type: String,
       required: true,
@@ -19,27 +19,30 @@ const studentSchema = new mongoose.Schema(
 
     gender: { type: String, required: true, enum: ['male', 'female'] },
 
-    // Updated departments
+    // ✅ Updated classes
     className: {
       type: String,
       required: true,
-      enum: ['Department A', 'Department B', 'Department C', 'Upper Primary', 'Middle School']
+      enum: ['خمسة و ستة', 'إعدادي', 'اعدادي', 'يوحنا', 'ابوسيفين', 'العذراء']
     },
 
-    // Updated grades
+    // ✅ Updated years (STRING now)
     studentYear: {
       type: String,
       required: true,
       enum: [
-        'Grade 1',
-        'Grade 2',
-        'Grade 3',
-        'Grade 4',
-        'Grade 5',
-        'Grade 6',
-        'Grade 7',
-        'Grade 8',
-        'Grade 9'
+        'اولى إبتدائي',
+        'تانية إبتدائي',
+        'ثالثة إبتدائي',
+        'رابعة إبتدائي',
+        'خمسة إبتدائي',
+        'سادسة إبتدائي',
+        'اولى اعدادي',
+        'تانية اعدادي',
+        'ثالثة اعدادي',
+        'اولى إعدادي',
+        'تانية إعدادي',
+        'ثالثة إعدادي'
       ]
     },
 
@@ -50,19 +53,19 @@ const studentSchema = new mongoose.Schema(
       max: 2099
     },
 
-    // Birthdate
+    // ✅ Birthdate
     birthDate: {
       type: Date,
       required: true
     },
-    // Parent phone (required)
+    // ✅ Parent phone (required)
     parentPhone: {
       type: String,
       required: true,
       match: [/^\d{11}$/, 'Phone number must be exactly 11 digits']
     },
 
-    // Student phone (optional)
+    // ✅ Student phone (optional)
     studentPhone: {
       type: String,
       default: '',
@@ -105,7 +108,7 @@ const studentSchema = new mongoose.Schema(
       default: false
     },
 
-    activityQualified: {
+    karazaQualified: {
       type: Boolean,
       default: false
     },
