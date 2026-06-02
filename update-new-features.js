@@ -19,7 +19,7 @@ async function main() {
 
   await Student.updateMany(
     { paymentMethod: { $exists: false } },
-    { $set: { paymentMethod: 'servant' } }
+    { $set: { paymentMethod: 'supervisor' } }
   );
 
   await Student.updateMany(

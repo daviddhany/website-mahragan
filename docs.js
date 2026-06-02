@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Admin / Staff Login</title>
+  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="icon" href="/public/logo-generic.svg" type="image/png">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-generic.svg" class="header-logo" alt="Logo"></a>
+  <div class="header-title"><h2>Admin / Staff Login</h2></div>
+  <div class="header-right">
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
+  </div>
+</header>
+
+<main>
+  <section class="card">
+    <form id="form">
+      <label>Email
+        <input name="email" type="email" required placeholder="admin@example.com" autocomplete="username">
+      </label>
+      <label>Password
+        <input name="password" type="password" required autocomplete="current-password">
+      </label>
+      <button type="submit">Login</button>
+      <p id="msg"></p>
+    </form>
+  </section>
+</main>
+
+<script src="/public/app.js"></script>
+<script>
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = Object.fromEntries(new FormData(e.target));
+  body.email = String(body.email || '').trim().toLowerCase();
+
+  const button = e.target.querySelector('button');
+  button.disabled = true;
+  button.textContent = 'Logging in...';
+
+  try {
+    await api('/api/auth/teacher/login', {
+      method: 'POST',
+      body: JSON.stringify(body)
+    });
+    location.href = '/c/3a7dcaf0-9901-83ea-b660-7e9e88d19bd8';
+  } catch (err) {
+    message('msg', err.message, false);
+    button.disabled = false;
+    button.textContent = 'Login';
+  }
+});
+</script>
+<footer class="app-footer" dir="ltr">© 2026 Your Organization. All rights reserved.</footer>
+</body>
+</html>

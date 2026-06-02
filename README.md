@@ -6,7 +6,7 @@ A complete Node.js + MongoDB web application for managing organization, school, 
 
 - Online student/participant registration
 - Student login and password change
-- Teacher/servant dashboard
+- Supervisor dashboard
 - Admin dashboard
 - Role-based access control
 - Activity and category management

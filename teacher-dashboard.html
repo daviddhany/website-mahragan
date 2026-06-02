@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Create Student Account</title>
+  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="icon" href="/public/logo-generic.svg" type="image/png">
+</head>
+<body>
+<header class="site-header">
+  <a href="/" class="logo-link"><img src="/public/logo-generic.svg" class="header-logo" alt="Logo"></a>
+  <div class="header-title"><h2>Student Activity Management System</h2></div>
+  <div class="header-right">
+    <nav class="header-actions">
+      <a href="/" class="btn-nav">Home</a>
+      <a href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5" class="btn-nav login">Student Login</a>
+    </nav>
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
+  </div>
+</header>
+
+<main>
+<section class="card">
+<div id="registrationClosedBox" class="error" style="display:none;margin-bottom:12px;">Registration is currently closed.</div>
+<form id="form">
+  <label>Full Name <input name="fullName" required placeholder="First Middle Last"></label>
+  <label>Gender
+    <select name="gender" required>
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </label>
+  <label>Birth Date <input name="birthDate" type="date" required></label>
+  <label>Department
+    <select name="className" id="className" required>
+      <option value="">Select department</option>
+      <option value="Department A">Department A</option>
+      <option value="Department B">Department B</option>
+      <option value="Department C">Department C</option>
+      <option value="Upper Department">Upper Department</option>
+      <option value="Middle Department">Middle Department</option>
+    </select>
+  </label>
+  <label>Grade
+    <select name="studentYear" id="studentYear" required>
+      <option value="">Select grade</option>
+    </select>
+  </label>
+  <label>Password <input name="password" type="password" required></label>
+  <label>Parent Phone <input name="parentPhone" required pattern="\d{11}" maxlength="11" placeholder="11 digits"></label>
+  <label>Student Phone - Optional <input name="studentPhone" pattern="\d{11}" maxlength="11" placeholder="11 digits"></label>
+  <label>Address <textarea name="address" required></textarea></label>
+  <button id="submitBtn">Create Account</button>
+  <p id="msg"></p>
+</form>
+</section>
+</main>
+<footer class="app-footer" dir="ltr">© 2026 Your Organization. All rights reserved.</footer>
+<script src="/public/app.js"></script>
+<script>
+async function checkRegistrationStatus() {
+  try {
+    const settings = await api('/api/students/registration-status');
+    if (!settings.registrationOpen) {
+      const box = document.getElementById('registrationClosedBox');
+      const form = document.getElementById('form');
+      const button = document.getElementById('submitBtn');
+      box.style.display = 'block';
+      box.textContent = 'Registration is currently closed by the administration.';
+      button.disabled = true;
+      button.textContent = 'Registration Closed';
+      form.querySelectorAll('input, select, textarea').forEach(input => input.disabled = true);
+    } else if (settings.registrationClosesAt) {
+      const box = document.getElementById('registrationClosedBox');
+      box.style.display = 'block';
+      box.className = 'success';
+      box.textContent = `Registration is open and will close automatically at ${new Date(settings.registrationClosesAt).toLocaleString('en-US')}.`;
+    }
+  } catch (err) {}
+}
+checkRegistrationStatus();
+
+const yearOptionsByClass = {
+  'Department A': [['Grade 1','Grade 1'], ['Grade 2','Grade 2'], ['Grade 3','Grade 3'], ['Grade 4','Grade 4']],
+  'Department B': [['Grade 1','Grade 1'], ['Grade 2','Grade 2'], ['Grade 3','Grade 3'], ['Grade 4','Grade 4']],
+  'Department C': [['Grade 1','Grade 1'], ['Grade 2','Grade 2'], ['Grade 3','Grade 3'], ['Grade 4','Grade 4']],
+  'Upper Department': [['Grade 5','Grade 5'], ['Grade 6','Grade 6']],
+  'Middle Department': [['Grade 7','Grade 7'], ['Grade 8','Grade 8'], ['Grade 9','Grade 9']]
+};
+
+function updateYearOptions() {
+  const classSelect = document.getElementById('className');
+  const yearSelect = document.getElementById('studentYear');
+  const years = yearOptionsByClass[classSelect.value] || [];
+  yearSelect.innerHTML = '<option value="">Select grade</option>';
+  years.forEach(([value, label]) => {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = label;
+    yearSelect.appendChild(option);
+  });
+  yearSelect.disabled = years.length === 0;
+}
+
+document.getElementById('className').addEventListener('change', updateYearOptions);
+updateYearOptions();
+
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const body = Object.fromEntries(new FormData(e.target));
+  const button = document.getElementById('submitBtn');
+  button.disabled = true;
+  button.textContent = 'Saving...';
+  try {
+    const data = await api('/api/students/register', { method:'POST', body: JSON.stringify(body) });
+    sessionStorage.setItem('lastRegisteredStudent', JSON.stringify(data.student || {}));
+    sessionStorage.setItem('lastStudentCode', data.studentCode || '');
+    message('msg', `Student saved. Student code: ${data.studentCode}. Opening details page...`);
+    setTimeout(() => { location.href = '/c/8c3fcaf0-5506-83ea-b660-3a9e88d19bd4'; }, 700);
+  } catch(err) {
+    message('msg', err.message, false);
+    button.disabled = false;
+    button.textContent = 'Create Account';
+  }
+});
+</script>
+</body>
+</html>

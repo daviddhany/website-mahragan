@@ -1,55 +1,18 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const Student = require('./models/Student');
-const Teacher = require('./models/Teacher');
-const { normalizeClassName, normalizeStudentYear } = require('./utils');
+# Server
+NODE_ENV=development
+PORT=3000
 
-async function normalizeModel(Model, label) {
-  const docs = await Model.find({});
-  let changed = 0;
+# Database
+MONGODB_URI=mongodb://127.0.0.1:27017/student_activity_management
 
-  for (const doc of docs) {
-    const beforeClass = doc.className || doc.assignedClass;
-    const beforeYear = doc.studentYear || doc.assignedYear;
-    const afterClass = normalizeClassName(beforeClass);
-    const afterYear = normalizeStudentYear(beforeYear);
+# Security
+SESSION_SECRET=replace_with_a_random_secret_at_least_32_characters
 
-    let dirty = false;
-    if (doc.className !== undefined && beforeClass !== afterClass) {
-      doc.className = afterClass;
-      dirty = true;
-    }
-    if (doc.assignedClass !== undefined && beforeClass !== afterClass) {
-      doc.assignedClass = afterClass;
-      dirty = true;
-    }
-    if (doc.studentYear !== undefined && beforeYear !== afterYear) {
-      doc.studentYear = afterYear;
-      dirty = true;
-    }
-    if (doc.assignedYear !== undefined && beforeYear !== afterYear) {
-      doc.assignedYear = afterYear;
-      dirty = true;
-    }
+# First admin account created by: npm run seed
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=Admin123456!
 
-    if (dirty) {
-      await doc.save();
-      changed++;
-    }
-  }
-
-  console.log(`${label}: normalized ${changed} records`);
-}
-
-async function main() {
-  const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/school_activity_app';
-  await mongoose.connect(mongoUri);
-  await normalizeModel(Student, 'Students');
-  await normalizeModel(Teacher, 'Teachers');
-  await mongoose.disconnect();
-}
-
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+# Cloudinary uploads
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret

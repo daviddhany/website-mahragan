@@ -1,0 +1,230 @@
+const express = require('express');
+const Student = require('../models/Student');
+const Teacher = require('../models/Teacher');
+const bcrypt = require('bcryptjs');
+
+const router = express.Router();
+
+// ================= STUDENT LOGIN =================
+router.post('/student/login', async (req, res) => {
+  try {
+    const { studentCode, password } = req.body;
+
+    const cleanCode = String(studentCode || '').trim().toUpperCase();
+
+    if (!cleanCode) {
+      return res.status(400).json({ error: 'Student code is required' });
+    }
+
+    const student = await Student.findOne({ studentCode: cleanCode });
+
+    if (!student) {
+      return res.status(401).json({ error: 'Invalid student code or password' });
+    }
+
+    const ok = await bcrypt.compare(password, student.passwordHash);
+
+    if (!ok) {
+      return res.status(401).json({ error: 'Invalid student code or password' });
+    }
+
+    req.session.userId = student._id.toString();
+    req.session.userType = 'student';
+
+    res.json({
+      message: 'Logged in',
+      userType: 'student',
+      mustChangePassword: student.mustChangePassword
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+// ================= TEACHER / ADMIN LOGIN =================
+router.post('/teacher/login', async (req, res) => {
+  try {
+    const { email, loginId, phone, password } = req.body;
+
+    const cleanLogin = String(email || loginId || phone || '').trim().toLowerCase();
+    const cleanPassword = String(password || '');
+
+    if (!cleanLogin || !cleanPassword) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    let teacher = await Teacher.findOne({
+      $or: [
+        { email: cleanLogin },
+        { phone: cleanLogin }
+      ]
+    });
+
+    // Self-healing demo admin login:
+    // If the admin account was not seeded in the same database, create it on first successful env/default login.
+    const adminEmail = String(process.env.ADMIN_EMAIL || 'admin@example.com').trim().toLowerCase();
+    const adminPassword = String(process.env.ADMIN_PASSWORD || 'Admin123456!');
+
+    if (!teacher && cleanLogin === adminEmail && cleanPassword === adminPassword) {
+      const passwordHash = await bcrypt.hash(adminPassword, 12);
+      teacher = await Teacher.findOneAndUpdate(
+        { email: adminEmail },
+        {
+          $set: {
+            fullName: 'Main Admin',
+            email: adminEmail,
+            phone: '',
+            passwordHash,
+            role: 'admin',
+            assignedGender: 'all'
+          },
+          $unset: { assignedClass: '', assignedYear: '' }
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: false }
+      );
+    }
+
+    if (!teacher) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    const ok = await bcrypt.compare(cleanPassword, teacher.passwordHash);
+
+    if (!ok) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    req.session.userId = teacher._id.toString();
+    req.session.userType = 'teacher';
+    req.session.role = teacher.role;
+
+    res.json({
+      message: 'Logged in',
+      userType: 'teacher',
+      role: teacher.role
+    });
+  } catch (err) {
+    console.error('Teacher login error:', err);
+    res.status(500).json({ error: 'Login failed. Check server console.' });
+  }
+});
+
+// ================= CURRENT USER =================
+router.get('/me', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Login is required' });
+  }
+
+  if (req.session.userType === 'teacher') {
+    const teacher = await Teacher.findById(req.session.userId).select('-passwordHash');
+
+    if (!teacher) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+
+    return res.json({
+      userType: 'teacher',
+      role: teacher.role,
+      fullName: teacher.fullName,
+      email: teacher.email,
+      phone: teacher.phone,
+      assignedClass: teacher.assignedClass,
+      assignedYear: teacher.assignedYear,
+      assignedGender: teacher.assignedGender
+    });
+  }
+
+  res.json({
+    userType: req.session.userType
+  });
+});
+
+// ================= LOGOUT =================
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.json({ message: 'Logged out' });
+  });
+});
+
+// ================= TEACHER PASSWORD CHANGE =================
+router.put('/teacher/change-password', async (req, res) => {
+  try {
+    if (!req.session.userId || req.session.userType !== 'teacher') {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'Old and new passwords are required' });
+    }
+
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    }
+
+    const teacher = await Teacher.findById(req.session.userId);
+
+    if (!teacher) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const oldPasswordOk = await bcrypt.compare(oldPassword, teacher.passwordHash);
+
+    if (!oldPasswordOk) {
+      return res.status(401).json({ error: 'Old password is incorrect' });
+    }
+
+    teacher.passwordHash = await bcrypt.hash(newPassword, 12);
+    await teacher.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+// ================= STUDENT PASSWORD CHANGE =================
+router.put('/student/change-password', async (req, res) => {
+  try {
+    if (!req.session.userId || req.session.userType !== 'student') {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ error: 'Old and new passwords are required' });
+    }
+
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters' });
+    }
+
+    if (oldPassword === newPassword) {
+      return res.status(400).json({ error: 'New password must be different from old password' });
+    }
+
+    const student = await Student.findById(req.session.userId);
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    const oldPasswordOk = await bcrypt.compare(oldPassword, student.passwordHash);
+
+    if (!oldPasswordOk) {
+      return res.status(401).json({ error: 'Old password is incorrect' });
+    }
+
+    student.passwordHash = await bcrypt.hash(newPassword, 12);
+    student.mustChangePassword = false;
+    await student.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to change password' });
+  }
+});
+
+module.exports = router;
