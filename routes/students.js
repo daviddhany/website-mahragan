@@ -69,7 +69,7 @@ router.post('/register', async (req, res) => {
 
     if (!effectiveRegistrationOpen) {
       return res.status(403).json({
-        error: 'تم إغلاق التسجيل حالياً بواسطة الإدارة'
+        error: 'Registration is currently closed by the administration'
       });
     }
 
@@ -88,25 +88,25 @@ router.post('/register', async (req, res) => {
 
     if (missing.length) {
       return res.status(400).json({
-        error: `من فضلك أكمل البيانات المطلوبة: ${missing.join(', ')}`
+        error: `Please complete the required fields: ${missing.join(', ')}`
       });
     }
 
     if (String(req.body.fullName).trim().split(/\s+/).length < 3) {
       return res.status(400).json({
-        error: 'الاسم يجب أن يكون ثلاثي'
+        error: 'Full name must contain at least 3 names'
       });
     }
 
     if (!/^\d{11}$/.test(req.body.parentPhone)) {
       return res.status(400).json({
-        error: 'رقم ولي الأمر يجب أن يكون 11 رقم'
+        error: 'Parent phone must be exactly 11 digits'
       });
     }
 
     if (req.body.studentPhone && !/^\d{11}$/.test(req.body.studentPhone)) {
       return res.status(400).json({
-        error: 'رقم تليفون المخدوم يجب أن يكون 11 رقم'
+        error: 'Student phone must be exactly 11 digits'
       });
     }
 
@@ -120,21 +120,21 @@ router.post('/register', async (req, res) => {
 
     if (!entryYear) {
       return res.status(400).json({
-        error: 'السنة الدراسية غير صحيحة'
+        error: 'Invalid grade'
       });
     }
 
     const allowedYearsByClass = {
-      'يوحنا': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
-      'ابوسيفين': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
-      'العذراء': ['اولى إبتدائي', 'تانية إبتدائي', 'ثالثة إبتدائي', 'رابعة إبتدائي'],
-      'خمسة و ستة': ['خمسة إبتدائي', 'سادسة إبتدائي'],
-      'إعدادي': ['اولى اعدادي', 'تانية اعدادي', 'ثالثة اعدادي']
+      'Department A': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'],
+      'Department B': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'],
+      'Department C': ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4'],
+      'Upper Department': ['Grade 5', 'Grade 6'],
+      'Middle Department': ['Grade 7', 'Grade 8', 'Grade 9']
     };
 
     if (!allowedYearsByClass[className] || !allowedYearsByClass[className].includes(studentYear)) {
       return res.status(400).json({
-        error: 'السنة المختارة لا تناسب الخدمة المختارة'
+        error: 'The selected grade does not match the selected department'
       });
     }
 
@@ -142,7 +142,7 @@ router.post('/register', async (req, res) => {
 
     if (!birthDateRange) {
       return res.status(400).json({
-        error: 'تاريخ الميلاد غير صحيح'
+        error: 'Invalid birth date'
       });
     }
 
@@ -164,7 +164,7 @@ router.post('/register', async (req, res) => {
 
     if (duplicateStudent) {
       return res.status(409).json({
-        error: `هذا المخدوم مسجل بالفعل بكود ${duplicateStudent.studentCode}`
+        error: `This student is already registered with code ${duplicateStudent.studentCode}`
       });
     }
 
@@ -217,15 +217,15 @@ router.post('/register', async (req, res) => {
       const duplicatedField = err.keyPattern ? Object.keys(err.keyPattern)[0] : 'field';
       return res.status(409).json({
         error: duplicatedField === 'studentCode'
-          ? 'كود المخدوم موجود بالفعل'
-          : `بيانات متكررة في قاعدة البيانات: ${duplicatedField}`
+          ? 'Student code already exists'
+          : `Duplicate data in database: ${duplicatedField}`
       });
     }
 
     console.error(err);
 
     res.status(500).json({
-      error: 'فشل إنشاء الحساب. من فضلك راجع البيانات وحاول مرة أخرى'
+      error: 'Failed to create account. Please check the data and try again'
     });
   }
 });
@@ -244,7 +244,7 @@ router.get('/me', requireStudent, async (req, res) => {
   } catch (err) {
 
     res.status(500).json({
-      error: 'فشل تحميل بيانات المخدوم'
+      error: 'Failed to load student data'
     });
   }
 });
@@ -273,7 +273,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
       String(updates.fullName).trim().split(/\s+/).length < 3
     ) {
       return res.status(400).json({
-        error: 'الاسم يجب أن يكون ثلاثي'
+        error: 'Full name must contain at least 3 names'
       });
     }
 
@@ -282,7 +282,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
       !/^\d{11}$/.test(updates.parentPhone)
     ) {
       return res.status(400).json({
-        error: 'رقم ولي الأمر يجب أن يكون 11 رقم'
+        error: 'Parent phone must be exactly 11 digits'
       });
     }
 
@@ -291,7 +291,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
       !/^\d{11}$/.test(updates.studentPhone)
     ) {
       return res.status(400).json({
-        error: 'رقم تليفون المخدوم يجب أن يكون 11 رقم'
+        error: 'Student phone must be exactly 11 digits'
       });
     }
 

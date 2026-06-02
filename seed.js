@@ -5,34 +5,31 @@ const bcrypt = require('bcryptjs');
 const Teacher = require('./models/Teacher');
 
 const MONGODB_URI =
-  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/school_activity_app';
+  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/student_activity_management';
 
 async function seed() {
   await mongoose.connect(MONGODB_URI);
 
-  const adminPhone = process.env.ADMIN_PHONE;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminEmail = String(process.env.ADMIN_EMAIL || 'admin@example.com').trim().toLowerCase();
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123456!';
 
-  if (!adminPhone || !adminPassword) {
-    throw new Error('Set ADMIN_PHONE and ADMIN_PASSWORD in environment variables before running seed.');
+  if (!/^\S+@\S+\.\S+$/.test(adminEmail)) {
+    throw new Error('ADMIN_EMAIL must be a valid email address.');
   }
 
-  if (!/^\d{11}$/.test(adminPhone)) {
-    throw new Error('ADMIN_PHONE must be 11 digits.');
-  }
-
-  if (adminPassword.length < 12) {
-    throw new Error('ADMIN_PASSWORD must be at least 12 characters.');
+  if (adminPassword.length < 8) {
+    throw new Error('ADMIN_PASSWORD must be at least 8 characters.');
   }
 
   const passwordHash = await bcrypt.hash(adminPassword, 12);
 
   await Teacher.updateOne(
-    { phone: adminPhone },
+    { email: adminEmail },
     {
       $set: {
         fullName: 'Main Admin',
-        phone: adminPhone,
+        email: adminEmail,
+        phone: '',
         passwordHash,
         role: 'admin'
       }
@@ -41,8 +38,8 @@ async function seed() {
   );
 
   console.log('Seed complete');
-  console.log(`Admin phone: ${adminPhone}`);
-  console.log('Admin password was read from ADMIN_PASSWORD and was not printed.');
+  console.log(`Admin email: ${adminEmail}`);
+  console.log(`Admin password: ${adminPassword}`);
 
   await mongoose.disconnect();
 }

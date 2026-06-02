@@ -8,11 +8,19 @@ const teacherSchema = new mongoose.Schema(
       trim: true
     },
 
-    phone: {
+    email: {
       type: String,
       required: true,
       unique: true,
-      match: [/^\d{11}$/, 'Phone number must be exactly 11 digits']
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Email must be valid']
+    },
+
+    phone: {
+      type: String,
+      default: '',
+      match: [/^$|^\d{11}$/, 'Phone number must be exactly 11 digits']
     },
 
     passwordHash: {
@@ -28,7 +36,7 @@ const teacherSchema = new mongoose.Schema(
 
     assignedClass: {
       type: String,
-      enum: ['خمسة و ستة', 'إعدادي', 'اعدادي', 'يوحنا', 'ابوسيفين', 'العذراء'],
+      enum: ['Department A', 'Department B', 'Department C', 'Upper Department', 'Middle Department'],
       required: function () {
         return this.role === 'teacher' || this.role === 'serviceLeader';
       }
@@ -46,18 +54,15 @@ const teacherSchema = new mongoose.Schema(
         return this.role === 'teacher';
       },
       enum: [
-        'اولى إبتدائي',
-        'تانية إبتدائي',
-        'ثالثة إبتدائي',
-        'رابعة إبتدائي',
-        'خمسة إبتدائي',
-        'سادسة إبتدائي',
-        'اولى اعدادي',
-        'تانية اعدادي',
-        'ثالثة اعدادي',
-        'اولى إعدادي',
-        'تانية إعدادي',
-        'ثالثة إعدادي'
+        'Grade 1',
+        'Grade 2',
+        'Grade 3',
+        'Grade 4',
+        'Grade 5',
+        'Grade 6',
+        'Grade 7',
+        'Grade 8',
+        'Grade 9'
       ]
     }
   },

@@ -1,6 +1,6 @@
-# Church Registration & Team Management System
+# Organization Registration & Team Management System
 
-A complete Node.js + MongoDB web application for managing church, school, ministry, or festival registration.
+A complete Node.js + MongoDB web application for managing organization, school, ministry, or festival registration.
 
 ## Main Features
 
@@ -54,9 +54,9 @@ Required values:
 
 ```env
 PORT=3000
-MONGODB_URI=mongodb://127.0.0.1:27017/church_registration_app
+MONGODB_URI=mongodb://127.0.0.1:27017/student_activity_management
 SESSION_SECRET=replace_with_a_random_secret_at_least_32_characters
-ADMIN_PHONE=01000000000
+ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=ChangeThisStrongPassword123!
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
@@ -69,7 +69,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 npm run seed
 ```
 
-The admin phone and password are read from `.env`.
+The admin email and password are read from `.env`.
 
 ## Production Checklist
 

@@ -4,33 +4,27 @@ const mongoose = require('mongoose');
 const Teacher = require('./models/Teacher');
 
 const MONGODB_URI =
-  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/school_activity_app';
+  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/student_activity_management';
 
 async function cleanup() {
   await mongoose.connect(MONGODB_URI);
 
-  const admins = await Teacher.find({ role: 'admin' }).sort({ phone: -1, createdAt: 1 });
+  const admins = await Teacher.find({ role: 'admin' }).sort({ email: 1, createdAt: 1 });
   const idsToDelete = [];
-  const seenPhones = new Set();
-  const mainAdminPhone = process.env.ADMIN_PHONE;
-  const mainAdmin = mainAdminPhone ? admins.find(a => a.phone === mainAdminPhone) : null;
+  const seenEmails = new Set();
 
   for (const admin of admins) {
-    const phone = admin.phone || '';
+    const email = String(admin.email || '').trim().toLowerCase();
 
-    // Remove old broken Main Admin records with no phone when the real seeded admin exists.
-    if (mainAdmin && !phone && admin.fullName === 'Main Admin') {
+    if (!email) {
       idsToDelete.push(admin._id);
       continue;
     }
 
-    // Remove duplicate admin accounts with the same phone, keeping the first one.
-    if (phone) {
-      if (seenPhones.has(phone)) {
-        idsToDelete.push(admin._id);
-      } else {
-        seenPhones.add(phone);
-      }
+    if (seenEmails.has(email)) {
+      idsToDelete.push(admin._id);
+    } else {
+      seenEmails.add(email);
     }
   }
 

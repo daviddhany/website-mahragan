@@ -1,25 +1,23 @@
 const Student = require('./models/Student');
 
 async function generateStudentCode(gender, className, entryYear) {
+  // Generic student code format: YY + Gender + Department + 3-digit serial
+  // Example: 25MA001 = 2025, Male, Department A, serial 001
   const genderCode = gender === 'male' ? 'M' : 'F';
 
   const classCodes = {
-    'يوحنا': 'A',
-    'يوحنا الحبيب': 'A',
-    'ابوسيفين': 'B',
-    'ابو سيفين': 'B',
-    'أبو سيفين': 'B',
-    'العذراء': 'C',
-    'خمسة و ستة': 'D',
-    'إعدادي': 'E',
-    'اعدادي': 'E'
+    'Department A': 'A',
+    'Department B': 'B',
+    'Department C': 'C',
+    'Upper Department': 'D',
+    'Middle Department': 'E'
   };
 
   const classCode = classCodes[className];
   const yearNumber = Number(entryYear);
 
   if (!classCode) {
-    throw new Error('Invalid class name for student code');
+    throw new Error('Invalid department for student code');
   }
 
   if (!Number.isInteger(yearNumber) || yearNumber < 2000 || yearNumber > 2099) {
@@ -38,46 +36,60 @@ async function generateStudentCode(gender, className, entryYear) {
     .filter((number) => Number.isInteger(number));
 
   let nextNumber = 1;
+  while (usedNumbers.includes(nextNumber)) nextNumber++;
 
-  while (usedNumbers.includes(nextNumber)) {
-    nextNumber++;
-  }
-
-  const serial = String(nextNumber).padStart(3, '0');
-
-  return `${prefix}${serial}`;
+  return `${prefix}${String(nextNumber).padStart(3, '0')}`;
 }
 
 function normalizeClassName(value) {
   if (value === undefined || value === null) return value;
   const text = String(value).trim();
-  if (['اعدادي', 'إعدادي', 'اعدادى', 'إعدادى'].includes(text)) return 'إعدادي';
-  return text;
+  const map = {
+    'department a': 'Department A',
+    'department b': 'Department B',
+    'department c': 'Department C',
+    'upper department': 'Upper Department',
+    'middle department': 'Middle Department',
+    'يوحنا': 'Department A',
+    'ابوسيفين': 'Department B',
+    'العذراء': 'Department C',
+    'خمسة و ستة': 'Upper Department',
+    'إعدادي': 'Middle Department',
+    'اعدادي': 'Middle Department'
+  };
+  return map[text.toLowerCase()] || map[text] || text;
 }
 
 function normalizeStudentYear(value) {
   if (value === undefined || value === null) return value;
-  return String(value)
-    .trim()
-    .replace(/إعدادي/g, 'اعدادي')
-    .replace(/إعدادى/g, 'اعدادي')
-    .replace(/اعدادى/g, 'اعدادي');
+  const text = String(value).trim();
+  const map = {
+    'اولى إبتدائي': 'Grade 1',
+    'تانية إبتدائي': 'Grade 2',
+    'ثالثة إبتدائي': 'Grade 3',
+    'رابعة إبتدائي': 'Grade 4',
+    'خمسة إبتدائي': 'Grade 5',
+    'سادسة إبتدائي': 'Grade 6',
+    'اولى اعدادي': 'Grade 7',
+    'تانية اعدادي': 'Grade 8',
+    'ثالثة اعدادي': 'Grade 9'
+  };
+  return map[text] || text;
 }
 
 function getEntryYearFromStudentYear(studentYear) {
   const normalized = normalizeStudentYear(studentYear);
   const entryYearByStudentYear = {
-    'اولى إبتدائي': 2025,
-    'تانية إبتدائي': 2024,
-    'ثالثة إبتدائي': 2023,
-    'رابعة إبتدائي': 2022,
-    'خمسة إبتدائي': 2021,
-    'سادسة إبتدائي': 2020,
-    'اولى اعدادي': 2019,
-    'تانية اعدادي': 2018,
-    'ثالثة اعدادي': 2017
+    'Grade 1': 2025,
+    'Grade 2': 2024,
+    'Grade 3': 2023,
+    'Grade 4': 2022,
+    'Grade 5': 2021,
+    'Grade 6': 2020,
+    'Grade 7': 2019,
+    'Grade 8': 2018,
+    'Grade 9': 2017
   };
-
   return entryYearByStudentYear[normalized] || null;
 }
 
@@ -86,9 +98,7 @@ function normalizeArabicEducationValue(value) {
 }
 
 function requireFields(body, fields) {
-  return fields.filter(
-    (field) => !body[field] || String(body[field]).trim() === ''
-  );
+  return fields.filter((field) => !body[field] || String(body[field]).trim() === '');
 }
 
 module.exports = {

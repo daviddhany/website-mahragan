@@ -12,13 +12,13 @@ async function getTeacher(req) {
   return Teacher.findById(req.session.userId);
 }
 
-const LOWER_SERVICE_CLASSES = ['يوحنا', 'ابوسيفين', 'العذراء'];
+const LOWER_SERVICE_CLASSES = ['Department A', 'Department B', 'Department C'];
 const PREP_CLASSES = ['إعدادي', 'اعدادي'];
 
 const PRIMARY_YEAR_GROUPS = [
-  ['اولى إبتدائي', 'تانية إبتدائي'],
-  ['ثالثة إبتدائي', 'رابعة إبتدائي'],
-  ['خمسة إبتدائي', 'سادسة إبتدائي']
+  ['Grade 1', 'Grade 2'],
+  ['Grade 3', 'Grade 4'],
+  ['Grade 5', 'Grade 6']
 ];
 
 function yearGroupForTeams(year) {
@@ -335,7 +335,7 @@ router.get('/export/pdf', requireTeacher, async (req, res) => {
 });
 
 async function generateTeamName(activityId, activityName, teacher) {
-  const teacherName = teacher.fullName || teacher.phone || 'الخادم';
+  const teacherName = teacher.fullName || teacher.phone || 'Staff Member';
 
   const filter = teacher.role === 'admin'
     ? { activity: activityId, teacher: teacher._id }

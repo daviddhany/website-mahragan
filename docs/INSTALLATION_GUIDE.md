@@ -34,13 +34,13 @@ On Windows, you can copy it manually and rename it to `.env`.
 For local MongoDB:
 
 ```env
-MONGODB_URI=mongodb://127.0.0.1:27017/church_registration_app
+MONGODB_URI=mongodb://127.0.0.1:27017/student_activity_management
 ```
 
 For MongoDB Atlas, paste your Atlas connection string:
 
 ```env
-MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/church_registration_app
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/student_activity_management
 ```
 
 ## 6. Configure Cloudinary
@@ -64,7 +64,7 @@ SESSION_SECRET=replace_with_a_random_secret_at_least_32_characters
 Set first admin credentials:
 
 ```env
-ADMIN_PHONE=01000000000
+ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=ChangeThisStrongPassword123!
 ```
 
@@ -106,7 +106,7 @@ Check `MONGODB_URI`, username, password, and network access.
 Check Cloudinary credentials and allowed file type.
 
 ### Admin cannot login
-Run `npm run seed` again after checking `ADMIN_PHONE` and `ADMIN_PASSWORD`.
+Run `npm run seed` again after checking `ADMIN_EMAIL` and `ADMIN_PASSWORD`.
 
 ### Session/cookie issues in production
 Set `NODE_ENV=production` and use HTTPS.

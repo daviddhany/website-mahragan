@@ -2,7 +2,7 @@
 
 ## Title Ideas
 
-- Church Registration & Team Management System
+- Organization Registration & Team Management System
 - Festival Registration Management Platform
 - Ministry Student Registration System
 - School Activity Registration Dashboard

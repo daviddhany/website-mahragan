@@ -12,6 +12,7 @@ const filter = { role: { $in: ['admin', 'teacher', 'serviceLeader'] } };
   if (search) {
     filter.$or = [
       { fullName: new RegExp(search, 'i') },
+      { email: new RegExp(search, 'i') },
       { phone: new RegExp(search, 'i') },
       { assignedClass: new RegExp(search, 'i') },
       { assignedYear: new RegExp(search, 'i') }
@@ -25,6 +26,7 @@ const filter = { role: { $in: ['admin', 'teacher', 'serviceLeader'] } };
 router.post('/', requireAdmin, async (req, res) => {
   const {
     fullName,
+    email,
     phone,
     password,
     assignedClass,
@@ -35,65 +37,67 @@ router.post('/', requireAdmin, async (req, res) => {
 
   const teacherRole = ['admin', 'serviceLeader', 'teacher'].includes(role) ? role : 'teacher';
 
-  if (!fullName || !phone || !password) {
+  if (!fullName || !email || !password) {
     return res.status(400).json({
-      error: 'من فضلك أكمل بيانات المستخدم'
+      error: 'Please complete user details'
     });
   }
 
   if (teacherRole !== 'admin' && (!assignedClass || !assignedGender || (teacherRole === 'teacher' && !assignedYear))) {
     return res.status(400).json({
-      error: 'من فضلك أكمل بيانات الخادم'
+      error: 'Please complete staff details'
     });
   }
 
   const normalizedAssignedClass = teacherRole === 'admin' ? undefined : normalizeClassName(assignedClass);
   const normalizedAssignedYear = teacherRole === 'teacher' && assignedYear ? normalizeStudentYear(assignedYear) : undefined;
 
-  if (!/^\d{11}$/.test(phone)) {
-    return res.status(400).json({
-      error: 'رقم تليفون الخادم يجب أن يكون 11 رقم'
-    });
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Email must be valid' });
+  }
+
+  if (phone && !/^\d{11}$/.test(phone)) {
+    return res.status(400).json({ error: 'Phone number must be exactly 11 digits' });
   }
 
   const allowedClasses = [
-    'خمسة و ستة',
-    'إعدادي',
-    'اعدادي',
-    'يوحنا',
-    'ابوسيفين',
-    'العذراء'
+    'Department A',
+    'Department B',
+    'Department C',
+    'Upper Department',
+    'Middle Department'
   ];
 
   if (teacherRole !== 'admin' && !allowedClasses.includes(normalizedAssignedClass)) {
-    return res.status(400).json({ error: 'الخدمة غير صحيحة' });
+    return res.status(400).json({ error: 'Invalid department' });
   }
 
   const allowedYears = [
-    'اولى إبتدائي',
-    'تانية إبتدائي',
-    'ثالثة إبتدائي',
-    'رابعة إبتدائي',
-    'خمسة إبتدائي',
-    'سادسة إبتدائي',
-    'اولى اعدادي',
-    'تانية اعدادي',
-    'ثالثة اعدادي'
+    'Grade 1',
+    'Grade 2',
+    'Grade 3',
+    'Grade 4',
+    'Grade 5',
+    'Grade 6',
+    'Grade 7',
+    'Grade 8',
+    'Grade 9'
   ];
 
   if (teacherRole === 'teacher' && !allowedYears.includes(normalizedAssignedYear)) {
-    return res.status(400).json({ error: 'السنة غير صحيحة' });
+    return res.status(400).json({ error: 'Invalid grade' });
   }
 
   if (teacherRole !== 'admin' && !['male', 'female'].includes(assignedGender)) {
-    return res.status(400).json({ error: 'النوع غير صحيح' });
+    return res.status(400).json({ error: 'Invalid gender' });
   }
 
-  const exists = await Teacher.findOne({ phone });
+  const exists = await Teacher.findOne({ email: cleanEmail });
 
   if (exists) {
     return res.status(409).json({
-      error: 'رقم تليفون الخادم موجود بالفعل'
+      error: 'Email already exists'
     });
   }
 
@@ -101,7 +105,8 @@ router.post('/', requireAdmin, async (req, res) => {
 
   const teacherData = {
     fullName,
-    phone,
+    email: cleanEmail,
+    phone: phone || '',
     passwordHash,
     role: teacherRole
   };
@@ -115,10 +120,11 @@ router.post('/', requireAdmin, async (req, res) => {
   const teacher = await Teacher.create(teacherData);
 
   res.status(201).json({
-    message: 'تم إنشاء الخادم',
+    message: 'User created successfully',
     teacher: {
       id: teacher._id,
       fullName: teacher.fullName,
+      email: teacher.email,
       phone: teacher.phone,
       assignedClass: teacher.assignedClass,
       assignedYear: teacher.assignedYear,
@@ -132,16 +138,16 @@ router.delete('/:id', requireAdmin, async (req, res) => {
   const teacher = await Teacher.findById(req.params.id);
 
   if (!teacher) {
-    return res.status(404).json({ error: 'المستخدم غير موجود' });
+    return res.status(404).json({ error: 'User not found' });
   }
 
   if (!['teacher', 'serviceLeader'].includes(teacher.role)) {
-    return res.status(403).json({ error: 'لا يمكن حذف الأدمن من هنا' });
+    return res.status(403).json({ error: 'Admins cannot be deleted here' });
   }
 
   await Teacher.deleteOne({ _id: teacher._id });
 
-  res.json({ message: 'تم حذف المستخدم' });
+  res.json({ message: 'User deleted successfully' });
 });
 
 module.exports = router;
