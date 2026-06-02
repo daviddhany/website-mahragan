@@ -6,7 +6,7 @@
   <title>تم إنشاء الحساب</title>
 
   <link rel="stylesheet" href="/public/styles.css">
-  <link rel="icon" href="/public/logo-left.png" type="image/png">
+  <link rel="icon" href="/public/logo-generic.svg" type="image/png">
 
   <style>
     body {
@@ -135,7 +135,7 @@
 
 <header class="site-header">
   <a href="/" class="logo-link">
-    <img src="/public/logo-left.png" class="header-logo" alt="Logo">
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
   </a>
 
   <div class="header-title">
@@ -148,7 +148,7 @@
       <a href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5" class="btn-nav login">تسجيل دخول</a>
     </nav>
 
-    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
   </div>
 </header>
 
@@ -157,14 +157,14 @@
     <h2>تم إنشاء الحساب بنجاح</h2>
 
     <p class="success">
-      احتفظ بكود المخدوم لأنه سيستخدمه في تسجيل الدخول.
+      احتفظ بكود المشارك لأنه سيستخدمه في تسجيل الدخول.
     </p>
 
     <div id="studentData"></div>
 
     <div class="success-buttons" style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
       <a class="btn-nav login" href="/c/9d4acaf0-6607-83ea-b660-4b9e88d19bd5">تسجيل الدخول</a>
-      <a class="btn-nav" href="/c/7b2ecaf0-4405-83ea-b660-2f9e88d19bd3">تسجيل مخدوم آخر</a>
+      <a class="btn-nav" href="/c/7b2ecaf0-4405-83ea-b660-2f9e88d19bd3">تسجيل مشارك آخر</a>
     </div>
   </section>
 </main>
@@ -189,14 +189,14 @@
   }
 
   if (!saved) {
-    dataBox.innerHTML = '<p class="error">لا توجد بيانات تسجيل حديثة. من فضلك سجل مخدوم جديد.</p>';
+    dataBox.innerHTML = '<p class="error">لا توجد بيانات تسجيل حديثة. من فضلك سجل مشارك جديد.</p>';
   } else {
     const student = JSON.parse(saved);
 
     dataBox.innerHTML = `
       <table>
         <tr>
-          <th>كود المخدوم / ID</th>
+          <th>كود المشارك / ID</th>
           <td><strong>${safeText(student.studentCode)}</strong></td>
         </tr>
 
@@ -236,7 +236,7 @@
         </tr>
 
         <tr>
-          <th>رقم المخدوم</th>
+          <th>رقم المشارك</th>
           <td>${safeText(student.studentPhone || 'لا يوجد')}</td>
         </tr>
 

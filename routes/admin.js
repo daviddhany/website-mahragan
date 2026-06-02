@@ -216,7 +216,7 @@ router.put('/students/:id/payment-confirmation', requireTeacher, requireRegistra
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ error: 'المخدوم غير موجود' });
+      return res.status(404).json({ error: 'المشارك غير موجود' });
     }
 
     const allowed = await canTeacherAccessStudent(currentTeacher, student);
@@ -246,7 +246,7 @@ router.put('/students/:id', requireTeacher, requireRegistrationOpenForNonAdmin, 
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ error: 'المخدوم غير موجود' });
+      return res.status(404).json({ error: 'المشارك غير موجود' });
     }
 
     const currentTeacher = await Teacher.findById(req.session.userId);
@@ -422,7 +422,7 @@ router.put('/students/:id/password', requireTeacher, requireRegistrationOpenForN
     const student = await Student.findById(req.params.id);
 
     if (!student) {
-      return res.status(404).json({ error: 'المخدوم غير موجود' });
+      return res.status(404).json({ error: 'المشارك غير موجود' });
     }
 
     if (currentTeacher.role !== 'admin') {
@@ -445,9 +445,9 @@ router.put('/students/:id/password', requireTeacher, requireRegistrationOpenForN
     student.passwordHash = await bcrypt.hash(newPassword, 12);
     await student.save();
 
-    res.json({ message: 'تم تغيير كلمة سر المخدوم' });
+    res.json({ message: 'تم تغيير كلمة سر المشارك' });
   } catch (err) {
-    res.status(500).json({ error: 'فشل تغيير كلمة سر المخدوم' });
+    res.status(500).json({ error: 'فشل تغيير كلمة سر المشارك' });
   }
 });
 module.exports = router;

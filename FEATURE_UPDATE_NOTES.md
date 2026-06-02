@@ -3,7 +3,7 @@
 Added in this version:
 
 1. Karaza qualification field in student registration/profile/admin edit.
-2. Payment method field: with servant or Instapay.
+2. Payment method field: with supervisor or Instapay.
 3. Payment proof upload appears only when the student chose Instapay.
 4. Activities now have category: spiritual or sports.
 5. Activities now have price; default is 10 EGP.

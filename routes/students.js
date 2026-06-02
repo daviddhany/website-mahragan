@@ -309,7 +309,7 @@ router.put('/me', requireStudent, requireRegistrationOpen, async (req, res) => {
   } catch (err) {
 
     res.status(500).json({
-      error: 'فشل تعديل بيانات المخدوم'
+      error: 'فشل تعديل بيانات المشارك'
     });
   }
 });

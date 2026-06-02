@@ -5,19 +5,19 @@
   <meta charset="utf-8">
   <title>Staff Management</title>
   <link rel="stylesheet" href="/public/styles.css">
-  <link rel="icon" href="/public/logo-left.png" type="image/png">
+  <link rel="icon" href="/public/logo-generic.svg" type="image/png">
 </head>
 
 <body>
 <header class="site-header">
-  <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
+  <a href="/" class="logo-link"><img src="/public/logo-generic.svg" class="header-logo" alt="Logo"></a>
   <div class="header-title"><h2>Staff Management</h2></div>
   <div class="header-right">
     <nav class="header-actions">
       <a href="/c/3a7dcaf0-9901-83ea-b660-7e9e88d19bd8" class="btn-nav">Dashboard</a>
       <button type="button" onclick="logout()" class="btn-logout">Logout</button>
     </nav>
-    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
   </div>
 </header>
 
@@ -194,7 +194,7 @@ if (toggleRegistrationBtn) {
   toggleRegistrationBtn.addEventListener('click', async () => {
     const isOpenNow = toggleRegistrationBtn.dataset.registrationOpen === 'true';
     const confirmMessage = isOpenNow
-      ? 'هل تريد Close Registration Now؟ كل التسجيلات والفرق وتعديل الخدام سيقف.'
+      ? 'هل تريد Close Registration Now؟ كل التسجيلات والفرق وتعديل المشرفين سيقف.'
       : 'هل تريد Open Registration؟';
 
     if (!confirm(confirmMessage)) return;

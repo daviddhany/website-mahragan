@@ -1,13 +1,13 @@
 <!doctype html><html><head>
   <meta name="viewport" content="width=device-width, initial-scale=1"><meta charset="utf-8"><title>الصفحة الشخصية</title><link rel="stylesheet" href="/public/styles.css">
-<link rel="icon" href="/public/logo-left.png" type="image/png"></head>
+<link rel="icon" href="/public/logo-generic.svg" type="image/png"></head>
 <body>
 <header class="site-header">
-  <a href="/" class="logo-link"><img src="/public/logo-left.png" class="header-logo" alt="Logo"></a>
+  <a href="/" class="logo-link"><img src="/public/logo-generic.svg" class="header-logo" alt="Logo"></a>
   <div class="header-title"><h2>نظام التسجيل</h2></div>
   <div class="header-right">
     <nav class="header-actions"><button type="button" onclick="logout()" class="btn-logout">تسجيل خروج</button></nav>
-    <img src="/public/logo-right.png" class="header-logo" alt="Logo">
+    <img src="/public/logo-generic.svg" class="header-logo" alt="Logo">
   </div>
 </header>
 <main>
@@ -67,7 +67,7 @@ async function loadMe(){
   me = await api('/api/students/me');
   document.getElementById('profile').innerHTML = `
     <div class="profile-grid">
-      <div class="profile-item"><span>كود المخدوم</span><strong>${escapeHtml(me.studentCode || '')}</strong></div>
+      <div class="profile-item"><span>كود المشارك</span><strong>${escapeHtml(me.studentCode || '')}</strong></div>
       <div class="profile-item"><span>الاسم</span><strong>${escapeHtml(me.fullName || '')}</strong></div>
       <div class="profile-item"><span>الخدمة</span><strong>${escapeHtml(me.className || '')}</strong></div>
       <div class="profile-item"><span>السنة</span><strong>${escapeHtml(me.studentYear || '')}</strong></div>
@@ -113,7 +113,7 @@ function renderSummary(){
   document.getElementById('summary').innerHTML = `
     <div class="profile-grid">
       <div class="profile-item"><span>الاسم</span><strong>${escapeHtml(me.fullName || '')}</strong></div>
-      <div class="profile-item"><span>كود المخدوم</span><strong>${escapeHtml(me.studentCode || '')}</strong></div>
+      <div class="profile-item"><span>كود المشارك</span><strong>${escapeHtml(me.studentCode || '')}</strong></div>
       <div class="profile-item"><span>الخدمة والسنة</span><strong>${escapeHtml(me.className || '')} - ${escapeHtml(me.studentYear || '')}</strong></div>
       <div class="profile-item"><span>الأنشطة المختارة</span><strong>${chosen.map(a => escapeHtml(a.name)).join('، ') || 'لم يتم الاختيار'}</strong></div>
       <div class="profile-item"><span>إجمالي الدفع</span><strong>${chosen.reduce((sum,a)=>sum+Number(a.price||0),0)} ج</strong></div>

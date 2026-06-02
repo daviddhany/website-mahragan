@@ -3,7 +3,7 @@ const router = express.Router();
 
 router.get('/', (req, res) => {
   res.json({
-    name: 'Mahragan Registration API',
+    name: 'Registration Management API',
     version: '1.1.0',
     description: 'Documented API for students, teachers, activities, teams, reports, and admin operations.',
     endpoints: [

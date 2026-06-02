@@ -92,6 +92,30 @@ app.use(
 }
   })
 );
+
+// Legacy public asset fallbacks for older cached HTML/pages.
+// Keep these so /styles.css, /c/styles.css and old logo paths never 404.
+app.get(['/styles.css', '/c/styles.css'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'styles.css'));
+});
+
+app.get([
+  '/logo-left.png',
+  '/logo-right.png',
+  '/logo%20mahragan.png',
+  '/logo mahragan.png',
+  '/c/logo-left.png',
+  '/c/logo-right.png',
+  '/c/logo%20mahragan.png',
+  '/c/logo mahragan.png',
+  '/public/logo-left.png',
+  '/public/logo-right.png',
+  '/public/logo%20mahragan.png',
+  '/public/logo mahragan.png'
+], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'logo-generic.png'));
+});
+
 app.use('/api/teachers', teacherRoutes);
 
 // ChatGPT-style clean page URLs.

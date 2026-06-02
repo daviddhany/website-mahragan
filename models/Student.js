@@ -96,8 +96,8 @@ const studentSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-      enum: ['servant', 'instapay'],
-      default: 'servant'
+      enum: ['supervisor', 'instapay'],
+      default: 'supervisor'
     },
 
     paymentConfirmed: {

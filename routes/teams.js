@@ -58,13 +58,13 @@ function sameTeamScopeFilterForTeacher(teacher) {
         : teacher.assignedYear;
     }
 
-    // خادم ابتدائي يشوف مجموعة السنين المناسبة: أولى+تانية، تالتة+رابعة، خامسة+سادسة.
+    // مشرف ابتدائي يشوف مجموعة السنين المناسبة: أولى+تانية، تالتة+رابعة، خامسة+سادسة.
     if (LOWER_SERVICE_CLASSES.includes(teacher.assignedClass)) {
       filter.className = { $in: LOWER_SERVICE_CLASSES };
       return filter;
     }
 
-    // خادم إعدادي يشوف نفس سنة إعدادي ونفس النوع في كل إعدادي، مع دعم الإملاءين.
+    // مشرف إعدادي يشوف نفس سنة إعدادي ونفس النوع في كل إعدادي، مع دعم الإملاءين.
     if (PREP_CLASSES.includes(teacher.assignedClass)) {
       filter.className = { $in: PREP_CLASSES };
       return filter;
@@ -134,7 +134,7 @@ async function validateStudents(teacher, studentIds, activityId) {
     const allowed = await canAccessStudent(teacher, studentId, activityId);
 
     if (!allowed) {
-      const err = new Error('لا يمكنك إضافة هذا المخدوم إلى هذا الفريق');
+      const err = new Error('لا يمكنك إضافة هذا المشارك إلى هذا الفريق');
       err.status = 403;
       throw err;
     }
@@ -152,7 +152,7 @@ async function removeStudentsFromOtherUnlockedTeams(teacher, activityId, current
   });
 
   if (lockedConflict) {
-    const err = new Error('يوجد مخدوم داخل فريق مقفول بالفعل');
+    const err = new Error('يوجد مشارك داخل فريق مقفول بالفعل');
     err.status = 409;
     throw err;
   }
@@ -197,7 +197,7 @@ router.get('/eligible-students', requireTeacher, async (req, res) => {
     res.json(students);
   } catch (err) {
     console.error('Eligible team students error:', err);
-    res.status(500).json({ error: 'فشل تحميل المخدومين المتاحين للفريق' });
+    res.status(500).json({ error: 'فشل تحميل المشاركين المتاحين للفريق' });
   }
 });
 
@@ -362,7 +362,7 @@ router.post('/', requireTeacher, requireRegistrationOpen, async (req, res) => {
     }
 
     if (!Array.isArray(studentIds)) {
-      return res.status(400).json({ error: 'قائمة المخدومين غير صحيحة' });
+      return res.status(400).json({ error: 'قائمة المشاركين غير صحيحة' });
     }
 
     const activity = await Activity.findById(activityId);
@@ -400,7 +400,7 @@ router.put('/:id/students', requireTeacher, requireRegistrationOpen, async (req,
     const { studentIds } = req.body;
 
     if (!Array.isArray(studentIds)) {
-      return res.status(400).json({ error: 'قائمة المخدومين غير صحيحة' });
+      return res.status(400).json({ error: 'قائمة المشاركين غير صحيحة' });
     }
 
     const team = await Team.findById(req.params.id);
